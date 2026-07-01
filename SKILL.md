@@ -18,13 +18,14 @@ description: >-
 ## TL;DR (30 seconds)
 
 ```
-1. READ the project first            → Phase 0
-2. EXPAND the question (10 angles)    → Phase 1
-3. SEARCH with quality filters        → Phase 2
-4. EXTRACT patterns from ≥2 refs      → Phase 3
-5. DECIDE: reuse, adapt, or learn?    → Phase 4
-6. CHECK 10 boxes before coding       → Phase 5
-7. REPORT findings to user            → Phase 6
+0. UNDERSTAND project identity        → Phase 0 (WHO is this project? WHY does it exist?)
+1. EXPAND the question (10 angles)    → Phase 1 (filter through project identity)
+2. SEARCH with quality filters        → Phase 2 (search for THIS type of project)
+3. EXTRACT patterns from ≥2 refs      → Phase 3
+4. DECIDE: reuse, adapt, or learn?    → Phase 4
+5. CHECK 10 boxes before coding       → Phase 5
+6. REPORT findings to user            → Phase 6
+7. SELF-AUDIT before saying "done"    → Phase 7
 ```
 
 ## Adaptive Depth
@@ -40,11 +41,66 @@ Not every task needs full research. Match depth to situation:
 
 **Default**: if unsure, start medium. If Phase 2 finds nothing useful within 3 searches, ask the user whether to expand or proceed with best-effort.
 
-## Phase 0: Understand the Project
+## Phase 0: Understand the Project Identity
 
-Read: CLAUDE.md, README, ARCHITECTURE.md, core source files, tech stack, code conventions, known issues (TODOs, FIXMEs).
+Don't just read files — understand what this project IS. The project's identity
+determines what "good" looks like for every feature you add.
 
-Output: one-paragraph project map (name, stack, architecture, conventions, problems).
+### 0A. Identity Questions
+
+Answer these before any research. Don't guess — find answers in the codebase:
+
+| Question | Look in |
+|----------|---------|
+| **What problem does this solve?** | README, docs, landing page |
+| **Who uses it? At what scale?** | Config, deployment docs, user guides |
+| **What are the hard constraints?** | Security, performance, compliance, budget |
+| **What makes it different?** | ARCHITECTURE.md, design docs, ADRs |
+| **What's the team's expertise?** | Tech stack choices, code conventions |
+| **What keeps the maintainer up at night?** | Issues, TODOs, error handling patterns |
+
+### 0B. Output: Project Identity Card
+
+```
+Project: [name]
+Problem it solves: [one sentence — the WHY, not the WHAT]
+Users & scale: [who, how many, what context]
+Hard constraints: [security? performance? compliance? cost?]
+Differentiators: [what makes this project unique vs alternatives]
+Tech DNA: [stack + why they chose it]
+Pain points: [what breaks most often? what's the hardest part?]
+```
+
+### 0C. Identity as a Research Lens
+
+The identity card is NOT just documentation. It's a LENS you use in every subsequent phase.
+For every search query, every reference evaluation, every design decision — ask:
+
+> "Given that this project is [identity], does this solution fit?"
+
+**Example: Same feature, different projects → different research**
+
+```
+Feature: "Add caching layer"
+
+Project A: AgentOS (AI agent platform)
+→ Search: "caching LLM responses agent platform"
+→ Search: "context window cache strategy AI agents"
+→ Search: "multi-tenant cache isolation agent systems"
+→ Concern: cache invalidation when agent state changes
+
+Project B: E-commerce (high-concurrency transactions)
+→ Search: "Redis hotkey solution production e-commerce"
+→ Search: "cache-stock consistency pattern"
+→ Search: "flash sale cache warming strategy"
+→ Concern: data consistency during concurrent writes
+```
+
+Same feature. Same tech stack. But the project identity changes WHAT you search for
+and WHICH patterns are relevant.
+
+**Rule: Before every search query, prefix it mentally with "For a [project type] that [solves X]..."**
+
 
 ## Decision Tree
 
@@ -54,9 +110,9 @@ Output: one-paragraph project map (name, stack, architecture, conventions, probl
 └─ New feature, design, unknown? → FULL (all phases)
 ```
 
-## Phase 1: Expand the Problem
+## Phase 1: Expand the Problem (through the identity lens)
 
-The surface question is never the whole problem. "Add X" = "add X correctly, securely, efficiently, maintainably." Expand across these dimensions:
+The surface question is never the whole problem. "Add X" = "add X correctly, securely, efficiently, maintainably." Expand across these dimensions, filtering each through the project identity from Phase 0:
 
 | # | Dimension | Ask |
 |---|-----------|-----|
