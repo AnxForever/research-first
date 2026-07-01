@@ -70,23 +70,112 @@ Map the project's need to specific search queries:
 
 Be specific: include the language, framework, and domain in every query.
 
-## Phase 2: Multi-Source Search
+## Phase 2: Multi-Source Search — WITH QUALITY
 
-Search ALL these sources. For FULL research, minimum requirements are marked:
+### 2A. Query Construction
 
-| Priority | Source | Method | Required? |
-|----------|--------|--------|-----------|
-| 1 | **Official docs** | WebSearch `{tech} official docs {topic}`, context7 MCP | YES |
-| 2 | **Reference implementations** | WebSearch `github {topic} production` | YES — ≥ 2 repos |
-| 3 | **Specs & standards** | RFCs, protocol specs, agentskills.io, framework docs | If exists |
-| 4 | **Source code** | Read actual files in reference repos. NOT just README. | YES — ≥ 2 core files |
-| 5 | **Tests** | Read test files in reference repos. They document edge cases. | Recommended |
-| 6 | **Issues & discussions** | GitHub issues, official forums | Optional |
+Bad queries find bad references. Good queries use specific qualifiers.
 
-**Rules**:
-- Never cite a blog post as primary evidence. Blog posts skip error handling.
-- If a standard exists (agentskills.io, RFC, OWASP), read it.
-- For any reference repo you find: clone it or read at least 2 source files + 1 test file.
+**GitHub search qualifiers:**
+```
+stars:>1000                    — community validation
+pushed:>2024-01-01             — actively maintained (not dead)
+language:python                — exact tech match
+license:mit                    — legally reusable
+in:readme "production"         — self-described production quality
+org:organization-name          — scope to trusted orgs
+path:src/                      — exclude test/vendor noise
+topic:web-framework            — GitHub topics
+```
+
+**Composite query template:**
+```
+{keyword} language:{lang} stars:>{min_stars} pushed:>{recent_date} license:{compatible_license}
+```
+
+**Query variations (always run at least 3):**
+1. By problem: `"{problem description}" language:{lang}`
+2. By solution: `"{solution pattern} example" language:{lang} path:src/`
+3. By domain: `topic:{domain} language:{lang} stars:>500`
+
+**Plain WebSearch queries:**
+```
+"{tech stack} {feature} production implementation github 2025"
+"{tech stack} {problem} best practice pattern"
+"{tech stack} {component} architecture reference"
+site:github.com "{tech} {pattern}"
+```
+
+### 2B. Source Prioritization
+
+Not all sources are equal. Follow this priority order:
+
+| Priority | Source | How to access |
+|----------|--------|---------------|
+| 1 | **Official docs** | context7 MCP (FIRST), or `{tech} official docs {topic}` |
+| 2 | **Specs & standards** | RFCs, agentskills.io, OWASP, framework protocol docs |
+| 3 | **Reference source code** | Read actual .ts/.py/.go/.rs files in repos |
+| 4 | **Reference tests** | Test files reveal edge cases and actual usage |
+| 5 | **GitHub issues** | Known bugs, design discussions, PR reviews |
+| 6 | **Stack Overflow** | Only accepted answers with high votes, verify recency |
+| 7 | **Blog posts** | LAST resort — cross-reference with official docs |
+
+**HARD RULES:**
+- NEVER cite a blog post as primary evidence. Always trace back to source code.
+- For any repo found: read at least 2 source files + 1 test file. Not just README.
+- If a standard/spec exists, read it BEFORE looking at implementations.
+
+### 2C. Quality Signals — Evaluate BEFORE Deep-Diving
+
+Before spending time reading a repo, score it on these signals:
+
+| Signal | Good | Warning | Dealbreaker |
+|--------|------|---------|-------------|
+| Last commit | < 1 month | 1-6 months | > 1 year |
+| Stars | > 500 | 50-500 | < 50 (unless niche) |
+| License | MIT/Apache/BSD | GPL | None |
+| Test directory | `test/` or `__tests__/` exists | Tests in same files | No tests |
+| Contributing guide | CONTRIBUTING.md exists | Brief section in README | None |
+| Release/tags | Git tags or releases | Only main branch | No versioning |
+| Issue response | Issues get replies | Some open, some closed | All open, no replies |
+
+**Quick quality check (2 minutes before committing to deep read):**
+1. Open the repo → check last commit date and license
+2. Skim the test directory → are there actual tests?
+3. Read one core source file → is it well-structured and documented?
+4. Check 3 recent closed issues → how does the maintainer respond?
+
+**Passes all 4 checks → worth deep reading. Fails any → deprioritize.**
+
+### 2D. Multi-Angle Coverage Verification
+
+After initial search, verify you haven't missed important sources by searching from different angles:
+
+| Angle | Query pattern | What it finds |
+|-------|--------------|---------------|
+| **By problem** | `"{problem}" language:{lang}` | Direct solutions |
+| **By technology** | `"{library/framework}" example` | Official/community examples |
+| **By pattern** | `"{design pattern}" implementation {lang}` | Architectural references |
+| **By author** | `org:{known-org}` or author's repos | Authority implementations |
+| **By dependency** | repos that depend on the target library | Integration patterns |
+| **By awesome-list** | `awesome-{topic}` repos | Curated collections |
+
+**Coverage check**: After searching, ask yourself:
+- "Did I find repos from different organizations/authors?" (not all from same person)
+- "Did I find both small focused libs AND large framework examples?"
+- "Did I find at least one repo that's clearly used in production?"
+
+### 2E. Search Anti-Patterns
+
+| Anti-Pattern | Why it fails | Fix |
+|-------------|-------------|-----|
+| Stopping after first result | Confirmation bias | Minimum 2 independent sources |
+| Searching only by keyword | Misses alternative approaches | Use multi-angle search (2D) |
+| Not filtering by date | Finds dead/outdated projects | Always add `pushed:>YYYY-MM-DD` |
+| Ignoring license | Can't legally reuse code | Check license BEFORE deep reading |
+| Using only GitHub search | Misses official docs, specs, papers | Start with docs, end with repos |
+| Vague queries | Returns noise, not signal | Include language + domain + quality qualifiers |
+| Copying code without reading tests | Misses edge cases and correct usage | Read tests before copying API calls |
 
 ## Phase 3: Learn the COMPLETE Pattern
 
