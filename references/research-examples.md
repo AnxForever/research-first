@@ -1,45 +1,54 @@
 # Research-First Examples
 
-## Example 1: Building an MCP Client
+## Example 1: Adding an MCP Client
 
-**Task**: "Add MCP client to AgentOS"
+**Task**: "Add MCP support to my agent platform"
 
-**Wrong approach**: Write JSON-RPC from scratch based on blog post.
-
-**Correct approach**:
-1. Read OpenCode source: `reference/opencode/packages/opencode/src/mcp/index.ts` (1013 lines)
-2. Read OpenCode catalog: `reference/opencode/packages/opencode/src/mcp/catalog.ts`
-3. Read OpenCode auth: `reference/opencode/packages/opencode/src/mcp/auth.ts`
-4. Read OpenCode lifecycle tests: `reference/opencode/packages/opencode/test/mcp/lifecycle.test.ts`
-5. Extract COMPLETE pattern: 3 transports (stdio/StreamableHTTP/SSE), 5 connection states, OAuth PKCE flow, process tree cleanup, tool cache invalidation
-
-**Result**: Found 30+ gaps between naive implementation and production reference.
-
-## Example 2: Building a Skill System
-
-**Task**: "Add skill auto-loading to AgentOS"
-
-**Wrong approach**: Hardcode a skill-to-task mapping table in system prompt.
+**Wrong approach**: Implement JSON-RPC 2.0 from scratch based on a blog tutorial. Result: works for stdio, but misses SSE streaming, OAuth, health monitoring, and process lifecycle management.
 
 **Correct approach**:
-1. Read OpenCode skill discovery: `reference/opencode/packages/opencode/src/skill/index.ts`
-2. Read OpenCode skill tool: `reference/opencode/packages/opencode/src/tool/skill.ts`
-3. Read OpenCode system prompt: `reference/opencode/packages/opencode/src/session/system.ts`
-4. Read OpenCode skill schema: `reference/opencode/packages/schema/src/skill.ts`
-5. Extract COMPLETE pattern: metadata-only in system prompt, XML registry format, on-demand loading via skill tool, file listing in tool output, multi-source discovery
+1. Search `github MCP client production implementation` → find OpenCode
+2. Read core files: `mcp/index.ts` (connection lifecycle), `mcp/catalog.ts` (tool bridging), `mcp/auth.ts` (OAuth)
+3. Read lifecycle tests: `test/mcp/lifecycle.test.ts`
+4. Extract COMPLETE pattern: 3 transports (stdio/StreamableHTTP/SSE), 5 connection states, OAuth PKCE flow, process tree cleanup, tool cache invalidation
+5. Output findings: "Found 25+ gaps between naive implementation and reference. Key: use official SDK, not manual JSON-RPC."
 
-**Result**: Found that injecting full skill content into system prompt wastes context; metadata + tool call is the correct pattern.
+**Result**: The implementation handles connection failures, orphaned processes, tool collisions, and OAuth — all things the blog tutorial never mentioned.
 
-## Example 3: Building a Scheduler
+## Example 2: Adding a Skill System
 
-**Task**: "Add scheduled tasks to AgentOS"
+**Task**: "Add skill auto-loading to my agent"
 
-**Wrong approach**: Write a while-loop with asyncio.sleep().
+**Wrong approach**: Dump all skill content into the system prompt. Result: wastes context window on unused skills, skills compete for attention.
 
 **Correct approach**:
-1. Search "FastAPI APScheduler 2025 best practices" → found 6 articles
-2. Search "github FastAPI boilerplate scheduler 2025" → found sodipto/fastapi-starter-boilerplate
-3. Read APScheduler 4.x official docs → lifespan pattern, AsyncIOScheduler
-4. Extract COMPLETE pattern: lifespan management, SQLite jobstore, explicit timezone, misfire_grace_time, multi-worker dedup
+1. Search `github agent skill system implementation` → find OpenCode skill module
+2. Read: `skill/index.ts` (discovery), `tool/skill.ts` (loading), `session/system.ts` (prompt integration)
+3. Extract pattern: metadata-only in prompt (name+description), XML format for structured parsing, on-demand loading via tool call, file listing in tool output
+4. Output findings: "Key insight — skills are discovered at startup but CONTENT is only loaded when LLM calls the skill tool."
 
-**Result**: Avoided the deprecated `on_event` pattern and the pickle issue with SQLAlchemyJobStore.
+**Result**: The skill system saves 80%+ of context vs dumping everything, and LLM gets richer tool output with file listings.
+
+## Example 3: Adding a Scheduler
+
+**Task**: "Add scheduled/cron tasks to my FastAPI app"
+
+**Wrong approach**: Write a while-loop with `asyncio.sleep()`. Result: no persistence, no cron syntax, breaks with multiple workers.
+
+**Correct approach**:
+1. Search `FastAPI APScheduler 2025 best practices` → 6 articles + GitHub repos
+2. Find reference: production FastAPI boilerplate with scheduler module
+3. Read APScheduler 4.x official docs: lifespan pattern, AsyncIOScheduler, job stores
+4. Extract pattern: FastAPI lifespan management, SQLite jobstore for persistence, explicit timezone, misfire_grace_time, multi-worker deduplication
+5. Output findings: "Avoid deprecated on_event. MemoryJobStore avoids pickle issues with closures. Must handle multi-worker duplicate execution."
+
+**Result**: The scheduler handles restarts (persisted jobs), cron expressions, and won't silently skip missed runs.
+
+## Key Lesson
+
+Every example follows the same pattern:
+1. **Search broadly** (docs + repos + issues) BEFORE writing code
+2. **Read source code** of the reference, not just README
+3. **Extract the COMPLETE pattern** — lifecycle + errors + edge cases
+4. **Compare against initial assumptions** — find what you would have missed
+5. **Output findings** before implementing
