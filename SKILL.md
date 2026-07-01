@@ -155,6 +155,8 @@ and WHICH patterns are relevant.
 
 **Rule: Before every search query, prefix it mentally with "For a [project type] that [solves X]..."**
 
+→ Template: [assets/project-identity-card.md](assets/project-identity-card.md) — fill this out once per project
+
 
 ## Decision Tree
 
@@ -280,6 +282,9 @@ All boxes before any code:
 ```
 
 Then ask: **"Proceed with implementation?"**
+
+→ **Template**: [assets/research-report-template.md](assets/research-report-template.md)
+→ **Real examples**: [references/case-studies.md](references/case-studies.md) — 3 cases with before/after
 
 ## Phase 7: Self-Audit (BEFORE reporting done)
 
