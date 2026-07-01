@@ -1,0 +1,13 @@
+# Packaging
+*.skill
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+dist/
+*.skill
