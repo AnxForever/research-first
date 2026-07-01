@@ -1,14 +1,14 @@
 ---
 name: research-first
 description: >-
-  Research before coding. When the user is about to DESIGN or WRITE code for a
-  non-trivial task, systematically search for existing solutions in official docs,
-  open source repos, and reference implementations. Learn complete patterns (lifecycle,
-  error handling, edge cases) from at least 2 independent sources before implementing.
-  Triggers on: feature requests ("add X", "implement X"), system design, tech selection,
-  non-trivial bug fixes, optimization, refactoring, integration tasks, and "how to
-  implement X" questions. Does NOT trigger on: running tests, viewing output, git
-  operations, explaining code, starting servers, one-line fixes, or config changes.
+  Research before coding. Whenever the user wants to build, improve, fix, or design
+  something in the codebase — any task that involves writing or modifying code beyond
+  a trivial change — systematically search for how others already solved it. Find
+  production references, read their source code, learn the complete pattern, and
+  decide whether to reuse or adapt before implementing. Does NOT trigger for: running
+  tests, viewing files, git operations, explaining code, one-line fixes, or operational
+  commands (start/stop/restart). The key question: is the user about to write or
+  design code for something they haven't built before?
 ---
 
 # Research-First Engineering
