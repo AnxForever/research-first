@@ -1,13 +1,14 @@
 ---
 name: research-first
 description: >-
-  Before modifying any project, find how others already solved it. Understand the
-  project first, expand surface questions into the full problem space, search with
-  quality-weighted queries, extract complete patterns from at least 2 independent
-  production references, evaluate whether to reuse or adapt, and output structured
-  findings before writing code. Adapts depth to time pressure and project risk.
-  Use for feature requests, bug fixes, architecture design, tech selection,
-  optimization, or any non-trivial code change. Skip for one-line fixes and typos.
+  Research before coding. When the user is about to DESIGN or WRITE code for a
+  non-trivial task, systematically search for existing solutions in official docs,
+  open source repos, and reference implementations. Learn complete patterns (lifecycle,
+  error handling, edge cases) from at least 2 independent sources before implementing.
+  Triggers on: feature requests ("add X", "implement X"), system design, tech selection,
+  non-trivial bug fixes, optimization, refactoring, integration tasks, and "how to
+  implement X" questions. Does NOT trigger on: running tests, viewing output, git
+  operations, explaining code, starting servers, one-line fixes, or config changes.
 ---
 
 # Research-First Engineering
