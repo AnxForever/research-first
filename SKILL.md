@@ -2,13 +2,14 @@
 name: research-first
 description: >-
   Research before coding. Whenever the user wants to build, improve, fix, or design
-  something in the codebase — any task that involves writing or modifying code beyond
-  a trivial change — systematically search for how others already solved it. Find
-  production references, read their source code, learn the complete pattern, and
-  decide whether to reuse or adapt before implementing. Does NOT trigger for: running
-  tests, viewing files, git operations, explaining code, one-line fixes, or operational
-  commands (start/stop/restart). The key question: is the user about to write or
-  design code for something they haven't built before?
+  something — backend architecture, frontend UI, or full-stack features — systematically
+  search for how others already solved it. For backend: find production references,
+  read source code, learn complete patterns. For frontend: study how ChatGPT/Claude
+  and major products design similar interfaces, find open-source components to reuse,
+  extract layout/component/interaction patterns. For both: decide reuse vs adapt vs
+  learn-from before implementing. Does NOT trigger for: running tests, viewing files,
+  git operations, explaining code, one-line fixes, or operational commands. The key
+  question: is the user about to write or design something they haven't built before?
 ---
 
 # Research-First Engineering
@@ -18,15 +19,63 @@ description: >-
 ## TL;DR (30 seconds)
 
 ```
-0. UNDERSTAND project identity        → Phase 0 (WHO is this project? WHY does it exist?)
-1. EXPAND the question (10 angles)    → Phase 1 (filter through project identity)
-2. SEARCH with quality filters        → Phase 2 (search for THIS type of project)
+0. UNDERSTAND project identity        → Phase 0 (WHO? WHY?)
+1. EXPAND the question (10 angles)    → Phase 1 (through identity lens)
+2. SEARCH — backend: source code,     → Phase 2 (2A-2E)
+   frontend: big players, components, → Phase 2F (design research)
+   design systems, open source reuse
 3. EXTRACT patterns from ≥2 refs      → Phase 3
 4. DECIDE: reuse, adapt, or learn?    → Phase 4
-5. CHECK 10 boxes before coding       → Phase 5
+5. CHECK 11 boxes before coding       → Phase 5
 6. REPORT findings to user            → Phase 6
 7. SELF-AUDIT before saying "done"    → Phase 7
 ```
+
+## Frontend/Design Research (Phase 2b)
+
+When the task involves UI design, frontend components, or visual layout, add
+this sub-phase after Phase 2 (Search). Design is NOT purely aesthetic — it
+directly impacts usability, trust, and conversion.
+
+### 2b.1 Research "Who Already Solved This UI Problem"
+
+For ANY frontend task, search these dimensions in parallel:
+
+| Dimension | Search For | Example Queries |
+|-----------|-----------|----------------|
+| **Big players** | How do ChatGPT/Claude/Gemini design this? | "ChatGPT chat interface layout components 2025" |
+| **Design systems** | Existing style guides, component libraries | "Ant Design chat component", "shadcn/ui chat bubble" |
+| **Competitors** | How do similar products solve this? | "open source AI data analysis platform UI" |
+| **Design trends** | What's the 2025 standard for this pattern? | "AI chat interface design patterns 2025 best practices" |
+| **Open source** | Can we reuse existing components? | "React chat UI component MIT license" |
+
+### 2b.2 Extract Design Patterns
+
+From ≥2 references, extract:
+
+- **Layout**: sidebar + main + input? Full-screen chat? Dashboard widgets?
+- **Component hierarchy**: what components are used, how are they nested?
+- **Interaction patterns**: streaming, drag-drop, keyboard shortcuts, mobile
+- **Visual language**: colors, typography, spacing, shadows, rounded corners
+- **States**: loading, empty, error, success — how does each look?
+
+### 2b.3 Frontend-Specific Decision Framework
+
+| If... | Then... |
+|-------|---------|
+| Major AI products all use the same pattern | **Adopt it.** Users expect familiarity (Jakob's Law) |
+| Open source component exists (MIT/Apache) | **Reuse or adapt.** Don't rebuild chat bubbles from scratch |
+| Pattern is unique to one product | **Evaluate.** Is it core to their brand or a UX innovation? |
+| No clear standard exists | **Simplify.** Default to minimal, add complexity only when needed |
+
+### 2b.4 Anti-Patterns (Frontend)
+
+- ❌ Designing UI without first checking how ChatGPT/Claude do it
+- ❌ Building custom chat bubbles when shadcn/ui has them
+- ❌ Ignoring the "left sidebar + chat + bottom input" standard layout
+- ❌ Skipping mobile/tablet layout planning
+- ❌ No empty/loading/error state design before coding
+- ❌ Dark mode as afterthought — it's expected in 2025
 
 ## Adaptive Depth
 
@@ -141,6 +190,36 @@ Search ≥3 sources. Priority: official docs → specs → source code → tests
 → Full query construction, quality signals matrix, multi-angle coverage, and anti-patterns: [search-quality.md](references/search-quality.md)
 
 **If search finds nothing**: after 3 varied queries with no good results, report to user: "No production references found for [topic]. Options: (1) broaden search, (2) proceed with best-effort from first principles, (3) reconsider approach." Do not silently proceed.
+
+### 2F. Frontend/Design Research (when task involves UI)
+
+When the task involves UI design, frontend components, or visual layout, add this sub-phase. Design is NOT purely aesthetic — it directly impacts usability, trust, and conversion.
+
+**Research "Who Already Solved This UI Problem"** — search these 5 angles in parallel:
+
+| Angle | What to Search | Example Queries |
+|-------|---------------|-----------------|
+| **Big players** | How do ChatGPT/Claude/Gemini design this? | "ChatGPT chat interface layout", "Claude Code dashboard design" |
+| **Design systems** | Existing component libraries, style guides | "shadcn/ui chat component", "Ant Design pro layout" |
+| **Competitors** | How do similar products solve this? | "open source AI agent platform UI github" |
+| **Design trends** | What's the 2025 standard for this pattern? | "AI chat interface design patterns 2025" |
+| **Open source reuse** | Can we reuse existing components? | "React chat UI component MIT license github" |
+
+**Extract Design Patterns** — from ≥2 references, extract:
+
+- **Layout**: sidebar + main + input? Full-screen? Dashboard grid? Multi-column?
+- **Component hierarchy**: what components are used, how are they nested?
+- **Interaction patterns**: streaming text? drag-drop? keyboard shortcuts? mobile gestures?
+- **Visual language**: colors, typography, spacing, shadows, rounded corners, icons
+- **States**: loading skeleton, empty state, error state, success — how does each look?
+
+**Rules for frontend research:**
+- If ≥2 major AI products use the same pattern → adopt it (Jakob's Law: users prefer familiarity)
+- If an open-source component exists with compatible license → reuse or adapt it
+- If no clear standard exists → default to minimal/simple, add complexity only when needed
+- Never design custom chat bubbles from scratch when shadcn/ui or Ant Design has them
+- Always check mobile/tablet layout before finalizing desktop design
+- Dark mode is not optional in 2025 — plan for it from the start
 
 ## Phase 3: Extract Complete Patterns
 
