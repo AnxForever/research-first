@@ -1,20 +1,24 @@
 ---
 name: research-first
 description: >-
-  Research before coding. Whenever the user wants to build, improve, fix, or design
-  something — backend architecture, frontend UI, or full-stack features — systematically
-  search for how others already solved it. For backend: find production references,
-  read source code, learn complete patterns. For frontend: study how ChatGPT/Claude
-  and major products design similar interfaces, find open-source components to reuse,
-  extract layout/component/interaction patterns. For both: decide reuse vs adapt vs
-  learn-from before implementing. Does NOT trigger for: running tests, viewing files,
-  git operations, explaining code, one-line fixes, or operational commands. The key
-  question: is the user about to write or design something they haven't built before?
+  Research before doing. Whenever the user wants to create, build, write, design, plan,
+  decide, or solve something — code, documents, presentations, workflows, strategies,
+  anything — systematically search for how others already did it better. Find what the
+  best practitioners do, study their methods, extract reusable patterns, and adapt them.
+  Applies to: writing (docs, emails, proposals), designing (UI, workflows, systems),
+  building (features, products, tools), planning (projects, roadmaps, architecture),
+  deciding (tech choices, strategies, tradeoffs). Does NOT trigger for: simple lookups,
+  running commands, viewing files, one-line fixes, or conversational chat. The key
+  question: is the user trying to PRODUCE something that could benefit from knowing
+  how others already did it?
 ---
 
-# Research-First Engineering
+# Research-First
 
-**Don't write code until you've found how others already solved it.**
+**Before you create anything, find how others already did it better.**
+
+This skill applies to ANY task — writing, designing, building, planning, deciding.
+The methodology is the same; only the sources change.
 
 ## TL;DR (30 seconds)
 
@@ -81,12 +85,13 @@ From ≥2 references, extract:
 
 Not every task needs full research. Match depth to situation:
 
-| Scenario | Time | Depth | Skip Phases |
-|----------|------|-------|-------------|
-| Hotfix / 5min | < 5 min | Quick search, one ref | 1, 3-5 |
-| Feature / 30min | 15-30 min | Two refs, key dimensions | — |
-| Architecture / 2hr | 1-2 hours | Full 10-dimension, ≥3 refs | — |
-| Unknown domain | +30 min extra | Add exploratory search first | — |
+| Scenario | Time | Depth | Approach |
+|----------|------|-------|----------|
+| Quick task (fix, tweak, short doc) | < 5 min | Quick search, one ref | Phase 2 only |
+| Standard task (feature, doc, design) | 15-30 min | Two refs, key dimensions | Full phases |
+| Major work (architecture, strategy) | 1-2 hours | Full 10-dimension, ≥3 refs | All phases + deep dive |
+| Creative work (writing, design, planning) | +15 min extra | Phase 2F — study best examples first | Add creative research |
+| Unknown domain | +30 min extra | Exploratory search first | Add before Phase 1 |
 
 **Default**: if unsure, start medium. If Phase 2 finds nothing useful within 3 searches, ask the user whether to expand or proceed with best-effort.
 
@@ -191,35 +196,35 @@ Search ≥3 sources. Priority: official docs → specs → source code → tests
 
 **If search finds nothing**: after 3 varied queries with no good results, report to user: "No production references found for [topic]. Options: (1) broaden search, (2) proceed with best-effort from first principles, (3) reconsider approach." Do not silently proceed.
 
-### 2F. Frontend/Design Research (when task involves UI)
+### 2F. Creative/Design Research (when task involves creating, not just coding)
 
-When the task involves UI design, frontend components, or visual layout, add this sub-phase. Design is NOT purely aesthetic — it directly impacts usability, trust, and conversion.
+When the task involves writing, designing, planning, or any creative output — not just code —
+add this sub-phase. The best creators study the best work before making their own.
 
-**Research "Who Already Solved This UI Problem"** — search these 5 angles in parallel:
+**Research "Who Already Did This Well"** — search these angles in parallel:
 
-| Angle | What to Search | Example Queries |
-|-------|---------------|-----------------|
-| **Big players** | How do ChatGPT/Claude/Gemini design this? | "ChatGPT chat interface layout", "Claude Code dashboard design" |
-| **Design systems** | Existing component libraries, style guides | "shadcn/ui chat component", "Ant Design pro layout" |
-| **Competitors** | How do similar products solve this? | "open source AI agent platform UI github" |
-| **Design trends** | What's the 2025 standard for this pattern? | "AI chat interface design patterns 2025" |
-| **Open source reuse** | Can we reuse existing components? | "React chat UI component MIT license github" |
+| Angle | What to Search | Example |
+|-------|---------------|---------|
+| **Best examples** | Who does this best? Study them. | "best developer documentation examples", "award-winning presentation design" |
+| **Templates & frameworks** | Existing templates, structures, formats | "technical documentation template", "project plan framework" |
+| **Style guides** | Established conventions and standards | "Google developer documentation style guide", "Apple HIG" |
+| **Comparable work** | How do similar products/projects do this? | "open source project README examples", "startup pitch deck examples" |
+| **Reusable assets** | Can we start from something existing? | "MIT licensed presentation template", "open source documentation theme" |
 
-**Extract Design Patterns** — from ≥2 references, extract:
+**Extract Patterns** — from ≥2 examples, extract:
 
-- **Layout**: sidebar + main + input? Full-screen? Dashboard grid? Multi-column?
-- **Component hierarchy**: what components are used, how are they nested?
-- **Interaction patterns**: streaming text? drag-drop? keyboard shortcuts? mobile gestures?
-- **Visual language**: colors, typography, spacing, shadows, rounded corners, icons
-- **States**: loading skeleton, empty state, error state, success — how does each look?
+- **Structure**: How is it organized? What's the information hierarchy?
+- **Format**: What format works best? (markdown? slides? interactive? video?)
+- **Tone & voice**: Formal? Casual? Technical? Accessible?
+- **Visual approach**: Minimal? Rich? Data-heavy? Illustration-driven?
+- **What makes the best examples stand out**: The ONE thing that elevates them
 
-**Rules for frontend research:**
-- If ≥2 major AI products use the same pattern → adopt it (Jakob's Law: users prefer familiarity)
-- If an open-source component exists with compatible license → reuse or adapt it
-- If no clear standard exists → default to minimal/simple, add complexity only when needed
-- Never design custom chat bubbles from scratch when shadcn/ui or Ant Design has them
-- Always check mobile/tablet layout before finalizing desktop design
-- Dark mode is not optional in 2025 — plan for it from the start
+**Rules for creative research:**
+- If a widely-adopted standard exists (e.g., Google style guide for docs) → follow it
+- If an open-source template exists with compatible license → start from it
+- If no standard exists → study 3 best examples and synthesize
+- Never write from scratch when templates exist
+- The best work always steals from the best — be deliberate about it
 
 ## Phase 3: Extract Complete Patterns
 
