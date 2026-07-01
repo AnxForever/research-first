@@ -1,151 +1,214 @@
 ---
 name: research-first
 description: >-
-  Research-first engineering. Before designing features or solving problems,
-  systematically search for existing solutions in official docs, open source repos,
-  and reference implementations. Learn the COMPLETE pattern (lifecycle, error handling,
-  edge cases) by reading source code, not just blog posts. Output structured research
-  summaries before writing code. Use when the user proposes new features, system
-  design, technology selection, or any non-trivial implementation task. Triggers on
-  feature requests, architecture questions, tech selection, how-to questions, and
-  problem solving. Skip for trivial fixes (typos, config values, one-line changes).
+  Universal project improvement skill. Before modifying any project, first understand
+  its features, architecture, and problems by reading its docs and source code. Then
+  proactively search for existing solutions — official documentation, open source
+  implementations, reference architectures — and reuse proven code instead of writing
+  from scratch. Learn the COMPLETE pattern (lifecycle, error handling, edge cases, security)
+  from at least 2 independent references before implementing. Use when the user asks to
+  add features, fix problems, optimize, refactor, or improve any project. Triggers on
+  feature requests, bug reports, architecture questions, performance issues, and any
+  non-trivial code change.
 ---
 
-# Research-First Engineering
+# Research-First Project Improvement
 
 ## Core Principle
 
-**Before writing code, exhaust existing knowledge.**
+**Don't write code until you've found how others already solved it.**
 
-Every non-trivial task has been solved before. The biggest mistake is building from
-mental models instead of reading reference implementations.
+Every project problem has been solved before — in official docs, open source repos,
+or production systems. The cost of reading references is always lower than the cost
+of rewriting bad code.
 
-## Decision Tree: Should I Research?
+This skill works on ANY project: read the project first, then search the world for
+answers, then implement based on proven patterns.
+
+## Phase 0: Understand the Project
+
+Before researching solutions, understand what you're working with:
+
+1. **Read project identity files**: CLAUDE.md, README.md, CONTRIBUTING.md, ARCHITECTURE.md
+2. **Read key docs**: Look for `docs/` directory, design documents, API specs
+3. **Scan core source files**: Identify the main modules, entry points, and critical paths
+4. **Identify the tech stack**: Language, framework, database, key dependencies
+5. **Note existing patterns**: Code style, naming conventions, error handling patterns, test style
+6. **Find known problems**: Check TODO comments, FIXME markers, issue trackers, recent commits
+
+Output a brief project map:
+```
+Project: [name]
+Stack: [language, framework, database, key deps]
+Architecture: [monolith/microservices/etc., key modules]
+Existing patterns: [code style, error handling, testing]
+Problems to solve: [what user asked + what you found]
+```
+
+## Decision Tree: How Deep to Research?
 
 ```
 Is the task...
-├─ A one-line fix, typo, or config value change? → SKIP
-├─ A well-known pattern I've done many times? → LIGHT (Phase 2 only)
-└─ A new feature, design, tech choice, or unknown domain? → FULL (all phases)
+├─ A one-line fix, typo, config value? → SKIP research, just do it
+├─ A well-known pattern in the project's stack? → LIGHT (Phase 2 only)
+└─ New feature, design, optimization, or unknown domain? → FULL (all phases)
 ```
 
 If in doubt, do full research.
 
-## Research Workflow
+## Phase 1: Define What to Search For
 
-### Phase 1: Define the Question
+Map the project's need to specific search queries:
 
-1. **What are we building?** — one sentence
-2. **What's the hard part?** — the unknown or risky parts
-3. **What would "done" look like?** — concrete success criteria
+| Project need | Search queries |
+|-------------|---------------|
+| "Add X feature" | `"{tech stack} {feature} production implementation github"` |
+| "Fix Y problem" | `"{tech stack} {problem} best practice solution"` |
+| "Optimize Z" | `"{tech stack} {component} performance optimization pattern"` |
+| "Design architecture" | `"{domain} system design architecture reference"` |
+| "Add integration" | `"{service} official docs integration guide"` |
 
-### Phase 2: Multi-Source Search
+Be specific: include the language, framework, and domain in every query.
 
-Search ALL sources. Minimum 3 different sources for FULL research:
+## Phase 2: Multi-Source Search
 
-| Priority | Source | Method | Required for FULL? |
-|----------|--------|--------|--------------------|
+Search ALL these sources. For FULL research, minimum requirements are marked:
+
+| Priority | Source | Method | Required? |
+|----------|--------|--------|-----------|
 | 1 | **Official docs** | WebSearch `{tech} official docs {topic}`, context7 MCP | YES |
-| 2 | **Reference implementations** | WebSearch `github {topic} production` | YES — at least 2 |
-| 3 | **Specs & standards** | agentskills.io, RFCs, protocol specs | If exists |
-| 4 | **Source code** | Read actual repo files (NOT README, NOT blog) | YES — at least 2 core files |
-| 5 | **Community** | GitHub issues, official forums | Optional |
+| 2 | **Reference implementations** | WebSearch `github {topic} production` | YES — ≥ 2 repos |
+| 3 | **Specs & standards** | RFCs, protocol specs, agentskills.io, framework docs | If exists |
+| 4 | **Source code** | Read actual files in reference repos. NOT just README. | YES — ≥ 2 core files |
+| 5 | **Tests** | Read test files in reference repos. They document edge cases. | Recommended |
+| 6 | **Issues & discussions** | GitHub issues, official forums | Optional |
 
 **Rules**:
-- NEVER cite a blog post as primary evidence
-- For FULL research: at least 2 independent implementations, at least 2 source files read
-- If you can't find 2 references, say so explicitly — don't pretend one tutorial is enough
+- Never cite a blog post as primary evidence. Blog posts skip error handling.
+- If a standard exists (agentskills.io, RFC, OWASP), read it.
+- For any reference repo you find: clone it or read at least 2 source files + 1 test file.
 
-### Phase 3: Learn the COMPLETE Pattern
+## Phase 3: Learn the COMPLETE Pattern
 
-For each reference, extract ALL of these. If you can't fill in every item, you haven't gone deep enough:
+For each reference implementation, extract ALL dimensions. If you can't fill every field,
+you haven't gone deep enough — find another reference or read more source code:
 
-1. **Data model** — What structures/schemas/fields exist?
-2. **Lifecycle** — What happens at startup → runtime → shutdown?
-3. **Error handling** — What errors are caught? Retry strategy? Circuit breaker?
-4. **Edge cases** — Empty input? Null? Race conditions? Timeouts? Large data?
-5. **Configuration** — What's configurable vs hardcoded?
-6. **Tests** — What test patterns? What edge cases do tests cover?
-7. **Security** — What threats does it defend against? What attacks is it vulnerable to?
-8. **What I would have missed** — The single most surprising finding from this reference
+1. **Data model** — Structures, schemas, fields, relationships
+2. **Lifecycle** — startup → runtime → shutdown for EVERY component
+3. **Error handling** — What errors are caught? Retry? Backoff? Circuit breaker? Graceful degradation?
+4. **Edge cases** — Empty/null/missing data, race conditions, timeouts, large inputs, concurrent access
+5. **Configuration** — What's configurable vs hardcoded? Environment-specific behavior?
+6. **Tests** — What patterns? What edge cases do tests cover? What do they NOT test?
+7. **Security** — What threats? Input validation? AuthN/AuthZ? Data sanitization? Injection prevention?
+8. **Integration** — How does it connect to other systems? What are the failure modes?
+9. **Performance** — Bottlenecks? Caching? Lazy loading? Batching?
+10. **What surprised me** — The ONE finding that contradicted my initial assumption
 
-**DEPTH CHECK — Before moving to Phase 4, ask yourself:**
-> "If the user asked me to explain this system's COMPLETE architecture right now,
-> could I draw the lifecycle diagram, list all error paths, and name 5 edge cases?"
+**SELF-CHECK before Phase 4**:
+> "Can I draw the complete architecture diagram, trace every error path, and name
+> 5 edge cases the reference handles that I would have missed on my own?"
 
-If the answer is NO, you haven't gone deep enough. Go back to Phase 2.
+If NO → go back to Phase 2.
 
-### Phase 4: Judge Readiness
+## Phase 4: Evaluate and Decide
 
-ALL boxes must be checked before writing code:
+For each reference, evaluate whether to REUSE, ADAPT, or LEARN-FROM:
 
-- [ ] Found at least 2 independent production-grade references (NOT tutorials)
-- [ ] Read source code from at least 2 core files in the reference
-- [ ] Read the official documentation for the core API
-- [ ] Identified at least 5 edge cases I would have missed without research
-- [ ] Understand the complete lifecycle (startup → runtime → shutdown)
-- [ ] Know the error handling strategy (what fails, how it recovers)
-- [ ] Can name at least ONE thing the reference does DIFFERENTLY from my initial plan
-- [ ] Found at least ONE security consideration or attack vector
+| Criteria | Reuse | Adapt | Learn-from |
+|----------|-------|-------|-----------|
+| License compatible? | ✓ | ✓ | Any |
+| Same language/framework? | ✓ | Similar | Any |
+| Same scale/requirements? | ✓ | Close | Different |
+| Actively maintained? | ✓ | If stable | Any |
+| Code quality matches project? | ✓ | With cleanup | For patterns only |
 
-**If any box is unchecked → go back to Phase 2. Do NOT start Phase 5.**
+**Decision**: Choose the best reference to follow. Prefer REUSE over ADAPT over LEARN-FROM.
+Document WHY you chose this approach.
 
-### Phase 5: Output Structured Findings
+## Phase 5: Judge Readiness
 
-Use this EXACT template:
+ALL boxes must be checked before writing a single line of code:
+
+- [ ] Read the project's own docs and key source files (Phase 0)
+- [ ] Found at least 2 independent production references (NOT tutorials)
+- [ ] Read source code from at least 2 core files in each reference
+- [ ] Read the official documentation for the core API/library
+- [ ] Identified at least 5 edge cases the references handle
+- [ ] Understand the complete lifecycle (startup → runtime → shutdown → error recovery)
+- [ ] Can name at least ONE surprising finding that changed my approach
+- [ ] Identified at least ONE security consideration
+- [ ] Evaluated whether to reuse, adapt, or learn-from each reference (Phase 4)
+- [ ] The solution fits the project's existing code style and conventions
+
+**HARD GATE: any box unchecked → go back. Do NOT start Phase 6.**
+
+## Phase 6: Output Structured Findings
+
+Use this EXACT template before writing code:
 
 ```
-## Research Summary: [Topic]
+## Research Summary: [Problem Being Solved]
 
-**References (minimum 2):**
-- [Project Name](URL)
-  - Core files read: [list 2+ file paths you actually read]
-  - Key insight: [one sentence]
-- [Project Name](URL)
-  - Core files read: [list 2+ file paths you actually read]
-  - Key insight: [one sentence]
+### Project Context
+[What I learned from Phase 0 about this project's architecture and conventions]
 
-**Complete architecture pattern:**
-1. Data model: [describe]
-2. Lifecycle: [startup → runtime → shutdown]
-3. Error handling: [retry? backoff? circuit breaker?]
-4. Security: [threats + defenses]
+### References Found
+1. **[Project Name](URL)**
+   - Files read: [list 2+ file paths you actually opened]
+   - Key insight: [one sentence]
+   - Reuse/Adapt/Learn-from: [decision + reason]
 
-**Edge cases discovered (minimum 5):**
-1. [Edge case] — how reference handles it
+2. **[Project Name](URL)**
+   - Files read: [list 2+ file paths you actually opened]
+   - Key insight: [one sentence]
+   - Reuse/Adapt/Learn-from: [decision + reason]
+
+### Complete Pattern
+- Data model: [describe]
+- Lifecycle: [startup → runtime → shutdown]
+- Error handling: [strategy]
+- Security: [threats + defenses]
+
+### Edge Cases Discovered (minimum 5)
+1. [Edge case] → reference handles it by [mechanism]
 2. ...
 
-**What I initially got wrong (minimum 1):**
-- [Mental model correction]
+### What I Initially Got Wrong
+- [Mental model correction based on reading source code]
 
-**Implementation approach:**
-[Which reference to follow, what to adapt, what to skip]
+### Implementation Plan
+1. [Step] — following [reference]
+2. [Step] — following [reference]
+3. [Step] — adapted for project conventions
 ```
 
-Then ask: "Based on this research, should I proceed?"
+Then ask: **"Based on this research, proceed with implementation?"**
 
-## Failure Modes — How This Skill Goes Wrong
+## Failure Modes
 
-| Failure | Symptom | Prevention |
-|---------|---------|-----------|
-| Surface-level research | Phase 3 items left blank, no source code read | Phase 4 box 2: "Read source code from at least 2 core files" |
-| One-source bias | Only found one reference | Phase 2 minimum: 2 independent implementations |
-| Skipping official docs | "I'll figure it out from examples" | Phase 2 priority 1: docs BEFORE repos |
-| Premature action | Starting to code before Phase 4 all checked | HARD GATE: any box unchecked → go back |
-| Ignoring security | No security row in Phase 5 template | Phase 3 item 7: security mandatory |
-| User has to call it out | User says "you're still surface-level" | Self-check after Phase 5: re-verify Phase 4 checklist |
+| Failure | Symptom | Prevention (hard gate) |
+|---------|---------|----------------------|
+| Skipping Phase 0 | Solution doesn't match project style | Phase 5 box 1: read project first |
+| Surface research | Can't fill Phase 3 dimensions | Phase 3 self-check question |
+| One-source bias | Only found one reference | Phase 2 minimum: 2 repos |
+| Tutorials instead of source | No error handling in plan | Phase 2 priority 4: read source code |
+| Ignoring license | Can't legally reuse code | Phase 4 license check |
+| Ignoring security | Vulnerable implementation | Phase 3 item 7 + Phase 5 box 8 |
+| Wrong abstraction level | Over-engineered or too simple | Phase 0: understand project scale |
+| User calls out shallowness | "You're still doing surface research" | Re-verify Phase 5 checklist immediately |
 
 ## Self-Improvement
 
-This skill should improve itself. After completing research:
+This skill improves with use. After each research session:
 
-1. Note what went wrong — was research too shallow? wrong sources? missed edge cases?
-2. Update this SKILL.md if a pattern can prevent the same mistake next time
-3. Add examples to `references/research-examples.md` for new failure modes
+1. Note what failed — too shallow? wrong sources? missed project context?
+2. Update this SKILL.md if a pattern can prevent the same mistake
+3. Add examples to `references/examples.md`
 
 ## Tool Usage
 
-- **context7 MCP**: Official docs for any library. Use FIRST.
-- **WebSearch + WebFetch**: Find and read reference source files
-- **agentskills.io spec**: [Client implementation guide](https://github.com/agentskills/agentskills/blob/main/docs/client-implementation/adding-skills-support.mdx) for skill system design
-- **Explore agent**: Fan-out search across reference repos
+- **Read/Glob/Grep**: Phase 0 — understand the project
+- **context7 MCP**: Official docs for any library. Use FIRST in Phase 2.
+- **WebSearch**: Find reference implementations + specs
+- **WebFetch**: Read source files from reference repos
+- **Explore agent**: Fan-out search across multiple reference repos
