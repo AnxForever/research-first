@@ -141,6 +141,55 @@ All boxes before any code:
 
 Then ask: **"Proceed with implementation?"**
 
+## Phase 7: Self-Audit (BEFORE reporting done)
+
+After implementation but BEFORE telling the user "done," run this audit.
+The user should never have to catch these — you catch them first.
+
+### 7A. Proactivity Check
+
+Ask yourself honestly:
+
+- [ ] Did the user have to point out anything I should have noticed myself?
+- [ ] Did I stop at the surface question, or did I expand to the full problem space?
+- [ ] Did I research before coding, or did I jump straight to implementation?
+- [ ] Did I find and read source code from reference implementations?
+- [ ] Are there remaining issues I know about but didn't mention?
+
+**If the user would need to say "you forgot X" or "this is still shallow" → fix it NOW, before reporting.**
+
+### 7B. Completeness Check
+
+- [ ] All Phase 5 readiness boxes still hold after implementation?
+- [ ] Did I handle all 10 problem dimensions, not just the obvious ones?
+- [ ] Did I test my changes? (run tests, verify they pass)
+- [ ] Did I update project documentation (CLAUDE.md, RESEARCH.md) with findings?
+- [ ] Are there any TODO comments or stubs I left behind?
+
+### 7C. Quality Check
+
+- [ ] If a picky user reviewed this, would they find obvious gaps?
+- [ ] Did I follow the project's existing code style and patterns?
+- [ ] Did I handle error cases, not just the happy path?
+- [ ] Is there anything I'm hoping the user won't notice?
+
+### 7D. Red Flags
+
+If ANY of these are true, do NOT report done. Fix first:
+
+| Red Flag | Action |
+|----------|--------|
+| User previously said "you're still being shallow" | Double research depth. Re-verify all Phase 5 boxes. |
+| I only searched one source | Go back to Phase 2. Find at least one more reference. |
+| I didn't read any source code | Read at least 2 core files from a reference implementation. |
+| I'm about to say "should I proceed?" without a research summary | Write the Phase 6 summary first. |
+| There are tests I didn't run | Run them now. |
+| I know about a related problem but didn't research it | Research it now. Don't wait for the user to ask. |
+
+**If the audit reveals issues → fix them first. Only report done when all checks pass.**
+
+---
+
 ## When Things Go Wrong
 
 | Situation | Response |
