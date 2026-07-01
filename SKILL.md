@@ -70,6 +70,54 @@ Map the project's need to specific search queries:
 
 Be specific: include the language, framework, and domain in every query.
 
+## Phase 1.5: Problem Space Expansion (MANDATORY for FULL research)
+
+**The user's surface question is never the whole problem.** A feature like "add X" actually
+means "add X, correctly, securely, efficiently, maintainably, in a way that fits the project,
+handles edge cases, and won't need rewriting next month."
+
+Before searching, expand the surface question into the complete problem tree. For ANY feature X,
+systematically ask these 10 probe questions and generate search queries for EACH one:
+
+| # | Probe Question | Search Query Template |
+|---|---------------|----------------------|
+| 1 | **Data** — What data does X need? Schema, storage, validation, migration? | `"{X} data model schema design"` |
+| 2 | **Lifecycle** — How does X start, run, stop, restart, recover from crash? | `"{X} lifecycle startup shutdown error recovery"` |
+| 3 | **Integration** — How does X connect to existing systems? Failure modes when dependencies are down? | `"{X} integration pattern {tech stack}"` |
+| 4 | **Security** — What attacks is X vulnerable to? AuthZ? Injection? Data leaks? | `"{X} security best practices OWASP"` |
+| 5 | **Performance** — Bottlenecks? Scaling limits? Resource usage? | `"{X} performance optimization bottleneck"` |
+| 6 | **Observability** — How to monitor, log, debug, audit X? | `"{X} monitoring logging observability"` |
+| 7 | **API/UX** — How do users/code interact with X? What's the contract? | `"{X} API design interface contract"` |
+| 8 | **Configuration** — What's configurable? Environment differences? Feature flags? | `"{X} configuration options environment"` |
+| 9 | **Testing** — How to test X? What edge cases? Integration tests? | `"{X} testing strategy edge cases"` |
+| 10 | **Evolution** — How will X change over time? Versioning? Backward compatibility? Deprecation? | `"{X} versioning backward compatibility migration"` |
+
+**Example: User says "add skill system to AgentOS"**
+
+Surface question: "How to load a SKILL.md file?"
+
+Problem space expansion:
+```
+1. Data       → skill schema, metadata format, agentskills.io spec
+2. Lifecycle  → discovery → load → execute → unload → compaction survival → reload
+3. Integration → skill + tool interaction, skill permissions, MCP skill bridge
+4. Security   → prompt injection via SKILL.md, malicious marketplace skills
+5. Performance → context budget per skill, 250-char description cap, 1% listing budget
+6. Observability → skill usage tracking, dedup logging, loaded skills state
+7. API/UX     → use_skill tool, slash commands, auto-match by description
+8. Configuration → managed/user/project priority, paths-based conditional skills
+9. Testing    → skill parsing tests, dedup tests, injection tests
+10. Evolution  → skill versioning, deprecation, migration between versions
+```
+
+**Each dimension generates 1-3 search queries. That's 10-30 queries instead of 1-2.**
+This is the difference between finding "how to load a file" and finding the COMPLETE
+architecture that Claude Code, OpenCode, and Google ADK all independently converged on.
+
+**HARD RULE: For FULL research, expand to at least 6 of the 10 dimensions before
+moving to Phase 2. If you only search the surface question, you WILL miss critical
+problems that the user will have to find later.**
+
 ## Phase 2: Multi-Source Search — WITH QUALITY
 
 ### 2A. Query Construction
