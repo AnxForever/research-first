@@ -1,21 +1,23 @@
 # research-first
 
-> Universal project improvement skill for AI coding agents.
-> Before writing code, find how others already solved it.
+> Before you create anything, find how others already did it better.
+
+A universal research methodology skill for AI agents. Works for any task — writing code, designing UI, drafting documents, planning projects, making decisions.
 
 ## What It Does
 
-When an AI agent is asked to "add X feature" or "fix Y problem", this skill forces it to:
+When asked to create, build, write, design, plan, or decide something, this skill guides the agent through a 7-phase research process:
 
-1. **Understand the project first** (read docs, map architecture)
-2. **Expand the surface question** into the full problem space (10 dimensions)
-3. **Search with quality** (GitHub qualifiers, multi-angle coverage, quality signals)
-4. **Extract complete patterns** from ≥2 independent production references
-5. **Evaluate reuse potential** (REUSE / ADAPT / LEARN-FROM)
-6. **Verify 10 readiness criteria** before writing any code
-7. **Output structured findings** for user approval
+0. **Understand project identity** — WHO is this for? WHY does it exist?
+1. **Expand the problem** — surface question → 10-dimension problem space
+2. **Search with quality** — backend: source code, specs / creative: best examples, templates, style guides
+3. **Extract complete patterns** — from ≥2 independent references
+4. **Evaluate reuse** — REUSE / ADAPT / LEARN-FROM
+5. **Verify readiness** — 11 checkboxes before producing output
+6. **Report findings** — structured summary for user approval
+7. **Self-audit** — catch problems before the user does
 
-No more "I found a Medium article, here's my implementation."
+No more "I found a tutorial, here's my implementation."
 
 ## Install
 
@@ -33,17 +35,17 @@ git clone https://github.com/AnxForever/research-first.git ~/.agents/skills/rese
 
 ```
 research-first/
-├── SKILL.md                          # Core workflow (Tier 1+2)
+├── SKILL.md                          # Core workflow (Tier 1+2, ~340 lines)
 └── references/                       # Deep guides (Tier 3, on-demand)
-    ├── search-quality.md             # Query construction, quality signals
-    ├── problem-expansion.md          # 10-dimension framework with examples
+    ├── search-quality.md             # Query construction, quality signals, anti-patterns
+    ├── problem-expansion.md          # 10-dimension framework with concrete examples
     ├── adapting-depth.md             # Time pressure, risk levels, failure modes
-    └── contradictions.md             # When references disagree
+    └── contradictions.md             # When references disagree — resolution framework
 ```
 
 ## Requirements
 
-- Any AI agent that supports the Agent Skills standard (Claude Code, Codex, Cursor, etc.)
+- Any AI agent supporting the Agent Skills standard (Claude Code, Codex, Cursor, etc.)
 - No dependencies, no API keys, no configuration needed
 
 ## License
