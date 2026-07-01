@@ -1,351 +1,325 @@
 ---
 name: research-first
 description: >-
-  Universal project improvement skill. Before modifying any project, first understand
-  its features, architecture, and problems by reading its docs and source code. Then
-  proactively search for existing solutions — official documentation, open source
-  implementations, reference architectures — and reuse proven code instead of writing
-  from scratch. Learn the COMPLETE pattern (lifecycle, error handling, edge cases, security)
-  from at least 2 independent references before implementing. Use when the user asks to
-  add features, fix problems, optimize, refactor, or improve any project. Triggers on
-  feature requests, bug reports, architecture questions, performance issues, and any
-  non-trivial code change.
+  Universal project improvement skill. Before modifying any project, understand its
+  architecture and problems (Phase 0), expand the surface question into the complete
+  problem space across 10 dimensions (Phase 1), search for existing solutions using
+  quality-weighted queries across 7 source types (Phase 2), extract complete patterns
+  from at least 2 independent references by reading source code and tests (Phase 3),
+  evaluate whether to reuse, adapt, or learn from each reference (Phase 4), verify 10
+  readiness criteria before writing any code (Phase 5), and output structured findings
+  (Phase 6). Use when the user asks to add features, fix problems, optimize, refactor,
+  design architecture, or improve any project. Triggers on feature requests, bug reports,
+  architecture questions, tech selection, performance issues, and any non-trivial code
+  change. Skip only for one-line fixes, typos, and config value changes.
 ---
 
-# Research-First Project Improvement
-
-## Core Principle
+# Research-First Engineering
 
 **Don't write code until you've found how others already solved it.**
 
-Every project problem has been solved before — in official docs, open source repos,
-or production systems. The cost of reading references is always lower than the cost
-of rewriting bad code.
+This skill works on any project. It forces you to understand the project first,
+search the world for proven solutions, and only then implement — following
+patterns that production systems have already validated.
 
-This skill works on ANY project: read the project first, then search the world for
-answers, then implement based on proven patterns.
+---
 
 ## Phase 0: Understand the Project
 
-Before researching solutions, understand what you're working with:
+Before searching for solutions, read the project:
 
-1. **Read project identity files**: CLAUDE.md, README.md, CONTRIBUTING.md, ARCHITECTURE.md
-2. **Read key docs**: Look for `docs/` directory, design documents, API specs
-3. **Scan core source files**: Identify the main modules, entry points, and critical paths
-4. **Identify the tech stack**: Language, framework, database, key dependencies
-5. **Note existing patterns**: Code style, naming conventions, error handling patterns, test style
-6. **Find known problems**: Check TODO comments, FIXME markers, issue trackers, recent commits
+1. **Identity files** — CLAUDE.md, README.md, ARCHITECTURE.md, CONTRIBUTING.md
+2. **Docs directory** — design documents, API specs, ADRs
+3. **Core source** — main modules, entry points, critical paths
+4. **Tech stack** — language, framework, database, key dependencies
+5. **Conventions** — code style, naming, error handling, test patterns
+6. **Known problems** — TODOs, FIXMEs, issue trackers, recent commits
 
-Output a brief project map:
+Output a project map:
 ```
 Project: [name]
-Stack: [language, framework, database, key deps]
-Architecture: [monolith/microservices/etc., key modules]
-Existing patterns: [code style, error handling, testing]
-Problems to solve: [what user asked + what you found]
+Stack: [language / framework / database / key deps]
+Architecture: [monolith | microservices | ..., key modules]
+Conventions: [code style, error handling, testing]
+Problems: [what user asked + what you discovered]
 ```
 
-## Decision Tree: How Deep to Research?
+## Decision Tree
 
 ```
-Is the task...
-├─ A one-line fix, typo, config value? → SKIP research, just do it
-├─ A well-known pattern in the project's stack? → LIGHT (Phase 2 only)
-└─ New feature, design, optimization, or unknown domain? → FULL (all phases)
+Task type:
+├─ One-line fix, typo, config value → SKIP research
+├─ Familiar pattern in this stack → LIGHT (Phase 2 only)
+└─ New feature, design, optimization, unknown domain → FULL (all phases)
 ```
 
-If in doubt, do full research.
+When in doubt, do full research.
 
-## Phase 1: Define What to Search For
+---
 
-Map the project's need to specific search queries:
+## Phase 1: Expand the Problem Space
 
-| Project need | Search queries |
-|-------------|---------------|
-| "Add X feature" | `"{tech stack} {feature} production implementation github"` |
-| "Fix Y problem" | `"{tech stack} {problem} best practice solution"` |
-| "Optimize Z" | `"{tech stack} {component} performance optimization pattern"` |
-| "Design architecture" | `"{domain} system design architecture reference"` |
-| "Add integration" | `"{service} official docs integration guide"` |
+The user's surface question is never the whole problem.
+"Add X" means "add X correctly, securely, efficiently, maintainably."
 
-Be specific: include the language, framework, and domain in every query.
+For any feature X, expand to these 10 dimensions and generate search queries for EACH:
 
-## Phase 1.5: Problem Space Expansion (MANDATORY for FULL research)
+| # | Dimension | Probe Question | Query Template |
+|---|-----------|---------------|----------------|
+| 1 | Data | Schema, storage, validation, migration? | `"{X} data model schema design"` |
+| 2 | Lifecycle | Startup, runtime, shutdown, crash recovery? | `"{X} lifecycle error recovery"` |
+| 3 | Integration | How connects to existing systems? Failure modes? | `"{X} integration pattern {stack}"` |
+| 4 | Security | Attack vectors? AuthZ? Injection? Data leaks? | `"{X} security best practices OWASP"` |
+| 5 | Performance | Bottlenecks? Scaling limits? Resource usage? | `"{X} performance optimization"` |
+| 6 | Observability | Monitoring, logging, debugging, auditing? | `"{X} monitoring observability"` |
+| 7 | API/UX | Contract? User interaction? Error messages? | `"{X} API design interface"` |
+| 8 | Configuration | Configurable vs hardcoded? Env differences? | `"{X} configuration environment"` |
+| 9 | Testing | Strategy? Edge cases? Integration tests? | `"{X} testing edge cases"` |
+| 10 | Evolution | Versioning? Backward compat? Migration path? | `"{X} versioning migration"` |
 
-**The user's surface question is never the whole problem.** A feature like "add X" actually
-means "add X, correctly, securely, efficiently, maintainably, in a way that fits the project,
-handles edge cases, and won't need rewriting next month."
-
-Before searching, expand the surface question into the complete problem tree. For ANY feature X,
-systematically ask these 10 probe questions and generate search queries for EACH one:
-
-| # | Probe Question | Search Query Template |
-|---|---------------|----------------------|
-| 1 | **Data** — What data does X need? Schema, storage, validation, migration? | `"{X} data model schema design"` |
-| 2 | **Lifecycle** — How does X start, run, stop, restart, recover from crash? | `"{X} lifecycle startup shutdown error recovery"` |
-| 3 | **Integration** — How does X connect to existing systems? Failure modes when dependencies are down? | `"{X} integration pattern {tech stack}"` |
-| 4 | **Security** — What attacks is X vulnerable to? AuthZ? Injection? Data leaks? | `"{X} security best practices OWASP"` |
-| 5 | **Performance** — Bottlenecks? Scaling limits? Resource usage? | `"{X} performance optimization bottleneck"` |
-| 6 | **Observability** — How to monitor, log, debug, audit X? | `"{X} monitoring logging observability"` |
-| 7 | **API/UX** — How do users/code interact with X? What's the contract? | `"{X} API design interface contract"` |
-| 8 | **Configuration** — What's configurable? Environment differences? Feature flags? | `"{X} configuration options environment"` |
-| 9 | **Testing** — How to test X? What edge cases? Integration tests? | `"{X} testing strategy edge cases"` |
-| 10 | **Evolution** — How will X change over time? Versioning? Backward compatibility? Deprecation? | `"{X} versioning backward compatibility migration"` |
-
-**Example: User says "add skill system to AgentOS"**
-
-Surface question: "How to load a SKILL.md file?"
-
-Problem space expansion:
+**Example: "add skill system to AgentOS"**
 ```
-1. Data       → skill schema, metadata format, agentskills.io spec
-2. Lifecycle  → discovery → load → execute → unload → compaction survival → reload
-3. Integration → skill + tool interaction, skill permissions, MCP skill bridge
-4. Security   → prompt injection via SKILL.md, malicious marketplace skills
-5. Performance → context budget per skill, 250-char description cap, 1% listing budget
-6. Observability → skill usage tracking, dedup logging, loaded skills state
-7. API/UX     → use_skill tool, slash commands, auto-match by description
-8. Configuration → managed/user/project priority, paths-based conditional skills
-9. Testing    → skill parsing tests, dedup tests, injection tests
-10. Evolution  → skill versioning, deprecation, migration between versions
+Surface: "How to load SKILL.md?"
+Expanded:
+  1. Data       → skill schema, agentskills.io spec, metadata format
+  2. Lifecycle  → discover → load → execute → unload → compaction survival
+  3. Integration → skill + tool interaction, permissions, MCP bridge
+  4. Security   → prompt injection via SKILL.md, marketplace risks
+  5. Performance → context budget, description cap, listing budget
+  6. Observability → usage tracking, dedup logging
+  7. API/UX     → use_skill tool, slash commands, auto-match
+  8. Configuration → managed/user/project priority, paths-based conditions
+  9. Testing    → parsing, dedup, injection, dependency resolution
+  10. Evolution  → versioning, deprecation, migration
 ```
 
-**Each dimension generates 1-3 search queries. That's 10-30 queries instead of 1-2.**
-This is the difference between finding "how to load a file" and finding the COMPLETE
-architecture that Claude Code, OpenCode, and Google ADK all independently converged on.
+**Hard rule: expand at least 6 of 10 dimensions before Phase 2.**
+This turns 1-2 surface queries into 10-30 targeted searches.
 
-**HARD RULE: For FULL research, expand to at least 6 of the 10 dimensions before
-moving to Phase 2. If you only search the surface question, you WILL miss critical
-problems that the user will have to find later.**
+---
 
-## Phase 2: Multi-Source Search — WITH QUALITY
+## Phase 2: Search with Quality
 
 ### 2A. Query Construction
 
-Bad queries find bad references. Good queries use specific qualifiers.
-
-**GitHub search qualifiers:**
+**GitHub qualifiers:**
 ```
-stars:>1000                    — community validation
-pushed:>2024-01-01             — actively maintained (not dead)
-language:python                — exact tech match
-license:mit                    — legally reusable
-in:readme "production"         — self-described production quality
-org:organization-name          — scope to trusted orgs
-path:src/                      — exclude test/vendor noise
-topic:web-framework            — GitHub topics
+stars:>1000              — community validation
+pushed:>2024-01-01       — actively maintained
+language:python          — exact tech match
+license:mit              — legally reusable
+in:readme "production"   — self-described production quality
+org:organization-name    — scope to trusted orgs
+path:src/                — exclude test/vendor noise
 ```
 
-**Composite query template:**
+**Composite template:**
 ```
-{keyword} language:{lang} stars:>{min_stars} pushed:>{recent_date} license:{compatible_license}
+{keyword} language:{lang} stars:>{min} pushed:>{date} license:{compatible}
 ```
 
-**Query variations (always run at least 3):**
-1. By problem: `"{problem description}" language:{lang}`
-2. By solution: `"{solution pattern} example" language:{lang} path:src/`
+**Always run at least 3 query variations:**
+1. By problem: `"{problem}" language:{lang}`
+2. By solution: `"{pattern} example" language:{lang} path:src/`
 3. By domain: `topic:{domain} language:{lang} stars:>500`
 
-**Plain WebSearch queries:**
-```
-"{tech stack} {feature} production implementation github 2025"
-"{tech stack} {problem} best practice pattern"
-"{tech stack} {component} architecture reference"
-site:github.com "{tech} {pattern}"
-```
+### 2B. Source Priority
 
-### 2B. Source Prioritization
+| Priority | Source | Method |
+|----------|--------|--------|
+| 1 | Official docs | context7 MCP FIRST, or `{tech} official docs {topic}` |
+| 2 | Specs & standards | RFCs, agentskills.io, OWASP, framework protocol docs |
+| 3 | Source code | Read actual .ts/.py/.go/.rs files — NOT just README |
+| 4 | Tests | Test files reveal edge cases and correct usage |
+| 5 | GitHub issues | Known bugs, design discussions, PR reviews |
+| 6 | Stack Overflow | Accepted answers with high votes only, verify recency |
+| 7 | Blog posts | Last resort — always cross-reference with official docs |
 
-Not all sources are equal. Follow this priority order:
+**Hard rules:**
+- Never cite a blog post as primary evidence.
+- If a standard/spec exists, read it before implementations.
+- For every repo: read ≥ 2 source files + ≥ 1 test file.
 
-| Priority | Source | How to access |
-|----------|--------|---------------|
-| 1 | **Official docs** | context7 MCP (FIRST), or `{tech} official docs {topic}` |
-| 2 | **Specs & standards** | RFCs, agentskills.io, OWASP, framework protocol docs |
-| 3 | **Reference source code** | Read actual .ts/.py/.go/.rs files in repos |
-| 4 | **Reference tests** | Test files reveal edge cases and actual usage |
-| 5 | **GitHub issues** | Known bugs, design discussions, PR reviews |
-| 6 | **Stack Overflow** | Only accepted answers with high votes, verify recency |
-| 7 | **Blog posts** | LAST resort — cross-reference with official docs |
+### 2C. Quality Signals
 
-**HARD RULES:**
-- NEVER cite a blog post as primary evidence. Always trace back to source code.
-- For any repo found: read at least 2 source files + 1 test file. Not just README.
-- If a standard/spec exists, read it BEFORE looking at implementations.
-
-### 2C. Quality Signals — Evaluate BEFORE Deep-Diving
-
-Before spending time reading a repo, score it on these signals:
+Score each repo BEFORE deep-diving:
 
 | Signal | Good | Warning | Dealbreaker |
 |--------|------|---------|-------------|
-| Last commit | < 1 month | 1-6 months | > 1 year |
-| Stars | > 500 | 50-500 | < 50 (unless niche) |
-| License | MIT/Apache/BSD | GPL | None |
-| Test directory | `test/` or `__tests__/` exists | Tests in same files | No tests |
-| Contributing guide | CONTRIBUTING.md exists | Brief section in README | None |
-| Release/tags | Git tags or releases | Only main branch | No versioning |
-| Issue response | Issues get replies | Some open, some closed | All open, no replies |
+| Last commit | < 1 month | 1–6 months | > 1 year |
+| Stars | > 500 | 50–500 | < 50 |
+| License | MIT / Apache / BSD | GPL | None |
+| Tests | `test/` directory exists | Tests in same files | No tests |
+| Contributing | CONTRIBUTING.md | Brief README section | None |
+| Releases | Git tags present | Main branch only | No versioning |
+| Issue response | Issues get replies | Mixed | All open, no replies |
 
-**Quick quality check (2 minutes before committing to deep read):**
-1. Open the repo → check last commit date and license
-2. Skim the test directory → are there actual tests?
-3. Read one core source file → is it well-structured and documented?
-4. Check 3 recent closed issues → how does the maintainer respond?
+**2-minute quick check:**
+1. Open repo → check last commit + license
+2. Skim test directory → real tests?
+3. Read one core source file → well-structured?
+4. Check 3 recent closed issues → maintainer responsive?
 
-**Passes all 4 checks → worth deep reading. Fails any → deprioritize.**
+Passes all 4 → worth deep reading. Fails any → deprioritize.
 
-### 2D. Multi-Angle Coverage Verification
+### 2D. Multi-Angle Coverage
 
-After initial search, verify you haven't missed important sources by searching from different angles:
+Search from 6 angles to avoid blind spots:
 
-| Angle | Query pattern | What it finds |
-|-------|--------------|---------------|
-| **By problem** | `"{problem}" language:{lang}` | Direct solutions |
-| **By technology** | `"{library/framework}" example` | Official/community examples |
-| **By pattern** | `"{design pattern}" implementation {lang}` | Architectural references |
-| **By author** | `org:{known-org}` or author's repos | Authority implementations |
-| **By dependency** | repos that depend on the target library | Integration patterns |
-| **By awesome-list** | `awesome-{topic}` repos | Curated collections |
+| Angle | Query | Finds |
+|-------|-------|-------|
+| By problem | `"{problem}" language:{lang}` | Direct solutions |
+| By technology | `"{lib}" example` | Official/community examples |
+| By pattern | `"{pattern}" implementation {lang}` | Architectural references |
+| By author | `org:{known-org}` | Authority implementations |
+| By dependency | Reverse dependency search | Integration patterns |
+| By awesome-list | `awesome-{topic}` | Curated collections |
 
-**Coverage check**: After searching, ask yourself:
-- "Did I find repos from different organizations/authors?" (not all from same person)
-- "Did I find both small focused libs AND large framework examples?"
-- "Did I find at least one repo that's clearly used in production?"
+**Coverage check:** Found repos from different orgs? Both small libs and large frameworks? At least one clearly production-used?
 
 ### 2E. Search Anti-Patterns
 
-| Anti-Pattern | Why it fails | Fix |
-|-------------|-------------|-----|
-| Stopping after first result | Confirmation bias | Minimum 2 independent sources |
-| Searching only by keyword | Misses alternative approaches | Use multi-angle search (2D) |
-| Not filtering by date | Finds dead/outdated projects | Always add `pushed:>YYYY-MM-DD` |
-| Ignoring license | Can't legally reuse code | Check license BEFORE deep reading |
-| Using only GitHub search | Misses official docs, specs, papers | Start with docs, end with repos |
-| Vague queries | Returns noise, not signal | Include language + domain + quality qualifiers |
-| Copying code without reading tests | Misses edge cases and correct usage | Read tests before copying API calls |
+| Mistake | Fix |
+|---------|-----|
+| Stopping at first result | Minimum 2 independent sources |
+| Keyword-only search | Multi-angle search (2D) |
+| No date filter | Always add `pushed:>YYYY-MM-DD` |
+| Ignoring license | Check before deep reading |
+| GitHub-only search | Start with docs, end with repos |
+| Vague queries | Language + domain + qualifiers |
+| Copying without reading tests | Read tests before API calls |
 
-## Phase 3: Learn the COMPLETE Pattern
+---
 
-For each reference implementation, extract ALL dimensions. If you can't fill every field,
-you haven't gone deep enough — find another reference or read more source code:
+## Phase 3: Extract Complete Patterns
 
-1. **Data model** — Structures, schemas, fields, relationships
-2. **Lifecycle** — startup → runtime → shutdown for EVERY component
-3. **Error handling** — What errors are caught? Retry? Backoff? Circuit breaker? Graceful degradation?
-4. **Edge cases** — Empty/null/missing data, race conditions, timeouts, large inputs, concurrent access
-5. **Configuration** — What's configurable vs hardcoded? Environment-specific behavior?
-6. **Tests** — What patterns? What edge cases do tests cover? What do they NOT test?
-7. **Security** — What threats? Input validation? AuthN/AuthZ? Data sanitization? Injection prevention?
-8. **Integration** — How does it connect to other systems? What are the failure modes?
-9. **Performance** — Bottlenecks? Caching? Lazy loading? Batching?
-10. **What surprised me** — The ONE finding that contradicted my initial assumption
+For each reference, extract ALL 10 dimensions. Missing any = not deep enough.
 
-**SELF-CHECK before Phase 4**:
-> "Can I draw the complete architecture diagram, trace every error path, and name
-> 5 edge cases the reference handles that I would have missed on my own?"
+1. **Data model** — structures, schemas, fields, relationships
+2. **Lifecycle** — startup → runtime → shutdown for every component
+3. **Error handling** — retry? backoff? circuit breaker? graceful degradation?
+4. **Edge cases** — null, empty, race, timeout, large input, concurrent access
+5. **Configuration** — configurable vs hardcoded? env-specific behavior?
+6. **Tests** — patterns? edge cases covered? what's NOT tested?
+7. **Security** — threats? input validation? authN/Z? sanitization? injection?
+8. **Integration** — connections to other systems? failure modes?
+9. **Performance** — bottlenecks? caching? lazy loading? batching?
+10. **Surprise** — the one finding that contradicted your initial assumption
 
-If NO → go back to Phase 2.
+**Self-check before Phase 4:**
+> "Can I draw the complete architecture, trace every error path, and name
+> 5 edge cases the reference handles that I would have missed alone?"
 
-## Phase 4: Evaluate and Decide
+If no → go back to Phase 2.
 
-For each reference, evaluate whether to REUSE, ADAPT, or LEARN-FROM:
+---
+
+## Phase 4: Evaluate Reuse Potential
+
+For each reference, decide: REUSE, ADAPT, or LEARN-FROM.
 
 | Criteria | Reuse | Adapt | Learn-from |
-|----------|-------|-------|-----------|
+|----------|-------|-------|------------|
 | License compatible? | ✓ | ✓ | Any |
 | Same language/framework? | ✓ | Similar | Any |
 | Same scale/requirements? | ✓ | Close | Different |
 | Actively maintained? | ✓ | If stable | Any |
-| Code quality matches project? | ✓ | With cleanup | For patterns only |
+| Code quality matches? | ✓ | With cleanup | Patterns only |
 
-**Decision**: Choose the best reference to follow. Prefer REUSE over ADAPT over LEARN-FROM.
-Document WHY you chose this approach.
+Prefer REUSE over ADAPT over LEARN-FROM. Document why.
 
-## Phase 5: Judge Readiness
+---
 
-ALL boxes must be checked before writing a single line of code:
+## Phase 5: Verify Readiness
 
-- [ ] Read the project's own docs and key source files (Phase 0)
-- [ ] Found at least 2 independent production references (NOT tutorials)
-- [ ] Read source code from at least 2 core files in each reference
-- [ ] Read the official documentation for the core API/library
-- [ ] Identified at least 5 edge cases the references handle
-- [ ] Understand the complete lifecycle (startup → runtime → shutdown → error recovery)
-- [ ] Can name at least ONE surprising finding that changed my approach
-- [ ] Identified at least ONE security consideration
-- [ ] Evaluated whether to reuse, adapt, or learn-from each reference (Phase 4)
-- [ ] The solution fits the project's existing code style and conventions
+**All 10 boxes must be checked before writing ANY code.**
 
-**HARD GATE: any box unchecked → go back. Do NOT start Phase 6.**
+- [ ] Read the project's docs and key source files (Phase 0)
+- [ ] Expanded at least 6/10 problem dimensions (Phase 1)
+- [ ] Found ≥ 2 independent production references (Phase 2)
+- [ ] Read ≥ 2 source files + 1 test file from each reference (Phase 2)
+- [ ] Read official documentation for the core API (Phase 2B)
+- [ ] Extracted all 10 pattern dimensions (Phase 3)
+- [ ] Identified ≥ 5 edge cases from references (Phase 3)
+- [ ] Found ≥ 1 security consideration (Phase 3)
+- [ ] Made reuse/adapt/learn-from decision for each reference (Phase 4)
+- [ ] Solution fits the project's existing conventions (Phase 0)
 
-## Phase 6: Output Structured Findings
+**Hard gate: any box unchecked → go back. Do not proceed to Phase 6.**
 
-Use this EXACT template before writing code:
+---
+
+## Phase 6: Report Findings
+
+Use this exact template:
 
 ```
-## Research Summary: [Problem Being Solved]
+## Research Summary: [Problem]
 
 ### Project Context
-[What I learned from Phase 0 about this project's architecture and conventions]
+[Phase 0 findings: architecture, conventions, constraints]
 
-### References Found
-1. **[Project Name](URL)**
-   - Files read: [list 2+ file paths you actually opened]
+### References
+1. **[Name](URL)**
+   - Files read: [2+ paths actually opened]
    - Key insight: [one sentence]
-   - Reuse/Adapt/Learn-from: [decision + reason]
+   - Decision: REUSE | ADAPT | LEARN-FROM — [why]
 
-2. **[Project Name](URL)**
-   - Files read: [list 2+ file paths you actually opened]
+2. **[Name](URL)**
+   - Files read: [2+ paths actually opened]
    - Key insight: [one sentence]
-   - Reuse/Adapt/Learn-from: [decision + reason]
+   - Decision: REUSE | ADAPT | LEARN-FROM — [why]
 
 ### Complete Pattern
-- Data model: [describe]
-- Lifecycle: [startup → runtime → shutdown]
-- Error handling: [strategy]
-- Security: [threats + defenses]
+- Data model:
+- Lifecycle: startup → runtime → shutdown
+- Error handling:
+- Security:
 
-### Edge Cases Discovered (minimum 5)
-1. [Edge case] → reference handles it by [mechanism]
+### Edge Cases (≥ 5)
+1. [Case] → handled by [mechanism]
 2. ...
 
-### What I Initially Got Wrong
-- [Mental model correction based on reading source code]
+### What I Got Wrong
+- [Assumption correction from reading source code]
 
 ### Implementation Plan
 1. [Step] — following [reference]
-2. [Step] — following [reference]
-3. [Step] — adapted for project conventions
+2. [Step] — adapted for project conventions
 ```
 
 Then ask: **"Based on this research, proceed with implementation?"**
 
+---
+
 ## Failure Modes
 
-| Failure | Symptom | Prevention (hard gate) |
-|---------|---------|----------------------|
-| Skipping Phase 0 | Solution doesn't match project style | Phase 5 box 1: read project first |
-| Surface research | Can't fill Phase 3 dimensions | Phase 3 self-check question |
-| One-source bias | Only found one reference | Phase 2 minimum: 2 repos |
-| Tutorials instead of source | No error handling in plan | Phase 2 priority 4: read source code |
-| Ignoring license | Can't legally reuse code | Phase 4 license check |
-| Ignoring security | Vulnerable implementation | Phase 3 item 7 + Phase 5 box 8 |
-| Wrong abstraction level | Over-engineered or too simple | Phase 0: understand project scale |
-| User calls out shallowness | "You're still doing surface research" | Re-verify Phase 5 checklist immediately |
+| Failure | Symptom | Hard Gate |
+|---------|---------|-----------|
+| Skipping Phase 0 | Solution alien to project style | Phase 5 box 1 |
+| Surface-only search | Can't fill Phase 3 dimensions | Phase 3 self-check |
+| One-source bias | Single reference | Phase 2: ≥ 2 repos |
+| Tutorials over source | No error handling in plan | Phase 2B: read source code |
+| Ignoring license | Illegal to reuse | Phase 4 license check |
+| Missing security | Vulnerable code | Phase 3 item 7 |
+| Wrong abstraction | Over/under-engineered | Phase 0: project scale |
+| User calls out shallowness | "Still doing surface research" | Re-verify all Phase 5 boxes |
 
 ## Self-Improvement
 
-This skill improves with use. After each research session:
+After each use, note failures and update this skill:
+1. What went wrong? (too shallow? wrong sources? missed context?)
+2. Can a rule change prevent it next time?
+3. Add concrete examples to `references/examples.md`
 
-1. Note what failed — too shallow? wrong sources? missed project context?
-2. Update this SKILL.md if a pattern can prevent the same mistake
-3. Add examples to `references/examples.md`
+## Tool Reference
 
-## Tool Usage
-
-- **Read/Glob/Grep**: Phase 0 — understand the project
-- **context7 MCP**: Official docs for any library. Use FIRST in Phase 2.
-- **WebSearch**: Find reference implementations + specs
-- **WebFetch**: Read source files from reference repos
-- **Explore agent**: Fan-out search across multiple reference repos
+| Phase | Tools |
+|-------|-------|
+| 0 — Understand | Read, Glob, Grep — project files |
+| 1 — Expand | Brainstorm all 10 dimensions |
+| 2 — Search | context7 MCP (docs), WebSearch (repos), WebFetch (source files) |
+| 3 — Extract | Read source files, compare implementations |
+| 4 — Evaluate | License check, quality signals (2C) |
+| 5 — Verify | Phase 5 checklist |
+| 6 — Report | Write to conversation + CLAUDE.md / docs/RESEARCH.md |
