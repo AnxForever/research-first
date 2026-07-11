@@ -1,23 +1,21 @@
 # research-first
 
-> Before you create anything, find how others already did it better.
+> Understand what the user is really trying to achieve, then research before choosing how.
 
-A universal research methodology skill for AI agents. Works for any task — writing code, designing UI, drafting documents, planning projects, making decisions.
+A universal intent-interpretation and research methodology for AI agents. It turns compressed ideas, symptoms, suggestions, and doubts into evidence-backed decisions without blindly copying the user or inventing unrelated scope.
 
 ## What It Does
 
-When asked to create, build, write, design, plan, or decide something, this skill guides the agent through a 7-phase research process:
+The skill guides the agent to:
 
-0. **Understand project identity** — WHO is this for? WHY does it exist?
-1. **Expand the problem** — surface question → 10-dimension problem space
-2. **Search with quality** — backend: source code, specs / creative: best examples, templates, style guides
-3. **Extract complete patterns** — from ≥2 independent references
-4. **Evaluate reuse** — REUSE / ADAPT / LEARN-FROM
-5. **Verify readiness** — 11 checkboxes before producing output
-6. **Report findings** — structured summary for user approval
-7. **Self-audit** — catch problems before the user does
+1. **Recover intent** — separate purpose, hard constraints, candidate means, assumptions, and missing dimensions.
+2. **Expand proportionally** — add only considerations supported by relevance, evidence, and task stakes.
+3. **Research with quality** — use local evidence, primary sources, prior art, user data, and safe experiments.
+4. **Judge proposed means** — adopt, adapt, combine, or decline instead of treating suggestions as specifications.
+5. **Reassess on doubt** — when the user questions the work, seek contrary evidence rather than defending or agreeing reflexively.
+6. **Act and verify** — turn findings into decisions, implementation constraints, tests, and completion evidence.
 
-No more "I found a tutorial, here's my implementation."
+It explicitly triggers when users ask for research, sources, examples, intent understanding, idea expansion, or reconsideration of work already in progress.
 
 ## Install
 
@@ -35,12 +33,15 @@ git clone https://github.com/AnxForever/research-first.git ~/.agents/skills/rese
 
 ```
 research-first/
-├── SKILL.md                          # Core workflow (Tier 1+2, ~340 lines)
-└── references/                       # Deep guides (Tier 3, on-demand)
+├── SKILL.md                          # Core workflow
+├── agents/openai.yaml                # Skill UI metadata
+├── assets/                           # Reusable research templates
+└── references/                       # Deep guides and regression cases
     ├── search-quality.md             # Query construction, quality signals, anti-patterns
     ├── problem-expansion.md          # 10-dimension framework with concrete examples
     ├── adapting-depth.md             # Time pressure, risk levels, failure modes
-    └── contradictions.md             # When references disagree — resolution framework
+    ├── contradictions.md             # When references disagree
+    └── intent-interpretation-evaluation.md # Rubric and regression cases
 ```
 
 ## Requirements

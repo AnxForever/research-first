@@ -1,348 +1,341 @@
 ---
 name: research-first
-description: >-
-  Research before doing. Whenever the user wants to create, build, write, design, plan,
-  decide, or solve something — code, documents, presentations, workflows, strategies,
-  anything — systematically search for how others already did it better. Find what the
-  best practitioners do, study their methods, extract reusable patterns, and adapt them.
-  Applies to: writing (docs, emails, proposals), designing (UI, workflows, systems),
-  building (features, products, tools), planning (projects, roadmaps, architecture),
-  deciding (tech choices, strategies, tradeoffs). Does NOT trigger for: simple lookups,
-  running commands, viewing files, one-line fixes, or conversational chat. The key
-  question: is the user trying to PRODUCE something that could benefit from knowing
-  how others already did it?
+description: Interpret the user's underlying purpose, expand compressed or incomplete requests, and research evidence before choosing a solution. Always use, in any language, when the user asks to research, investigate, gather sources or examples, inspect evidence, understand their intent, avoid literal copying, or expand an idea. Also always use when the user questions, doubts, challenges, corrects, is dissatisfied with, or asks to reconsider the agent's understanding, plan, decision, or work; reassess intent, assumptions, and contrary evidence instead of merely defending or agreeing. Use for ideas, symptoms, named technologies, proposed implementations, product directions, architecture, integrations, migrations, security, privacy, payments, and other consequential work where evidence could change the framing or solution. Skip only fully specified, low-risk mechanical actions where research cannot materially change the result. Resume valid research instead of restarting it.
 ---
 
-# Research-First
+# Research First
 
-**Before you create anything, find how others already did it better.**
+Build from evidence, not habit. Research is any disciplined reduction of uncertainty: inspecting the workspace, reading official docs and source, analyzing user-provided material or telemetry, comparing established examples, or running a safe experiment.
 
-This skill applies to ANY task — writing, designing, building, planning, deciding.
-The methodology is the same; only the sources change.
+## Operating Contract
 
-## TL;DR (30 seconds)
+1. Treat every user request, idea, and suggestion as compressed evidence of intent, not automatically as a complete specification.
+2. Establish what is already known before searching.
+3. Match research depth to risk, novelty, reversibility, ambiguity, and user urgency.
+4. Use the evidence types that fit the task; do not force every task into GitHub research.
+5. Prefer primary evidence and independently corroborate material claims.
+6. Convert findings into an expanded problem definition, decisions, implementation constraints, and tests.
+7. If the user already authorized execution, continue after a concise research update. Ask before implementation only when authority or a material product choice is missing.
+8. Preserve an evidence trail sufficient to explain important decisions without flooding the user.
 
-```
-0. UNDERSTAND project identity        → Phase 0 (WHO? WHY?)
-1. EXPAND the question (10 angles)    → Phase 1 (through identity lens)
-2. SEARCH — backend: source code,     → Phase 2 (2A-2E)
-   frontend: big players, components, → Phase 2F (design research)
-   design systems, open source reuse
-3. EXTRACT patterns from ≥2 refs      → Phase 3
-4. DECIDE: reuse, adapt, or learn?    → Phase 4
-5. CHECK 11 boxes before coding       → Phase 5
-6. REPORT findings to user            → Phase 6
-7. SELF-AUDIT before saying "done"    → Phase 7
-```
+## Step 0: Resume Before Restarting
 
-## Frontend/Design Research (Phase 2b)
+First inspect the conversation, active plan/goal, existing research notes, recent commits, and current workspace state.
 
-When the task involves UI design, frontend components, or visual layout, add
-this sub-phase after Phase 2 (Search). Design is NOT purely aesthetic — it
-directly impacts usability, trust, and conversion.
+- Reuse research that is recent, source-grounded, and still relevant.
+- Verify only assumptions affected by new code, changed requirements, version drift, or external state.
+- Do not repeat completed searches merely to satisfy a checklist.
+- When inheriting a task, record what is established, uncertain, and stale.
 
-### 2b.1 Research "Who Already Solved This UI Problem"
+### Interpret Every User Input by Intent
 
-For ANY frontend task, search these dimensions in parallel:
+Apply this to initial requests, short ideas, rough descriptions, follow-up messages, examples, corrections,
+technology names, and proposed implementations. Users often contribute inspiration, symptoms, partial domain
+knowledge, or a preferred direction with limited wording. Treat the message as evidence about the desired outcome,
+not automatically as a complete or literal specification.
 
-| Dimension | Search For | Example Queries |
-|-----------|-----------|----------------|
-| **Big players** | How do ChatGPT/Claude/Gemini design this? | "ChatGPT chat interface layout components 2025" |
-| **Design systems** | Existing style guides, component libraries | "Ant Design chat component", "shadcn/ui chat bubble" |
-| **Competitors** | How do similar products solve this? | "open source AI data analysis platform UI" |
-| **Design trends** | What's the 2025 standard for this pattern? | "AI chat interface design patterns 2025 best practices" |
-| **Open source** | Can we reuse existing components? | "React chat UI component MIT license" |
+Before acting, separate the message into:
 
-### 2b.2 Extract Design Patterns
-
-From ≥2 references, extract:
-
-- **Layout**: sidebar + main + input? Full-screen chat? Dashboard widgets?
-- **Component hierarchy**: what components are used, how are they nested?
-- **Interaction patterns**: streaming, drag-drop, keyboard shortcuts, mobile
-- **Visual language**: colors, typography, spacing, shadows, rounded corners
-- **States**: loading, empty, error, success — how does each look?
-
-### 2b.3 Frontend-Specific Decision Framework
-
-| If... | Then... |
-|-------|---------|
-| Major AI products all use the same pattern | **Adopt it.** Users expect familiarity (Jakob's Law) |
-| Open source component exists (MIT/Apache) | **Reuse or adapt.** Don't rebuild chat bubbles from scratch |
-| Pattern is unique to one product | **Evaluate.** Is it core to their brand or a UX innovation? |
-| No clear standard exists | **Simplify.** Default to minimal, add complexity only when needed |
-
-### 2b.4 Anti-Patterns (Frontend)
-
-- ❌ Designing UI without first checking how ChatGPT/Claude do it
-- ❌ Building custom chat bubbles when shadcn/ui has them
-- ❌ Ignoring the "left sidebar + chat + bottom input" standard layout
-- ❌ Skipping mobile/tablet layout planning
-- ❌ No empty/loading/error state design before coding
-- ❌ Dark mode as afterthought — it's expected in 2025
-
-## Adaptive Depth
-
-Not every task needs full research. Match depth to situation:
-
-| Scenario | Time | Depth | Approach |
-|----------|------|-------|----------|
-| Quick task (fix, tweak, short doc) | < 5 min | Quick search, one ref | Phase 2 only |
-| Standard task (feature, doc, design) | 15-30 min | Two refs, key dimensions | Full phases |
-| Major work (architecture, strategy) | 1-2 hours | Full 10-dimension, ≥3 refs | All phases + deep dive |
-| Creative work (writing, design, planning) | +15 min extra | Phase 2F — study best examples first | Add creative research |
-| Unknown domain | +30 min extra | Exploratory search first | Add before Phase 1 |
-
-**Default**: if unsure, start medium. If Phase 2 finds nothing useful within 3 searches, ask the user whether to expand or proceed with best-effort.
-
-## Phase 0: Understand the Project Identity
-
-Don't just read files — understand what this project IS. The project's identity
-determines what "good" looks like for every feature you add.
-
-### 0A. Identity Questions
-
-Answer these before any research. Don't guess — find answers in the codebase:
-
-| Question | Look in |
-|----------|---------|
-| **What problem does this solve?** | README, docs, landing page |
-| **Who uses it? At what scale?** | Config, deployment docs, user guides |
-| **What are the hard constraints?** | Security, performance, compliance, budget |
-| **What makes it different?** | ARCHITECTURE.md, design docs, ADRs |
-| **What's the team's expertise?** | Tech stack choices, code conventions |
-| **What keeps the maintainer up at night?** | Issues, TODOs, error handling patterns |
-
-### 0B. Output: Project Identity Card
-
-```
-Project: [name]
-Problem it solves: [one sentence — the WHY, not the WHAT]
-Users & scale: [who, how many, what context]
-Hard constraints: [security? performance? compliance? cost?]
-Differentiators: [what makes this project unique vs alternatives]
-Tech DNA: [stack + why they chose it]
-Pain points: [what breaks most often? what's the hardest part?]
+```text
+Underlying purpose: what outcome, pain, risk, or quality bar the user is trying to change
+Hard constraints: explicit boundaries that must be followed
+Candidate means: examples, technologies, wording, or implementation ideas that may be adapted
+Open assumptions: details the user may be implying but has not established
+Missing dimensions: needs, users, lifecycle, failure modes, tradeoffs, and acceptance evidence not yet expressed
+Impact on active goal: create, refine, extend, correct, or replace
 ```
 
-### 0C. Identity as a Research Lens
+Use the surrounding conversation, active goal, current artifacts, and evidence to infer purpose. Prefer the
+interpretation that best advances the durable user outcome while preserving explicit constraints. Do not copy the
+user's nouns, decomposition, or proposed mechanism into the plan merely because they were mentioned.
 
-The identity card is NOT just documentation. It's a LENS you use in every subsequent phase.
-For every search query, every reference evaluation, every design decision — ask:
+For each material request or suggestion:
 
-> "Given that this project is [identity], does this solution fit?"
+1. Restate its intended effect internally in outcome language.
+2. Expand the compressed idea into the relevant product, technical, operational, and human questions.
+3. Research the local problem, user context, relevant prior art, and authoritative guidance before choosing a mechanism.
+4. Look for needs, risks, opportunities, and established solutions the user did not have space or vocabulary to name.
+5. Test whether the proposed means is sufficient, compatible, and the best fit.
+6. Classify proposed means as **adopt**, **adapt**, **combine**, or **decline**, with evidence.
+7. Update the objective, plan, and acceptance evidence around the expanded purpose, not the user's phrasing.
 
-**Example: Same feature, different projects → different research**
+The agent is responsible for adding justified depth. Do not limit the solution to the concepts the user happened to
+mention. Bring back relevant missing considerations and stronger options discovered through research, while avoiding
+scope expansion that does not serve the inferred purpose.
 
-```
-Feature: "Add caching layer"
+Use an **interpretation confidence** before committing to the expanded frame:
 
-Project A: AgentOS (AI agent platform)
-→ Search: "caching LLM responses agent platform"
-→ Search: "context window cache strategy AI agents"
-→ Search: "multi-tenant cache isolation agent systems"
-→ Concern: cache invalidation when agent state changes
+- **High:** context and evidence strongly support the inferred purpose; proceed and briefly state the interpretation.
+- **Medium:** several interpretations are plausible but a reversible path serves them all; proceed with labeled assumptions.
+- **Low:** interpretations imply materially different, costly, destructive, or externally visible outcomes; research what
+  can be discovered, then ask one focused question before crossing that decision boundary.
 
-Project B: E-commerce (high-concurrency transactions)
-→ Search: "Redis hotkey solution production e-commerce"
-→ Search: "cache-stock consistency pattern"
-→ Search: "flash sale cache warming strategy"
-→ Concern: data consistency during concurrent writes
-```
+Expansion is justified only when it passes all three tests:
 
-Same feature. Same tech stack. But the project identity changes WHAT you search for
-and WHICH patterns are relevant.
+1. **Relevance:** it directly improves the inferred user outcome or prevents a material failure.
+2. **Evidence:** local facts, authoritative guidance, user context, or a safe experiment supports it.
+3. **Proportionality:** its cost and complexity match the task's stakes.
 
-**Rule: Before every search query, prefix it mentally with "For a [project type] that [solves X]..."**
+If an addition fails one of these tests, omit it or present it as an optional follow-up rather than silently enlarging scope.
 
-→ Template: [assets/project-identity-card.md](assets/project-identity-card.md) — fill this out once per project
+Literal execution is appropriate only when the user clearly specifies a hard constraint, exact artifact, or
+deliberately chosen method. Even then, research how to implement it correctly in context. If literal wording
+conflicts with the larger purpose, surface the conflict and pursue the purpose unless the user explicitly confirms
+that the method itself is the requirement.
 
+Examples:
 
-## Decision Tree
+- "Add browser skills" may express a need for agents to complete web workflows reliably. Research browser
+  automation, permission boundaries, session isolation, and observability before deciding whether that means a
+  skill, MCP server, built-in tool, or combination.
+- "Make it like Vercel" usually defines qualities such as restraint, hierarchy, density, and interaction behavior;
+  it does not require copying every token or layout regardless of the product's workflows.
+- "Use Redis" may signal a need for shared state, durability, coordination, or speed. Verify which problem exists
+  before introducing Redis.
 
-```
-├─ One-line fix, typo, config? → SKIP
-├─ Familiar pattern? → LIGHT (Phase 2 only, one ref)
-└─ New feature, design, unknown? → FULL (all phases)
-```
+For an initial request, use the expanded intent to frame the goal before planning. For later input, if it changes only
+the means, continue toward the existing goal with an evidence-based adaptation. If it changes the desired outcome or
+scope materially, state that interpretation explicitly and revise the goal or plan rather than silently mixing
+incompatible objectives.
 
-## Phase 1: Expand the Problem (through the identity lens)
+### Treat User Doubt as a Reassessment Trigger
 
-The surface question is never the whole problem. "Add X" = "add X correctly, securely, efficiently, maintainably." Expand across these dimensions, filtering each through the project identity from Phase 0:
+When the user questions the work—explicitly or indirectly—assume the current reasoning may have missed their purpose,
+used weak evidence, made an unsupported assumption, or optimized the wrong outcome. Examples include "Are you sure?",
+"This still feels wrong," "Why are you doing this?", "Is that enough?", corrections, repeated requests, and a change
+in tone that indicates lost confidence.
 
-| # | Dimension | Ask |
-|---|-----------|-----|
-| 1 | Data | Schema? Storage? Validation? Migration? |
-| 2 | Lifecycle | Startup? Shutdown? Crash recovery? |
-| 3 | Integration | How connect to existing? Failure modes? |
-| 4 | Security | Attack vectors? AuthZ? Injection? |
-| 5 | Performance | Bottlenecks? Scaling limits? |
-| 6 | Observability | Monitoring? Logging? Debugging? |
-| 7 | API/UX | Contract? User interaction? |
-| 8 | Configuration | Configurable? Env differences? |
-| 9 | Testing | Strategy? Edge cases? |
-| 10 | Evolution | Versioning? Backward compat? |
+Pause the affected course of action long enough to run a focused reassessment:
 
-Expand at least 6 dimensions. Each generates 1-3 search queries.
-→ If unfamiliar with the domain, read [problem-expansion.md](references/problem-expansion.md) for detailed examples.
+1. Identify exactly what claim, assumption, interpretation, or result the doubt concerns.
+2. Reconstruct the user's intended outcome from the full conversation, not only the latest objection.
+3. Inspect the current artifact and evidence; distinguish what is proven, inferred, stale, or absent.
+4. Seek new evidence that could falsify the current approach, not only sources that support it.
+5. Compare three possibilities: the work is sound but poorly explained; the direction is right but incomplete; the
+   underlying framing or solution is wrong.
+6. Continue, revise, or reverse based on evidence, and explain the correction concretely.
 
-## Phase 2: Search with Quality
+Do not treat doubt as an instruction to agree automatically. Reflexive deference is another form of shallow literalism.
+Likewise, do not defend sunk work merely because it already exists. The purpose of reassessment is to recover alignment
+and truth, not to preserve either party's first position.
 
-Search ≥3 sources. Priority: official docs → specs → source code → tests → issues → Stack Overflow → blogs (last resort).
+For ambiguous intent, conflicting signals, or skill evaluation, read
+[references/intent-interpretation-evaluation.md](references/intent-interpretation-evaluation.md).
 
-**Rules**: ≥2 independent repos. Read ≥2 source files + ≥1 test file per repo. Never cite blogs as primary evidence.
+## Step 1: Frame the Work Context
 
-**Quality filter** (before deep-diving): last commit < 1yr? license compatible? tests exist? maintainer responsive?
+Create a short context brief. For a codebase, inspect README, architecture docs, configuration, tests, and recent history. For a document or decision, inspect the supplied artifact, audience, constraints, and desired outcome.
 
-→ Full query construction, quality signals matrix, multi-angle coverage, and anti-patterns: [search-quality.md](references/search-quality.md)
-
-**If search finds nothing**: after 3 varied queries with no good results, report to user: "No production references found for [topic]. Options: (1) broaden search, (2) proceed with best-effort from first principles, (3) reconsider approach." Do not silently proceed.
-
-### 2F. Creative/Design Research (when task involves creating, not just coding)
-
-When the task involves writing, designing, planning, or any creative output — not just code —
-add this sub-phase. The best creators study the best work before making their own.
-
-**Research "Who Already Did This Well"** — search these angles in parallel:
-
-| Angle | What to Search | Example |
-|-------|---------------|---------|
-| **Best examples** | Who does this best? Study them. | "best developer documentation examples", "award-winning presentation design" |
-| **Templates & frameworks** | Existing templates, structures, formats | "technical documentation template", "project plan framework" |
-| **Style guides** | Established conventions and standards | "Google developer documentation style guide", "Apple HIG" |
-| **Comparable work** | How do similar products/projects do this? | "open source project README examples", "startup pitch deck examples" |
-| **Reusable assets** | Can we start from something existing? | "MIT licensed presentation template", "open source documentation theme" |
-
-**Extract Patterns** — from ≥2 examples, extract:
-
-- **Structure**: How is it organized? What's the information hierarchy?
-- **Format**: What format works best? (markdown? slides? interactive? video?)
-- **Tone & voice**: Formal? Casual? Technical? Accessible?
-- **Visual approach**: Minimal? Rich? Data-heavy? Illustration-driven?
-- **What makes the best examples stand out**: The ONE thing that elevates them
-
-**Rules for creative research:**
-- If a widely-adopted standard exists (e.g., Google style guide for docs) → follow it
-- If an open-source template exists with compatible license → start from it
-- If no standard exists → study 3 best examples and synthesize
-- Never write from scratch when templates exist
-- The best work always steals from the best — be deliberate about it
-
-## Phase 3: Extract Complete Patterns
-
-For each reference, extract: data model, lifecycle, error handling, edge cases, configuration, tests, security, integration, performance, and the one finding that surprised you.
-
-→ Full 10-dimension checklist: [problem-expansion.md](references/problem-expansion.md)
-
-**When two references disagree**: prioritize the one that (1) matches the project's language/framework, (2) is more actively maintained, (3) has better test coverage. Document the conflict and your choice in Phase 6.
-
-## Phase 4: Evaluate Reuse
-
-For each reference: **REUSE** (same stack, compatible license)→ **ADAPT** (similar stack, needs adjustment) → **LEARN-FROM** (different stack, patterns only).
-
-→ License compatibility guide and decision matrix: [adapting-depth.md](references/adapting-depth.md)
-
-## Phase 5: Verify Readiness
-
-All boxes before any code:
-
-- [ ] Read project docs and source (Phase 0)
-- [ ] Expanded ≥6/10 dimensions (Phase 1)
-- [ ] Found ≥2 independent references (Phase 2)
-- [ ] Read ≥2 source files + 1 test file per reference
-- [ ] Read official docs for core API
-- [ ] Extracted all pattern dimensions (Phase 3)
-- [ ] Identified ≥5 edge cases
-- [ ] Found ≥1 security consideration
-- [ ] Made reuse/adapt/learn-from decision (Phase 4)
-- [ ] Solution fits project conventions
-
-**Any box unchecked → go back. Do not proceed to Phase 6.**
-
-## Phase 6: Report Findings
-
-```
-## Research Summary: [Problem]
-
-### Project Context
-[One paragraph from Phase 0]
-
-### References
-1. [Name](URL) — files read: [paths] — key insight — decision: REUSE|ADAPT|LEARN-FROM
-2. [Name](URL) — files read: [paths] — key insight — decision: REUSE|ADAPT|LEARN-FROM
-
-### Edge Cases (≥5)
-1. [Case] → [mechanism]
-
-### What I Got Wrong
-[Assumption corrected by reading source code]
-
-### Plan
-1. [Step] — following [ref]
+```text
+Subject: project, artifact, system, or decision
+Outcome: what success changes for the user
+Users/audience: who consumes or is affected by it
+Constraints: security, compatibility, policy, time, cost, tone, format
+Current state: what exists and what is already proven
+Unknowns: uncertainties that could change the approach
+Failure cost: impact and reversibility if wrong
 ```
 
-Then ask: **"Proceed with implementation?"**
+Do not invent missing identity details. Infer only from evidence and label assumptions.
 
-→ **Template**: [assets/research-report-template.md](assets/research-report-template.md)
-→ **Real examples**: [references/case-studies.md](references/case-studies.md) — 3 cases with before/after
+## Step 2: Choose Research Depth
 
-## Phase 7: Self-Audit (BEFORE reporting done)
+Use the smallest depth that responsibly reduces the important uncertainty.
 
-After implementation but BEFORE telling the user "done," run this audit.
-The user should never have to catch these — you catch them first.
+| Mode | Use when | Minimum evidence |
+|---|---|---|
+| Direct | Mechanical or fully specified, low-risk change | Local/source evidence and targeted verification |
+| Quick | Familiar, reversible task with one meaningful unknown | 1 strong evidence stream; 2-3 relevant dimensions |
+| Standard | New feature, design, plan, integration, or customer-facing change | 2 independent evidence streams; at least 6 relevant dimensions; 5 edge cases |
+| Deep | Security, auth, money, privacy, destructive operations, core architecture, migration, regulated work | 3+ evidence streams; 8-10 dimensions; adversarial and rollback analysis |
 
-### 7A. Proactivity Check
+Escalate depth when evidence conflicts, the domain is unfamiliar, the action is hard to reverse, or the user previously found the work shallow. Reduce breadth—not validation integrity—when time is constrained.
 
-Ask yourself honestly:
+Read [references/adapting-depth.md](references/adapting-depth.md) when depth is ambiguous or constraints are severe.
 
-- [ ] Did the user have to point out anything I should have noticed myself?
-- [ ] Did I stop at the surface question, or did I expand to the full problem space?
-- [ ] Did I research before coding, or did I jump straight to implementation?
-- [ ] Did I find and read source code from reference implementations?
-- [ ] Are there remaining issues I know about but didn't mention?
+## Step 3: Expand the Real Question
 
-**If the user would need to say "you forgot X" or "this is still shallow" → fix it NOW, before reporting.**
+Select the dimensions that can materially affect the outcome. Standard work should cover at least six; Deep work should normally cover all applicable dimensions.
 
-### 7B. Completeness Check
+1. Outcome and acceptance criteria
+2. Data, inputs, provenance, and validation
+3. Lifecycle, state transitions, shutdown, and recovery
+4. Integration boundaries and dependencies
+5. Security, privacy, authorization, and abuse cases
+6. Performance, scale, cost, and resource limits
+7. Observability, auditability, and diagnosis
+8. API, UX, accessibility, and human workflow
+9. Configuration, environments, and deployment
+10. Testing, compatibility, migration, and evolution
 
-- [ ] All Phase 5 readiness boxes still hold after implementation?
-- [ ] Did I handle all 10 problem dimensions, not just the obvious ones?
-- [ ] Did I test my changes? (run tests, verify they pass)
-- [ ] Did I update project documentation (CLAUDE.md, RESEARCH.md) with findings?
-- [ ] Are there any TODO comments or stubs I left behind?
+Omit irrelevant dimensions explicitly rather than filling them with generic prose. Use [references/problem-expansion.md](references/problem-expansion.md) for unfamiliar domains.
 
-### 7C. Quality Check
+When the request contains a proposed solution, expand both questions separately:
 
-- [ ] If a picky user reviewed this, would they find obvious gaps?
-- [ ] Did I follow the project's existing code style and patterns?
-- [ ] Did I handle error cases, not just the happy path?
-- [ ] Is there anything I'm hoping the user won't notice?
+- **Purpose question:** What result would make the user's underlying problem meaningfully better?
+- **Means question:** Which mechanism best produces that result in this context?
 
-### 7D. Red Flags
+Research must be allowed to change the means. Otherwise it is confirmation work, not research-first work.
 
-If ANY of these are true, do NOT report done. Fix first:
+## Step 4: Select Evidence Streams
 
-| Red Flag | Action |
-|----------|--------|
-| User previously said "you're still being shallow" | Double research depth. Re-verify all Phase 5 boxes. |
-| I only searched one source | Go back to Phase 2. Find at least one more reference. |
-| I didn't read any source code | Read at least 2 core files from a reference implementation. |
-| I'm about to say "should I proceed?" without a research summary | Write the Phase 6 summary first. |
-| There are tests I didn't run | Run them now. |
-| I know about a related problem but didn't research it | Research it now. Don't wait for the user to ask. |
+Choose evidence by the question being answered. Two streams are independent when they arise from different failure modes or authorities—not merely two pages repeating the same claim.
 
-**If the audit reveals issues → fix them first. Only report done when all checks pass.**
+| Evidence stream | Best for |
+|---|---|
+| Local source, tests, history, configuration | Existing behavior, conventions, constraints, regressions |
+| Official docs, standards, specifications, policy | Supported contracts, lifecycle, security and compliance requirements |
+| Maintainer source and tests | Real implementation details and edge behavior |
+| User-provided files, examples, feedback, analytics | Actual requirements, audience, defects, and usage patterns |
+| Production logs, metrics, traces, database inspection | Operational reality and scale |
+| Competitors, reference products, design systems | Expected UX, positioning, interaction patterns |
+| Papers, benchmarks, authoritative datasets | Algorithms, scientific or quantitative claims |
+| Safe prototypes, spikes, dry runs, experiments | Feasibility and ambiguous runtime behavior |
 
----
+Examples of valid Standard combinations:
 
-## When Things Go Wrong
+- Existing feature: local implementation/tests + official API docs.
+- Product workflow: user feedback/analytics + two strong product examples.
+- Migration: current schema/data sample + vendor migration guide + dry run.
+- Document revision: supplied draft/source material + applicable style guide or exemplar.
+- Incident diagnosis: logs/traces + source/history + reproduction experiment.
 
-| Situation | Response |
-|-----------|----------|
-| No good references found | Report to user with options. Don't silently proceed. |
-| References contradict | Follow [contradictions.md](references/contradictions.md): prioritize by stack match, maintenance, test coverage. |
-| Time running out | Drop to lighter depth tier. Focus on highest-risk dimensions (security, lifecycle). |
-| Completely unfamiliar domain | Add exploratory phase: search `"{domain} fundamentals architecture"` before Phase 1. |
-| User says "still too shallow" | Re-verify ALL Phase 5 checkboxes immediately. Expand to 10/10 dimensions. |
+Repository quotas are not universal. When external code reuse or architecture is central, inspect at least two independent implementations; for each serious reuse candidate, read core source and tests rather than only its README.
 
-→ Full failure mode catalog: [adapting-depth.md](references/adapting-depth.md)
+Read [references/search-quality.md](references/search-quality.md) before broad external research.
+
+## Step 5: Gather Evidence Efficiently
+
+### Local-first tasks
+
+Start with the workspace. Search narrowly, follow data/control flow, inspect nearby tests, and check recent changes. Search externally only for unresolved behavior, unfamiliar APIs, security guidance, standards, or prior art that can change the design.
+
+### External research
+
+Prioritize:
+
+1. Official documentation and specifications
+2. Primary source code, tests, datasets, or product behavior
+3. Maintainer issues, release notes, and security advisories
+4. High-quality independent analysis
+5. Blogs and forum answers only as leads to verify
+
+Pin versions, dates, commits, or document revisions when behavior can drift. Check license before copying code or assets.
+
+### Creative and design work
+
+Study relevant exemplars, templates, style guides, and reusable assets. Extract structure, interaction, visual language, states, accessibility, and the reason the example works. Do not add design research to a backend-only change unless it affects a user-facing contract.
+
+### Operational actions
+
+For deployments, migrations, account changes, or external writes, research the exact target version and environment. Prefer read-only inspection and dry runs. Identify rollback, blast radius, credential scope, and success signals before mutating state.
+
+### Restricted or offline environments
+
+Use available local docs, vendored source, lockfiles, installed package metadata, tests, fixtures, and experiments. If primary evidence is unavailable:
+
+- state the evidence gap;
+- distinguish fact, inference, and assumption;
+- proceed with a reversible best-effort path when the user has authorized it;
+- ask only if the missing evidence creates a material, irreversible choice.
+
+## Step 6: Synthesize, Do Not Accumulate
+
+For each important finding, capture:
+
+```text
+Question → Evidence → Confidence → Decision/constraint → Verification
+```
+
+Compare evidence across these concerns when applicable:
+
+- contract/data model
+- lifecycle and failure handling
+- security boundary
+- configuration and deployment
+- performance/cost
+- API/UX
+- test strategy
+- compatibility/evolution
+
+Resolve conflicts by preferring evidence that is primary, version-matched, reproducible, maintained, and closest to the actual environment. Document consequential conflicts and why one source won.
+
+Classify reuse decisions:
+
+- REUSE: compatible, licensed, maintained, and fits directly.
+- ADAPT: sound pattern but local constraints require changes.
+- LEARN-FROM: useful principle, incompatible implementation or license.
+- REJECT: evidence shows it does not fit.
+
+## Step 7: Readiness Gate
+
+Before creating or changing anything substantial, confirm:
+
+- [ ] Context and desired outcome are understood.
+- [ ] Research depth matches risk and novelty.
+- [ ] Material unknowns were expanded across relevant dimensions.
+- [ ] Primary evidence was used where available.
+- [ ] Material claims have independent support or are labeled uncertain.
+- [ ] At least five edge cases exist for Standard/Deep work.
+- [ ] Security and failure/rollback were considered when relevant.
+- [ ] Reuse/license/version decisions are explicit when relevant.
+- [ ] Findings map to implementation constraints and verification.
+- [ ] The proposed action fits the user's authority and scope.
+- [ ] User input was separated into purpose, constraints, candidate means, assumptions, and missing dimensions.
+- [ ] The plan optimizes for the inferred outcome rather than mirroring the latest wording.
+
+If a box is inapplicable, mark it inapplicable rather than manufacturing research.
+
+## Step 8: Report and Act
+
+Give a concise research update before substantial implementation:
+
+```markdown
+Research summary: [topic]
+
+- Context: [what matters locally]
+- Evidence: [primary streams and pinned versions]
+- Corrections: [assumptions changed by evidence, if any]
+- Edge cases: [important cases and mechanisms]
+- Decision: [reuse/adapt/learn-from/reject]
+- Execution plan: [ordered slices and verification]
+```
+
+Then:
+
+- If execution is already authorized, continue immediately.
+- If the user asked only for analysis/review, stop at findings.
+- If a missing choice materially changes scope, cost, risk, or external state, ask that question.
+- If research disproves the requested approach, explain the evidence and propose the closest viable alternative.
+
+## Step 9: Verify and Self-Audit
+
+After execution, test in proportion to risk and revisit the evidence-to-decision chain.
+
+- Confirm the implementation addresses the researched edge cases.
+- Run relevant tests, builds, lint/type checks, dry runs, or artifact inspection.
+- Check for new TODOs, stubs, unsupported claims, or stale docs.
+- Report known residual risks and unverified external assumptions.
+- Do not claim completion because research or coding is extensive; claim it only when the requested outcome is achieved.
+- Compare the result against both failure directions: literal under-interpretation and speculative over-interpretation.
+- Confirm every added requirement traces to user purpose plus evidence, and every explicit constraint remains intact.
+
+## Common Failure Modes
+
+- Research theater: collecting links without changing a decision.
+- Checklist cargo cult: forcing repo counts or dimensions onto irrelevant work.
+- Search-first, context-later: importing patterns that conflict with the workspace.
+- README trust: relying on marketing documentation without source/tests for behavior-critical claims.
+- Version blindness: mixing current docs with older installed software.
+- Confirmation bias: searching only for the initially preferred solution.
+- Authorization stall: asking to proceed after the user already authorized execution.
+- Novelty paralysis: refusing reversible progress because perfect external precedent does not exist.
+- Silent uncertainty: presenting inference as fact.
+- Re-researching: ignoring valid work already completed in the same goal.
+- Dictation bias: treating any user wording as a complete implementation specification.
+- Vocabulary mirroring: copying named tools or decompositions into the plan without proving they fit.
+- Means fixation: researching only how to implement the proposed mechanism instead of whether it serves the purpose.
+- Compression blindness: assuming the absence of a named requirement means the underlying need does not exist.
+- Vocabulary ceiling: limiting research and solution quality to concepts the user already knows how to name.
+- Interruption amnesia: forgetting the active goal when incorporating later guidance.
+- Over-interpretation: ignoring an explicit hard constraint under the pretext of pursuing a broader purpose.

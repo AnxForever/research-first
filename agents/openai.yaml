@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research First"
+  short_description: "Infer intent, research the real problem, then act"
+  default_prompt: "Use $research-first to interpret my underlying purpose and constraints, research the important uncertainties and best-fit means, then act with evidence-backed verification."
