@@ -1,11 +1,11 @@
 # Research Summary: [Problem Being Solved]
 
-## Project Identity (Phase 0)
+## Project Identity (Step 1)
 > What problem does this project solve? Who uses it? What are the hard constraints?
 
 [Brief: this project is a ____ that solves ____ for ____. Key constraint: ____.]
 
-## References Found (Phase 2)
+## References Found (Step 4–5)
 
 ### 1. [Project Name](URL)
 - **Files read**: `[path/to/core.ts]`, `[path/to/handler.py]`
@@ -19,7 +19,7 @@
 - **Decision**: REUSE | ADAPT | LEARN-FROM
 - **Why**: [reasoning]
 
-## Complete Pattern (Phase 3)
+## Complete Pattern (Step 6)
 
 ### Data Model
 [Structures, schemas, fields, relationships]
@@ -39,7 +39,7 @@ Error path: [what fails] → [how it recovers]
 - **Threats identified**: [list]
 - **Defenses**: [list]
 
-## Edge Cases (≥5, Phase 3)
+## Edge Cases (≥5, Step 6)
 
 | # | Edge Case | How Reference Handles It |
 |---|-----------|-------------------------|

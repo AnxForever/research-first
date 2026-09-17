@@ -40,7 +40,7 @@ Reference A says X. Reference B says Y.
 
 ## Document the Conflict
 
-In Phase 6 report, always note the disagreement:
+In the Step 8 report, always note the disagreement:
 
 ```
 ### Conflicts Resolved
@@ -53,7 +53,7 @@ B's approach is better for: [scenario]. We may adopt it later if [condition].
 
 If two references agree on an approach that feels wrong for your project:
 
-1. Trust your Phase 0 knowledge — you understand the project's constraints
+1. Trust your Step 1 knowledge — you understand the project's constraints
 2. Search specifically for `"{approach} problems"` or `"{approach} limitations"`
 3. Look for a third reference that takes a different approach entirely
 4. If only two approaches exist and both feel wrong, the problem might need reframing
