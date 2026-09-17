@@ -1,115 +1,112 @@
-# Search Quality — Complete Guide
+# Evidence and Search Quality
 
-## Query Construction
+## Start With the Question
 
-### GitHub Qualifiers
+Write the uncertainty in a testable form before choosing a source:
 
-```
-stars:>1000              — community validation
-stars:100..500           — niche but validated
-pushed:>2024-06-01       — actively maintained
-pushed:<2023-01-01       — find legacy (for migration research)
-language:python          — exact tech match
-language:typescript      — exact tech match
-license:mit              — permissive, easy to reuse
-license:apache-2.0       — permissive with patent grant
-in:readme "production"   — self-described production quality
-in:name {keyword}        — keyword in repo name
-in:description {keyword} — keyword in description
-org:{org-name}           — scope to trusted org
-user:{username}          — scope to known author
-path:src/                — exclude test/vendor noise
--path:test/ -path:dist/  — aggressive noise exclusion
-topic:{tag}              — GitHub topics
+```text
+What must be true for this approach to work in this environment?
+What evidence would disprove it?
+Which version, audience, scale, or policy applies?
 ```
 
-### Composite Templates
+Search by problem, competing solution, failure mode, and authoritative owner. Avoid queries that assume the preferred answer.
 
-```
-Basic:      {keyword} language:{lang} stars:>{min} pushed:>{date}
-Production: {keyword} language:{lang} stars:>1000 pushed:>2024-01-01 license:mit
-Niche:      {keyword} language:{lang} stars:10..500 topic:{domain}
-Docs-first: site:github.com "{tech} {topic}" in:readme
-```
+## Source Priority
 
-### Query Variations
+| Priority | Source | Use for |
+|---|---|---|
+| 1 | Local system/source of truth | Current behavior, constraints, data, conventions |
+| 2 | Official docs/specs/policies | Supported contract, security, compliance, lifecycle |
+| 3 | Primary implementation/tests/data | Edge behavior, integration details, reproducibility |
+| 4 | Maintainer issues/releases/advisories | Known defects, drift, migration notes |
+| 5 | Independent expert analysis | Alternative interpretation and operational experience |
+| 6 | Blogs/forums/search summaries | Leads only; verify material claims |
 
-Always run at least 3:
+The order changes by task. Production telemetry may outrank official performance claims; a legal policy may outrank an implementation example.
 
-1. By problem: `"{problem description}" language:{lang}`
-2. By solution: `"{solution pattern} example" language:{lang} path:src/`
-3. By domain: `topic:{domain} language:{lang} stars:>500`
+## Quality Signals
 
-### Plain WebSearch Queries
+Evaluate evidence on:
 
-```
-"{tech stack} {feature} production implementation github 2025"
-"{tech stack} {problem} best practice pattern"
-"{tech stack} {component} architecture reference"
-site:github.com "{tech} {pattern}"
-```
+- Authority: is the source responsible for the contract or result?
+- Proximity: does it observe the actual system or audience?
+- Version match: does it apply to the installed/target version and date?
+- Reproducibility: can the behavior or claim be checked?
+- Independence: is it genuinely separate from other evidence?
+- Completeness: does it include failure cases, not only the happy path?
+- Maintenance: is it current and acknowledged by maintainers?
+- Incentives: is it documentation, marketing, advocacy, or neutral measurement?
+- License/rights: may code, data, media, or templates be reused?
 
-## Source Priority Hierarchy
+## Repository Research
 
-| Priority | Source | How | When to Skip |
-|----------|--------|-----|-------------|
-| 1 | Official docs | context7 MCP FIRST, else WebSearch `{tech} docs {topic}` | Never skip |
-| 2 | Specs & standards | RFCs, agentskills.io, OWASP, protocol docs | If no standard exists |
-| 3 | Source code | Read .ts/.py/.go/.rs files in repos | Never skip for FULL |
-| 4 | Tests | Test files in reference repos | Skip for LIGHT only |
-| 5 | GitHub issues | Known bugs, discussions, PR reviews | Skip if time < 15min |
-| 6 | Stack Overflow | Accepted answers, high votes, recent | Skip if official docs sufficient |
-| 7 | Blog posts | Cross-reference with docs | Skip whenever possible |
+When code reuse or implementation patterns are material:
 
-## Quality Signals Matrix
+1. Pin a release, tag, or commit.
+2. Check license, recent activity, releases, and CI.
+3. Read at least two core source files relevant to the question.
+4. Read tests that demonstrate lifecycle and failure behavior.
+5. Inspect relevant issues or advisories for hidden constraints.
+6. Compare with an independent implementation or official specification.
 
-| Signal | Green | Yellow | Red |
-|--------|-------|--------|-----|
-| Last commit | < 1 month | 1-6 months | > 1 year |
-| Stars | > 500 | 50-500 | < 50 |
-| License | MIT/Apache/BSD | GPL/LGPL | None |
-| Test directory | `test/` exists | Tests in source | No tests |
-| Contributing guide | CONTRIBUTING.md | README section | None |
-| Releases/tags | Git tags | Main only | No versioning |
-| Issue response | Active replies | Mixed | All open |
-| CI/CD | Green badge | No badge | Red/failing |
-| Dependencies | Up to date | Minor outdated | Major vulnerable |
-| Docs quality | Comprehensive | Minimal | README only |
+Popularity is a weak signal. Prefer version fit, tests, maintainership, and architectural similarity over stars.
 
-## 2-Minute Quick Check
+Useful query dimensions include problem wording, protocol/API name, failure message, security boundary, migration path, language/framework, organization, file path, and target version. Use current dates rather than hard-coded year filters.
 
-1. Open repo → last commit date? license file?
-2. Skim test directory → real tests or placeholder?
-3. Read one core source file → well-structured? documented?
-4. Check 3 recent closed issues → maintainer responsive? problems acknowledged?
+## Product and Design Research
 
-Passes all 4 → deep read. Fails any → deprioritize unless it's the only reference.
+Use live products, official design systems, accessibility guidance, user studies, analytics, and support feedback. Record:
 
-## Multi-Angle Coverage
+- target user and job-to-be-done;
+- hierarchy and interaction flow;
+- empty/loading/error/success states;
+- accessibility and responsive behavior;
+- what is convention versus brand-specific styling;
+- evidence that the pattern works for the intended audience.
 
-| Angle | Query Pattern | Finds |
-|-------|--------------|-------|
-| By problem | `"{problem}" language:{lang}` | Direct solutions |
-| By technology | `"{lib}" example production` | Official/community examples |
-| By pattern | `"{pattern}" implementation {lang}` | Architectural references |
-| By author | `org:{known-org}` or known author | Authority implementations |
-| By awesome-list | `awesome-{topic}` | Curated collections |
-| By paper | `"{algorithm}" code github` | Academic implementations |
+Do not infer business success from visual polish alone.
 
-Coverage check:
-- Repos from ≥2 different orgs/authors?
-- Both small focused libs AND large framework examples?
-- At least one clearly used in production (issues, users, testimonials)?
+## Quantitative and Scientific Research
 
-## Search Anti-Patterns
+Prefer original datasets, methods, standards, peer-reviewed work, and reproducible benchmarks. Check sample definition, denominators, uncertainty, confounders, leakage, and whether the metric matches the user's decision.
 
-| Mistake | Why | Fix |
-|---------|-----|-----|
-| First result only | Confirmation bias | ≥2 independent sources |
-| Keyword-only | Misses alternatives | Multi-angle coverage |
-| No date filter | Dead projects | `pushed:>YYYY-MM-DD` |
-| License ignored | Illegal reuse | Check before deep reading |
-| GitHub-only | Misses docs/specs | Start with docs |
-| Vague queries | Noise | Language + domain + qualifiers |
-| No test reading | Wrong API usage | Read tests |
-| Stars-only sorting | Popular ≠ good pattern | Cross-reference quality signals |
+Never merge numbers from incompatible populations or time periods without explicit normalization.
+
+## Operational Research
+
+Pin the target environment and exact version. Verify prerequisites, permissions, credential scope, rate limits, backups, rollback, blast radius, and observable success criteria. Use read-only checks and dry runs before writes when supported.
+
+## Corroboration Rules
+
+- Material claim: support with primary evidence or label as inference.
+- High-risk claim: require primary evidence plus an independent stream.
+- Conflicting sources: prefer version-matched, reproducible, proximate evidence and document the conflict.
+- No source: state the gap and use a reversible experiment rather than presenting a guess as fact.
+
+## Search Stop Conditions
+
+Stop researching when:
+
+- the important uncertainty is resolved enough to choose safely;
+- additional sources repeat known information;
+- a prototype/test can answer faster and more directly;
+- remaining uncertainty is explicitly accepted and contained by rollback or validation.
+
+Continue when:
+
+- evidence changes the architecture or safety boundary;
+- sources disagree on material behavior;
+- version applicability is unclear;
+- edge cases or failure recovery remain unknown.
+
+## Anti-Patterns
+
+- First-result bias
+- GitHub-only or web-only evidence
+- Reading README without tests for behavior-critical claims
+- Hard-coded recency filters that age poorly
+- Treating popularity as correctness
+- Copying without license review
+- Collecting sources without recording decisions
+- Repeating prior research instead of auditing freshness
