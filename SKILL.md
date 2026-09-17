@@ -1,11 +1,4 @@
----
-name: research-first
-description: Interpret the user's underlying purpose, expand compressed or incomplete requests, and research evidence before choosing a solution. Always use, in any language, when the user asks to research, investigate, gather sources or examples, inspect evidence, understand their intent, avoid literal copying, or expand an idea. Also always use when the user questions, doubts, challenges, corrects, is dissatisfied with, or asks to reconsider the agent's understanding, plan, decision, or work; reassess intent, assumptions, and contrary evidence instead of merely defending or agreeing. Use for ideas, symptoms, named technologies, proposed implementations, product directions, architecture, integrations, migrations, security, privacy, payments, and other consequential work where evidence could change the framing or solution. Skip only fully specified, low-risk mechanical actions where research cannot materially change the result. Resume valid research instead of restarting it.
----
 
-# Research First
-
-Build from evidence, not habit. Research is any disciplined reduction of uncertainty: inspecting the workspace, reading official docs and source, analyzing user-provided material or telemetry, comparing established examples, or running a safe experiment.
 
 ## Operating Contract
 
@@ -17,6 +10,9 @@ Build from evidence, not habit. Research is any disciplined reduction of uncerta
 6. Convert findings into an expanded problem definition, decisions, implementation constraints, and tests.
 7. If the user already authorized execution, continue after a concise research update. Ask before implementation only when authority or a material product choice is missing.
 8. Preserve an evidence trail sufficient to explain important decisions without flooding the user.
+9. Treat every material feature and independently failing lifecycle as its own research unit. Project-level research does not automatically cover its subfeatures.
+10. Maintain a complete feature inventory, including promised, implemented, hidden, disabled, inherited, and operational capabilities. An unlisted feature is an unassessed gap, not implicitly covered.
+11. Mark inherited features with missing, stale, indirect, or generic evidence as historical research gaps; do not grandfather them as correct or erase the historical marker after later backfill.
 
 ## Step 0: Resume Before Restarting
 
@@ -26,6 +22,26 @@ First inspect the conversation, active plan/goal, existing research notes, recen
 - Verify only assumptions affected by new code, changed requirements, version drift, or external state.
 - Do not repeat completed searches merely to satisfy a checklist.
 - When inheriting a task, record what is established, uncertain, and stale.
+
+### Maintain a Per-Feature Evidence Ledger
+
+For multi-feature products, refactors, and long-running goals, create or update a compact feature evidence ledger before substantial implementation. A feature is a user-visible outcome or independently failing lifecycle, not merely a file, component, endpoint, or sprint item.
+
+For each feature record a stable feature ID, parent capability, lifecycle scope, user outcome, delivery state, local/runtime evidence, primary guidance, mature product or open-source evidence, adopt/adapt/combine/decline decision, acceptance and failure evidence, current coverage, historical gap state, and priority.
+
+Use **covered** only for current feature-specific evidence that supports material lifecycle, security, UX, and failure decisions. Use **partial** when a material dimension remains unverified, **gap** when the implementation rests on intuition, user wording, generic project research, code existence, or tests, and **stale** when versions, requirements, runtime state, or product direction changed.
+
+When touching inherited behavior, inspect its ledger entry, treat missing feature-specific research as a live reasoning defect, seek evidence that could reverse the implementation, and backfill before preserving or extending it. Tests prove behavior under their coverage; they do not prove that behavior is the right decision.
+
+Keep **delivery state**, **current evidence coverage**, and **research history** separate:
+
+- Delivery state: `idea`, `planned`, `implemented`, `enabled`, `operational`, `deprecated`.
+- Evidence coverage: `covered`, `partial`, `gap`, `stale`.
+- Historical gap: `none`, `inherited-unassessed`, `previously-overclaimed`, `reopened-by-change`, `backfilled`.
+
+Backfilling may improve current coverage, but it must change the historical marker to `backfilled`, not delete the fact that the feature was previously unassessed or overclaimed. Before planning broad work, reconcile the inventory against product copy, routes, controls, APIs, schemas, flags, tests, deployment configuration, operations docs, and prior completion claims. Add every missing item as `gap` before implementation.
+
+Read [references/feature-evidence-ledger.md](references/feature-evidence-ledger.md) for the structure and backfill rules.
 
 ### Interpret Every User Input by Intent
 
@@ -151,7 +167,7 @@ Use the smallest depth that responsibly reduces the important uncertainty.
 
 Escalate depth when evidence conflicts, the domain is unfamiliar, the action is hard to reverse, or the user previously found the work shallow. Reduce breadth—not validation integrity—when time is constrained.
 
-Read [references/adapting-depth.md](references/adapting-depth.md) when depth is ambiguous or constraints are severe.
+Read [references/adapting-depth.md](references/adapting-depth.md) for depth scoring, per-task adaptation, and what to do when evidence is unavailable.
 
 ## Step 3: Expand the Real Question
 
@@ -192,52 +208,19 @@ Choose evidence by the question being answered. Two streams are independent when
 | Papers, benchmarks, authoritative datasets | Algorithms, scientific or quantitative claims |
 | Safe prototypes, spikes, dry runs, experiments | Feasibility and ambiguous runtime behavior |
 
-Examples of valid Standard combinations:
+When external code reuse or architecture is central, inspect at least two independent implementations; for each serious reuse candidate, read core source and tests rather than only its README.
 
-- Existing feature: local implementation/tests + official API docs.
-- Product workflow: user feedback/analytics + two strong product examples.
-- Migration: current schema/data sample + vendor migration guide + dry run.
-- Document revision: supplied draft/source material + applicable style guide or exemplar.
-- Incident diagnosis: logs/traces + source/history + reproduction experiment.
-
-Repository quotas are not universal. When external code reuse or architecture is central, inspect at least two independent implementations; for each serious reuse candidate, read core source and tests rather than only its README.
-
-Read [references/search-quality.md](references/search-quality.md) before broad external research.
+Read [references/search-quality.md](references/search-quality.md) for source priority, quality signals, corroboration, stop conditions, and anti-patterns.
 
 ## Step 5: Gather Evidence Efficiently
 
-### Local-first tasks
+- **Local-first tasks.** Start with the workspace. Search narrowly, follow data/control flow, inspect nearby tests, and check recent changes. Search externally only for unresolved behavior, unfamiliar APIs, security guidance, standards, or prior art that can change the design.
+- **External research.** Prefer official documentation and specifications, then primary source and maintainer artifacts, then independent analysis. Pin versions, dates, commits, or document revisions when behavior can drift. Check license before copying code or assets.
+- **Creative and design work.** Study relevant exemplars, templates, style guides, and reusable assets; extract structure, interaction, visual language, states, accessibility, and the reason the example works. Do not add design research to a backend-only change unless it affects a user-facing contract.
+- **Operational actions.** Research the exact target version and environment. Prefer read-only inspection and dry runs. Identify rollback, blast radius, credential scope, and success signals before mutating state.
+- **Restricted or offline environments.** Use available local docs, vendored source, lockfiles, installed package metadata, tests, fixtures, and experiments. If primary evidence is unavailable: state the evidence gap; distinguish fact, inference, and assumption; proceed with a reversible best-effort path when the user has authorized it; ask only if the missing evidence creates a material, irreversible choice.
 
-Start with the workspace. Search narrowly, follow data/control flow, inspect nearby tests, and check recent changes. Search externally only for unresolved behavior, unfamiliar APIs, security guidance, standards, or prior art that can change the design.
-
-### External research
-
-Prioritize:
-
-1. Official documentation and specifications
-2. Primary source code, tests, datasets, or product behavior
-3. Maintainer issues, release notes, and security advisories
-4. High-quality independent analysis
-5. Blogs and forum answers only as leads to verify
-
-Pin versions, dates, commits, or document revisions when behavior can drift. Check license before copying code or assets.
-
-### Creative and design work
-
-Study relevant exemplars, templates, style guides, and reusable assets. Extract structure, interaction, visual language, states, accessibility, and the reason the example works. Do not add design research to a backend-only change unless it affects a user-facing contract.
-
-### Operational actions
-
-For deployments, migrations, account changes, or external writes, research the exact target version and environment. Prefer read-only inspection and dry runs. Identify rollback, blast radius, credential scope, and success signals before mutating state.
-
-### Restricted or offline environments
-
-Use available local docs, vendored source, lockfiles, installed package metadata, tests, fixtures, and experiments. If primary evidence is unavailable:
-
-- state the evidence gap;
-- distinguish fact, inference, and assumption;
-- proceed with a reversible best-effort path when the user has authorized it;
-- ask only if the missing evidence creates a material, irreversible choice.
+Read [references/search-quality.md](references/search-quality.md) for per-domain research rules and [references/adapting-depth.md](references/adapting-depth.md) for evidence-unavailable conditions.
 
 ## Step 6: Synthesize, Do Not Accumulate
 
@@ -246,17 +229,6 @@ For each important finding, capture:
 ```text
 Question → Evidence → Confidence → Decision/constraint → Verification
 ```
-
-Compare evidence across these concerns when applicable:
-
-- contract/data model
-- lifecycle and failure handling
-- security boundary
-- configuration and deployment
-- performance/cost
-- API/UX
-- test strategy
-- compatibility/evolution
 
 Resolve conflicts by preferring evidence that is primary, version-matched, reproducible, maintained, and closest to the actual environment. Document consequential conflicts and why one source won.
 
@@ -283,6 +255,8 @@ Before creating or changing anything substantial, confirm:
 - [ ] The proposed action fits the user's authority and scope.
 - [ ] User input was separated into purpose, constraints, candidate means, assumptions, and missing dimensions.
 - [ ] The plan optimizes for the inferred outcome rather than mirroring the latest wording.
+- [ ] Every material feature being changed has a ledger entry or is explicitly one low-risk mechanical unit.
+- [ ] Existing features with weak historical evidence are marked partial/gap/stale rather than presumed correct.
 
 If a box is inapplicable, mark it inapplicable rather than manufacturing research.
 
@@ -319,6 +293,7 @@ After execution, test in proportion to risk and revisit the evidence-to-decision
 - Do not claim completion because research or coding is extensive; claim it only when the requested outcome is achieved.
 - Compare the result against both failure directions: literal under-interpretation and speculative over-interpretation.
 - Confirm every added requirement traces to user purpose plus evidence, and every explicit constraint remains intact.
+- Update the feature ledger with implementation evidence, remaining gaps, source versions/dates, and any design reversal caused by research.
 
 ## Common Failure Modes
 
@@ -339,3 +314,7 @@ After execution, test in proportion to risk and revisit the evidence-to-decision
 - Vocabulary ceiling: limiting research and solution quality to concepts the user already knows how to name.
 - Interruption amnesia: forgetting the active goal when incorporating later guidance.
 - Over-interpretation: ignoring an explicit hard constraint under the pretext of pursuing a broader purpose.
+- Project-research umbrella: assuming one general research document justifies every later feature.
+- Historical grandfathering: preserving inherited behavior because it exists or passes tests despite missing feature-specific evidence.
+- Green-test substitution: using build/test success as proof that the chosen product behavior or security boundary is correct.
+- Ledger theater: collecting links without recording the decision changed and the failure evidence required.
