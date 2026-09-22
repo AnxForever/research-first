@@ -6,6 +6,11 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Optional Python tooling
+__pycache__/
+*.py[cod]
+.venv/
+
 # IDE
 .vscode/
 .idea/

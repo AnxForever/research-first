@@ -1,0 +1,662 @@
+diff --git a/README.md b/README.md
+index 82b6da5..52f1f2c 100644
+--- a/README.md
++++ b/README.md
+@@ -100,6 +100,20 @@ Start the server
+   pnpm run dev
+ ```
+ 
++## Task CSV exports
++
++Select tasks and use **Export tasks** in the bulk actions toolbar to download a CSV.
++The export includes selected tasks across pages that match the current filters,
++in the current sort order. It always contains `id`, `title`, `status`, `label`,
++and `priority`, including fields hidden in the table, and preserves your selection.
++
++Files use UTF-8 with a BOM for spreadsheet compatibility. Titles retain their full
++text, including commas, quotes, and line breaks. Formula-like values receive a
++leading apostrophe so spreadsheet programs can treat them as text; that prefix
++is part of the exported value. Spreadsheet applications may change this protection
++when editing and saving the file again. The existing Import dialog is still a demo,
++so CSV round-trip import into this dashboard is not implemented.
++
+ ## Sponsoring this project ❤️
+ 
+ If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏
+diff --git a/package.json b/package.json
+index 344a66e..8e0fb76 100644
+--- a/package.json
++++ b/package.json
+@@ -50,6 +50,7 @@
+     "date-fns": "^4.1.0",
+     "input-otp": "^1.4.2",
+     "lucide-react": "^1.8.0",
++    "papaparse": "5.7.0",
+     "react": "^19.2.5",
+     "react-day-picker": "9.14.0",
+     "react-dom": "^19.2.5",
+@@ -72,6 +73,7 @@
+     "@tanstack/router-plugin": "^1.167.22",
+     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+     "@types/node": "^25.6.0",
++    "@types/papaparse": "^5.5.2",
+     "@types/react": "^19.2.14",
+     "@types/react-dom": "^19.2.3",
+     "@vitejs/plugin-react": "^6.0.1",
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 443830a..2aa9958 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -101,6 +101,9 @@ importers:
+       lucide-react:
+         specifier: ^1.8.0
+         version: 1.8.0(react@19.2.5)
++      papaparse:
++        specifier: 5.7.0
++        version: 5.7.0
+       react:
+         specifier: ^19.2.5
+         version: 19.2.5
+@@ -162,6 +165,9 @@ importers:
+       '@types/node':
+         specifier: ^25.6.0
+         version: 25.6.0
++      '@types/papaparse':
++        specifier: ^5.5.2
++        version: 5.5.2
+       '@types/react':
+         specifier: ^19.2.14
+         version: 19.2.14
+@@ -1960,6 +1966,9 @@ packages:
+   '@types/node@25.6.0':
+     resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
+ 
++  '@types/papaparse@5.5.2':
++    resolution: {integrity: sha512-gFnFp/JMzLHCwRf7tQHrNnfhN4eYBVYYI897CGX4MY1tzY9l2aLkVyx2IlKZ/SAqDbB3I1AOZW5gTMGGsqWliA==}
++
+   '@types/react-dom@19.2.3':
+     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
+     peerDependencies:
+@@ -2884,6 +2893,9 @@ packages:
+     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
+     engines: {node: '>=10'}
+ 
++  papaparse@5.7.0:
++    resolution: {integrity: sha512-qBGxg/7Q3Kl9Wfhrz2Z74UnvnHTXLNG6jmKJFeBvP2+y4lV7So+7SR62+Zd47JvdrCkX+nDcnr0ObPzek/+6RA==}
++
+   parse-imports-exports@0.2.4:
+     resolution: {integrity: sha512-4s6vd6dx1AotCx/RCI2m7t7GCh5bDRUtGNvRfHSP2wbBQdMi67pPe7mtzmgwcaQ8VKK/6IB7Glfyu3qdZJPybQ==}
+ 
+@@ -4956,6 +4968,10 @@ snapshots:
+     dependencies:
+       undici-types: 7.19.2
+ 
++  '@types/papaparse@5.5.2':
++    dependencies:
++      '@types/node': 25.6.0
++
+   '@types/react-dom@19.2.3(@types/react@19.2.14)':
+     dependencies:
+       '@types/react': 19.2.14
+@@ -5998,6 +6014,8 @@ snapshots:
+     dependencies:
+       p-limit: 3.1.0
+ 
++  papaparse@5.7.0: {}
++
+   parse-imports-exports@0.2.4:
+     dependencies:
+       parse-statements: 1.0.11
+diff --git a/src/features/tasks/components/data-table-bulk-actions.test.tsx b/src/features/tasks/components/data-table-bulk-actions.test.tsx
+new file mode 100644
+index 0000000..132d511
+--- /dev/null
++++ b/src/features/tasks/components/data-table-bulk-actions.test.tsx
+@@ -0,0 +1,267 @@
++import { useState } from 'react'
++import {
++  type ColumnDef,
++  type RowSelectionState,
++  getCoreRowModel,
++  getFilteredRowModel,
++  getPaginationRowModel,
++  getSortedRowModel,
++  useReactTable,
++} from '@tanstack/react-table'
++import { toast } from 'sonner'
++import { beforeEach, describe, expect, it, vi } from 'vitest'
++import { render } from 'vitest-browser-react'
++import { userEvent } from 'vitest/browser'
++import { type Task } from '../data/schema'
++import { downloadTasksCsv } from '../lib/export-tasks'
++import { DataTableBulkActions } from './data-table-bulk-actions'
++
++vi.mock('../lib/export-tasks', () => ({ downloadTasksCsv: vi.fn() }))
++vi.mock('sonner', () => ({
++  toast: { success: vi.fn(), error: vi.fn(), promise: vi.fn() },
++}))
++
++const tasks: Task[] = [
++  {
++    id: 'TASK-Z',
++    title: 'Zulu',
++    status: 'todo',
++    label: 'feature',
++    priority: 'high',
++  },
++  {
++    id: 'TASK-D',
++    title: 'Delta',
++    status: 'done',
++    label: 'bug',
++    priority: 'low',
++  },
++  {
++    id: 'TASK-A',
++    title: 'Alpha',
++    status: 'todo',
++    label: 'documentation',
++    priority: 'medium',
++  },
++  {
++    id: 'TASK-B',
++    title: 'Bravo',
++    status: 'todo',
++    label: 'feature',
++    priority: 'low',
++  },
++]
++
++const columns: ColumnDef<Task>[] = [
++  { accessorKey: 'id' },
++  { accessorKey: 'title' },
++  { accessorKey: 'status', filterFn: 'equalsString' },
++]
++
++function TableHarness() {
++  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
++  // eslint-disable-next-line react-hooks/incompatible-library
++  const table = useReactTable({
++    data: tasks,
++    columns,
++    getRowId: (task) => task.id,
++    initialState: { pagination: { pageIndex: 0, pageSize: 2 } },
++    state: { rowSelection },
++    onRowSelectionChange: setRowSelection,
++    enableRowSelection: true,
++    getCoreRowModel: getCoreRowModel(),
++    getFilteredRowModel: getFilteredRowModel(),
++    getSortedRowModel: getSortedRowModel(),
++    getPaginationRowModel: getPaginationRowModel(),
++  })
++
++  return (
++    <>
++      <button
++        type='button'
++        onClick={() => {
++          table.setColumnFilters([{ id: 'status', value: 'todo' }])
++          table.setPageIndex(0)
++        }}
++      >
++        Show todo tasks
++      </button>
++      <button type='button' onClick={() => table.resetColumnFilters()}>
++        Clear filter
++      </button>
++      <button
++        type='button'
++        onClick={() => table.setSorting([{ id: 'title', desc: false }])}
++      >
++        Sort by title ascending
++      </button>
++      <div>
++        {table.getRowModel().rows.map((row) => (
++          <label key={row.id}>
++            <input
++              type='checkbox'
++              checked={row.getIsSelected()}
++              onChange={row.getToggleSelectedHandler()}
++            />
++            Select {row.original.id}
++          </label>
++        ))}
++      </div>
++      <button
++        type='button'
++        disabled={!table.getCanPreviousPage()}
++        onClick={() => table.previousPage()}
++      >
++        Previous page
++      </button>
++      <button
++        type='button'
++        disabled={!table.getCanNextPage()}
++        onClick={() => table.nextPage()}
++      >
++        Next page
++      </button>
++      <p data-testid='selected-task-ids'>
++        {Object.keys(rowSelection)
++          .filter((id) => rowSelection[id])
++          .sort()
++          .join(', ')}
++      </p>
++      <DataTableBulkActions table={table} />
++    </>
++  )
++}
++
++describe('DataTableBulkActions CSV export', () => {
++  beforeEach(() => vi.resetAllMocks())
++
++  it('does not offer export without a selection', async () => {
++    const { getByRole } = await render(<TableHarness />)
++
++    await expect
++      .element(getByRole('button', { name: 'Export tasks', exact: true }))
++      .not.toBeInTheDocument()
++    await expect.element(getByRole('toolbar')).not.toBeInTheDocument()
++    expect(downloadTasksCsv).not.toHaveBeenCalled()
++    expect(toast.success).not.toHaveBeenCalled()
++  })
++
++  it('exports selected tasks across pages in filtered sort order and keeps all selections', async () => {
++    const { getByRole, getByTestId } = await render(<TableHarness />)
++
++    await userEvent.click(getByRole('checkbox', { name: 'Select TASK-Z' }))
++    await userEvent.click(getByRole('checkbox', { name: 'Select TASK-D' }))
++    await userEvent.click(getByRole('button', { name: 'Next page' }))
++    await userEvent.click(getByRole('checkbox', { name: 'Select TASK-A' }))
++    await userEvent.click(getByRole('button', { name: 'Show todo tasks' }))
++    await userEvent.click(
++      getByRole('button', { name: 'Sort by title ascending' })
++    )
++
++    await expect
++      .element(getByRole('checkbox', { name: 'Select TASK-A' }))
++      .toBeChecked()
++    await expect
++      .element(getByRole('checkbox', { name: 'Select TASK-B' }))
++      .not.toBeChecked()
++    await expect
++      .element(getByRole('checkbox', { name: 'Select TASK-Z' }))
++      .not.toBeInTheDocument()
++
++    await userEvent.click(
++      getByRole('button', { name: 'Export tasks', exact: true })
++    )
++
++    expect(downloadTasksCsv).toHaveBeenCalledExactlyOnceWith([
++      tasks[2],
++      tasks[0],
++    ])
++    expect(toast.success).toHaveBeenCalledOnce()
++    expect(toast.error).not.toHaveBeenCalled()
++    await expect
++      .element(getByTestId('selected-task-ids'))
++      .toHaveTextContent('TASK-A, TASK-D, TASK-Z')
++    await expect
++      .element(getByRole('checkbox', { name: 'Select TASK-A' }))
++      .toBeChecked()
++
++    await userEvent.click(getByRole('button', { name: 'Next page' }))
++    await expect
++      .element(getByRole('checkbox', { name: 'Select TASK-Z' }))
++      .toBeChecked()
++    await userEvent.click(getByRole('button', { name: 'Clear filter' }))
++    await expect
++      .element(getByRole('button', { name: 'Previous page' }))
++      .toBeDisabled()
++    await userEvent.click(getByRole('button', { name: 'Next page' }))
++    await expect
++      .element(getByRole('checkbox', { name: 'Select TASK-D' }))
++      .toBeChecked()
++  })
++
++  it('hides export when filters exclude every selected task without clearing selection', async () => {
++    const { getByRole, getByTestId } = await render(<TableHarness />)
++
++    await userEvent.click(getByRole('checkbox', { name: 'Select TASK-D' }))
++    await userEvent.click(getByRole('button', { name: 'Show todo tasks' }))
++
++    await expect
++      .element(getByRole('button', { name: 'Export tasks', exact: true }))
++      .not.toBeInTheDocument()
++    await expect
++      .element(getByTestId('selected-task-ids'))
++      .toHaveTextContent('TASK-D')
++    expect(downloadTasksCsv).not.toHaveBeenCalled()
++
++    await userEvent.click(getByRole('button', { name: 'Clear filter' }))
++    await expect
++      .element(getByRole('checkbox', { name: 'Select TASK-D' }))
++      .toBeChecked()
++    await expect
++      .element(getByRole('button', { name: 'Export tasks', exact: true }))
++      .toBeInTheDocument()
++  })
++
++  it('keeps selections after a download failure so the same tasks can be retried', async () => {
++    vi.mocked(downloadTasksCsv).mockImplementationOnce(() => {
++      throw new Error('Download unavailable')
++    })
++    const { getByRole, getByTestId } = await render(<TableHarness />)
++
++    await userEvent.click(getByRole('checkbox', { name: 'Select TASK-Z' }))
++    await userEvent.click(getByRole('button', { name: 'Next page' }))
++    await userEvent.click(getByRole('checkbox', { name: 'Select TASK-A' }))
++    await userEvent.click(
++      getByRole('button', { name: 'Export tasks', exact: true })
++    )
++
++    expect(downloadTasksCsv).toHaveBeenCalledExactlyOnceWith([
++      tasks[0],
++      tasks[2],
++    ])
++    expect(toast.error).toHaveBeenCalledOnce()
++    expect(toast.success).not.toHaveBeenCalled()
++    await expect
++      .element(getByTestId('selected-task-ids'))
++      .toHaveTextContent('TASK-A, TASK-Z')
++    await expect
++      .element(getByRole('checkbox', { name: 'Select TASK-A' }))
++      .toBeChecked()
++    await userEvent.click(getByRole('button', { name: 'Previous page' }))
++    await expect
++      .element(getByRole('checkbox', { name: 'Select TASK-Z' }))
++      .toBeChecked()
++
++    await userEvent.click(
++      getByRole('button', { name: 'Export tasks', exact: true })
++    )
++
++    expect(downloadTasksCsv).toHaveBeenCalledTimes(2)
++    expect(downloadTasksCsv).toHaveBeenNthCalledWith(2, [tasks[0], tasks[2]])
++    expect(toast.success).toHaveBeenCalledOnce()
++    expect(toast.error).toHaveBeenCalledOnce()
++    await expect
++      .element(getByTestId('selected-task-ids'))
++      .toHaveTextContent('TASK-A, TASK-Z')
++  })
++})
+diff --git a/src/features/tasks/components/data-table-bulk-actions.tsx b/src/features/tasks/components/data-table-bulk-actions.tsx
+index bca8017..20ff5fb 100644
+--- a/src/features/tasks/components/data-table-bulk-actions.tsx
++++ b/src/features/tasks/components/data-table-bulk-actions.tsx
+@@ -18,20 +18,19 @@ import {
+ import { DataTableBulkActions as BulkActionsToolbar } from '@/components/data-table'
+ import { priorities, statuses } from '../data/data'
+ import { type Task } from '../data/schema'
++import { downloadTasksCsv } from '../lib/export-tasks'
+ import { TasksMultiDeleteDialog } from './tasks-multi-delete-dialog'
+ 
+-type DataTableBulkActionsProps<TData> = {
+-  table: Table<TData>
++type DataTableBulkActionsProps = {
++  table: Table<Task>
+ }
+ 
+-export function DataTableBulkActions<TData>({
+-  table,
+-}: DataTableBulkActionsProps<TData>) {
++export function DataTableBulkActions({ table }: DataTableBulkActionsProps) {
+   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+   const selectedRows = table.getFilteredSelectedRowModel().rows
+ 
+   const handleBulkStatusChange = (status: string) => {
+-    const selectedTasks = selectedRows.map((row) => row.original as Task)
++    const selectedTasks = selectedRows.map((row) => row.original)
+     toast.promise(sleep(2000), {
+       loading: 'Updating status...',
+       success: () => {
+@@ -44,7 +43,7 @@ export function DataTableBulkActions<TData>({
+   }
+ 
+   const handleBulkPriorityChange = (priority: string) => {
+-    const selectedTasks = selectedRows.map((row) => row.original as Task)
++    const selectedTasks = selectedRows.map((row) => row.original)
+     toast.promise(sleep(2000), {
+       loading: 'Updating priority...',
+       success: () => {
+@@ -57,16 +56,21 @@ export function DataTableBulkActions<TData>({
+   }
+ 
+   const handleBulkExport = () => {
+-    const selectedTasks = selectedRows.map((row) => row.original as Task)
+-    toast.promise(sleep(2000), {
+-      loading: 'Exporting tasks...',
+-      success: () => {
+-        table.resetRowSelection()
+-        return `Exported ${selectedTasks.length} task${selectedTasks.length > 1 ? 's' : ''} to CSV.`
+-      },
+-      error: 'Error',
+-    })
+-    table.resetRowSelection()
++    const selectedTasks = table
++      .getSortedRowModel()
++      .rows.filter((row) => row.getIsSelected())
++      .map((row) => row.original)
++
++    if (selectedTasks.length === 0) return
++
++    try {
++      downloadTasksCsv(selectedTasks)
++      toast.success(
++        `CSV download started for ${selectedTasks.length} task${selectedTasks.length > 1 ? 's' : ''}.`
++      )
++    } catch {
++      toast.error('Could not start the CSV download. Please try again.')
++    }
+   }
+ 
+   return (
+diff --git a/src/features/tasks/lib/export-tasks.test.ts b/src/features/tasks/lib/export-tasks.test.ts
+new file mode 100644
+index 0000000..8e2d109
+--- /dev/null
++++ b/src/features/tasks/lib/export-tasks.test.ts
+@@ -0,0 +1,146 @@
++import Papa from 'papaparse'
++import { afterEach, describe, expect, it, vi } from 'vitest'
++import { type Task } from '../data/schema'
++import { createTasksCsv, downloadTasksCsv } from './export-tasks'
++
++const task: Task = {
++  id: 'TASK-0001',
++  title: 'Review tasks',
++  status: 'in progress',
++  label: 'documentation',
++  priority: 'high',
++}
++
++afterEach(() => {
++  vi.restoreAllMocks()
++  vi.useRealTimers()
++})
++
++describe('Task CSV content', () => {
++  it('preserves full task fields, Unicode, whitespace, quotes and multiline text', () => {
++    const tasks = [
++      {
++        ...task,
++        title: '  中文😀, "review"\r\nnext line  ',
++        internalNote: 'not an exported field',
++      },
++      { ...task, id: 'TASK-0002', title: '', label: 'bug', priority: 'low' },
++    ]
++
++    const csv = createTasksCsv(tasks)
++
++    expect(csv).toBe(
++      '\ufeff"id","title","status","label","priority"\r\n' +
++        '"TASK-0001","  中文😀, ""review""\r\nnext line  ","in progress","documentation","high"\r\n' +
++        '"TASK-0002","","in progress","bug","low"'
++    )
++    const parsed = Papa.parse<Task>(csv, { header: true })
++    expect(parsed.errors).toEqual([])
++    expect(parsed.data).toEqual([
++      { ...task, title: tasks[0].title },
++      { ...task, id: 'TASK-0002', title: '', label: 'bug', priority: 'low' },
++    ])
++    expect(tasks[0].title).toBe('  中文😀, "review"\r\nnext line  ')
++  })
++
++  it.each([
++    '=1+1',
++    '+SUM(A1:A2)',
++    '-1+2',
++    '@SUM(A1:A2)',
++    '\ttext',
++    '\rtext',
++    '\ntext',
++    '  =1+1',
++    '\u00a0+1',
++    '=1\n+2',
++    '＝1+1',
++    '＋1',
++    '－1',
++    '＠SUM(A1:A2)',
++  ])('exports formula-like text with a protective prefix: %j', (title) => {
++    const csv = createTasksCsv([{ ...task, title }])
++    const parsed = Papa.parse<Task>(csv, { header: true })
++    expect(parsed.errors).toEqual([])
++    expect(parsed.data[0].title).toBe("'" + title)
++    expect(csv).toContain(',"\'')
++  })
++
++  it('protects every exported field while leaving ordinary embedded symbols intact', () => {
++    const parsed = Papa.parse<Task>(
++      createTasksCsv([
++        {
++          id: '=id',
++          title: 'A = B, and A@B; - sign in the middle',
++          status: '+status',
++          label: '@label',
++          priority: '-priority',
++        },
++      ]),
++      { header: true }
++    )
++    expect(parsed.data[0]).toEqual({
++      id: "'=id",
++      title: 'A = B, and A@B; - sign in the middle',
++      status: "'+status",
++      label: "'@label",
++      priority: "'-priority",
++    })
++  })
++})
++
++describe('Task CSV download lifecycle', () => {
++  it('creates a UTF-8 CSV download and releases its temporary resources afterwards', async () => {
++    vi.useFakeTimers()
++    const createUrl = vi.spyOn(URL, 'createObjectURL')
++    const revokeUrl = vi.spyOn(URL, 'revokeObjectURL')
++    let wasAttached = false
++    const click = vi
++      .spyOn(HTMLAnchorElement.prototype, 'click')
++      .mockImplementation(function (this: HTMLAnchorElement) {
++        wasAttached = this.isConnected
++      })
++
++    downloadTasksCsv([{ ...task, title: '中文😀' }])
++
++    const clickedLink = click.mock.contexts[0] as HTMLAnchorElement
++    expect(createUrl).toHaveBeenCalledOnce()
++    const blob = createUrl.mock.calls[0][0] as Blob
++    expect(blob.type).toBe('text/csv;charset=utf-8')
++    expect([...new Uint8Array(await blob.arrayBuffer()).slice(0, 3)]).toEqual([
++      0xef, 0xbb, 0xbf,
++    ])
++    expect(await blob.text()).toContain('中文😀')
++    expect(clickedLink?.download).toMatch(
++      /^tasks-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z\.csv$/
++    )
++    expect(wasAttached).toBe(true)
++    expect(clickedLink?.isConnected).toBe(false)
++    expect(revokeUrl).not.toHaveBeenCalled()
++    vi.runAllTimers()
++    expect(revokeUrl).toHaveBeenCalledWith(createUrl.mock.results[0].value)
++  })
++
++  it('does not generate or download an empty selection', () => {
++    const createUrl = vi.spyOn(URL, 'createObjectURL')
++    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click')
++    downloadTasksCsv([])
++    expect(createUrl).not.toHaveBeenCalled()
++    expect(click).not.toHaveBeenCalled()
++  })
++
++  it('releases the Blob and removes the link if triggering the download fails', () => {
++    const createUrl = vi.spyOn(URL, 'createObjectURL')
++    const revokeUrl = vi.spyOn(URL, 'revokeObjectURL')
++    const click = vi
++      .spyOn(HTMLAnchorElement.prototype, 'click')
++      .mockImplementation(() => {
++        throw new Error('Download unavailable')
++      })
++
++    expect(() => downloadTasksCsv([task])).toThrow('Download unavailable')
++    const clickedLink = click.mock.contexts[0] as HTMLAnchorElement
++    expect(clickedLink?.isConnected).toBe(false)
++    expect(revokeUrl).toHaveBeenCalledWith(createUrl.mock.results[0].value)
++  })
++})
+diff --git a/src/features/tasks/lib/export-tasks.ts b/src/features/tasks/lib/export-tasks.ts
+new file mode 100644
+index 0000000..bc9db25
+--- /dev/null
++++ b/src/features/tasks/lib/export-tasks.ts
+@@ -0,0 +1,51 @@
++import Papa from 'papaparse'
++import { type Task } from '../data/schema'
++
++const columns = ['id', 'title', 'status', 'label', 'priority'] as const
++
++// Keep spreadsheet formula-like values as text, including multiline titles and
++// leading whitespace. The apostrophe is intentionally part of the CSV value.
++const formulaPrefix = /^[\t\r\n]|^\s*[=+\-@＝＋－＠]/
++
++export function createTasksCsv(tasks: readonly Task[]): string {
++  return (
++    '\ufeff' +
++    Papa.unparse(
++      {
++        fields: [...columns],
++        data: tasks.map((task) => columns.map((column) => task[column])),
++      },
++      { quotes: true, newline: '\r\n', escapeFormulae: formulaPrefix }
++    )
++  )
++}
++
++export function downloadTasksCsv(tasks: readonly Task[]): void {
++  if (tasks.length === 0) return
++
++  const blob = new Blob([createTasksCsv(tasks)], {
++    type: 'text/csv;charset=utf-8',
++  })
++  const url = URL.createObjectURL(blob)
++  let link: HTMLAnchorElement | undefined
++  let downloadStarted = false
++
++  try {
++    link = document.createElement('a')
++    link.href = url
++    link.download = `tasks-${new Date().toISOString().replace(/[:.]/g, '-')}.csv`
++    link.hidden = true
++    document.body.appendChild(link)
++    link.click()
++    downloadStarted = true
++  } finally {
++    link?.remove()
++    if (downloadStarted) {
++      // Give the browser time to consume the URL before releasing the Blob.
++      // A click starts a download; it cannot confirm the user saved the file.
++      setTimeout(() => URL.revokeObjectURL(url), 1000)
++    } else {
++      URL.revokeObjectURL(url)
++    }
++  }
++}

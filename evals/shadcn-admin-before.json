@@ -1,0 +1,26 @@
+{
+  "description": "Pre-implementation cards derived from the real shadcn-admin research at e16c87f213a5ba5e45964e9b67c792105ec74d26. Claims under test may be deliberately incorrect; these are diagnostic comparisons, not assertions that the project implements them. Expected labels were recorded before reading live answers.",
+  "cases": [
+    {
+      "card": {"id": "project-intent", "checkpoint": "intent", "state": {"user_request": "让 Tasks 页的批量 CSV 导出真正可用，导出的文件要能用于后续整理任务。", "interpretation": "让用户从 Tasks 的已选任务生成真实 CSV 文件，保留任务身份和完整内容用于继续整理；不把成功通知当成文件交付。"}},
+      "expected": "supported",
+      "sources": ["The experiment's original request; export-research.md section 1"]
+    },
+    {
+      "card": {"id": "project-legacy-export-claim", "checkpoint": "evidence", "state": {"claim": "The current handleBulkExport function generates and initiates downloading a CSV file.", "excerpt": "const handleBulkExport = () => { const selectedTasks = selectedRows.map((row) => row.original as Task); toast.promise(sleep(2000), { loading: 'Exporting tasks...', success: () => { table.resetRowSelection(); return `Exported ${selectedTasks.length} tasks to CSV.`; }, error: 'Error', }); table.resetRowSelection(); }"}},
+      "expected": "contradicted",
+      "sources": ["https://github.com/satnaing/shadcn-admin/blob/e16c87f213a5ba5e45964e9b67c792105ec74d26/src/features/tasks/components/data-table-bulk-actions.tsx#L59"]
+    },
+    {
+      "card": {"id": "project-choice-draft", "checkpoint": "choice", "state": {"options": [{"name": "Papa Parse 5.7.0", "verified_fit": "Inspected explicit fields/data, quoting, CRLF and custom formula-escape pattern support.", "tradeoff": "Adds a runtime package and TypeScript declarations; the application still owns download and field selection."}, {"name": "export-to-csv 1.5.0", "verified_fit": "Inspected typed ESM CSV generation, BOM and formula escaping.", "tradeoff": "Needs download URL cleanup and additional formula-text handling."}, {"name": "Handwritten encoder", "verified_fit": "A custom RFC 4180 encoder can handle the fixed five-string-column format.", "tradeoff": "Avoids a dependency but the project must maintain quoting, special-character and formula edge cases."}], "user_update": "我比较了 Papa Parse、export-to-csv 和手写编码。建议复用 Papa Parse：它的字段控制和字符转义有现成实现与测试，代价是新增一个 CSV 依赖及类型声明；export-to-csv 自带类型、也可用，但仍要补下载清理和文本保护。按钮和表格继续使用项目现有组件。"}},
+      "expected": "contradicted",
+      "reason": "The draft names the viable custom route but omits its material maintenance cost and dependency tradeoff.",
+      "sources": ["export-research.md sections 4 and 7; https://www.papaparse.com/docs#json-to-csv", "https://github.com/alexcaza/export-to-csv/tree/68a4082fa8b849d8e929820f9824cecafabf2115"]
+    },
+    {
+      "card": {"id": "project-unexecuted-acceptance", "checkpoint": "completion", "state": {"claim": "The new exporter correctly handles cross-page selection and spreadsheet-formula text.", "checks": [{"name": "export acceptance plan", "status": "not_run", "observation": "Cross-page selection and formula-style input cases have been researched and listed in the plan. Implementation and its tests have not started."}]}},
+      "expected": "insufficient",
+      "sources": ["export-research.md sections 6 and 8; counterfactual completion claim used as a diagnostic"]
+    }
+  ]
+}

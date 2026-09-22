@@ -342,6 +342,16 @@ After execution, test in proportion to risk and revisit the evidence-to-decision
 - Confirm every added requirement traces to user purpose plus evidence, and every explicit constraint remains intact.
 - Update the feature ledger with implementation evidence, remaining gaps, source versions/dates, and any design reversal caused by research.
 
+## Optional Jev Checkpoints
+
+When the user enables Jev, use [references/jev-checkpoints.md](references/jev-checkpoints.md)
+for bounded second opinions after intent interpretation, source inspection, drafting
+the reuse comparison, or execution verification. Supply one explicit request/claim
+and its relevant evidence per check. Jev's answer is advisory, cannot establish
+source authenticity or authorize action, and must not replace the user's choice or
+real tests. Keep the ordinary workflow available without an API key; do not add a
+model call to every step or stall authorized work on an unavailable optional check.
+
 ## Common Failure Modes
 
 - Research theater: collecting links without changing a decision.

@@ -1,0 +1,51 @@
+{
+  "description": "Post-implementation diagnostic cards from actual Edge downloads and their recorded limits. Expected labels were written by the task agent before these live responses. This follow-up is not an independent held-out benchmark; the office-compatibility claim is deliberately unverified, not an adopted completion statement.",
+  "cases": [
+    {
+      "card": {
+        "id": "project-saved-cross-page-csv",
+        "checkpoint": "completion",
+        "state": {
+          "claim": "In Edge 153.0.4234.48, the actual saved CSV contains the two tasks selected across two pages, in their table order.",
+          "checks": [
+            {
+              "name": "Edge actual download and independent CSV parse",
+              "status": "passed",
+              "observation": "Selected TASK-9366 on page 1 and TASK-9874 on page 2. Clicked Export tasks, awaited a real Playwright download event, saved cross-page.csv with saveAs; download.failure() returned null. Python csv.DictReader parsed the saved 228-byte file as exactly two records in order TASK-9366, TASK-9874; all five field values equaled the selected rows. No Blob or anchor mocks."
+            },
+            {
+              "name": "Earlier agent-browser Chrome download attempt",
+              "status": "failed",
+              "observation": "A separate agent-browser 0.37.1 session using Chrome 153.0.8010.47 returned Download was canceled. Its root cause is unresolved. The subsequent successful Edge test used unchanged application code; the completion claim is scoped to Edge."
+            }
+          ]
+        }
+      },
+      "expected": "supported",
+      "sources": ["shadcn-admin-browser/result.json", "shadcn-admin-browser/cross-page.csv", "verify-shadcn-export.mjs"]
+    },
+    {
+      "card": {
+        "id": "project-office-compatibility-not-tested",
+        "checkpoint": "completion",
+        "state": {
+          "claim": "The exported files have been verified to open correctly in Excel and LibreOffice.",
+          "checks": [
+            {
+              "name": "Edge download and Python CSV parsing",
+              "status": "passed",
+              "observation": "Three actual CSV files were downloaded in Edge and parsed by Python. Header fields, record ordering, CRLF and UTF-8 BOM matched the expected fixtures. Neither office application was used in this check."
+            },
+            {
+              "name": "Excel and LibreOffice application checks",
+              "status": "not_run",
+              "observation": "No file was opened in Excel or LibreOffice; locale-dependent delimiter handling and re-saving were not tested."
+            }
+          ]
+        }
+      },
+      "expected": "insufficient",
+      "sources": ["shadcn-admin-browser/result.json", "README.md: verification limits"]
+    }
+  ]
+}

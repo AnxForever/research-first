@@ -1,0 +1,84 @@
+{
+  "startedAt": "2026-09-22T08:08:01.405Z",
+  "baseUrl": "http://127.0.0.1:4173/tasks",
+  "browser": "msedge",
+  "mechanism": "real Playwright download event and saveAs; no Blob/anchor mocks",
+  "checks": [
+    "No export control and no download with empty selection",
+    "Two selected tasks across pages downloaded; all five fields equal full displayed values",
+    "Filter narrows export to exactly the one selected matching task",
+    "Clearing filter restores both selections, verified on both pages",
+    "CSV rows follow current descending title sort across pages",
+    "Clearing selection removes export control and creates no extra download"
+  ],
+  "downloads": [
+    {
+      "scenario": "cross-page.csv",
+      "path": "D:\\research-first-lab\\export-browser-artifacts\\cross-page.csv",
+      "suggestedFilename": "tasks-2026-09-22T08-08-08-064Z.csv",
+      "failure": null,
+      "bytes": 228,
+      "bomHex": "efbbbf",
+      "rows": [
+        {
+          "id": "TASK-9366",
+          "title": "Auctus bardus minus pariatur vobis solitudo tamquam solitudo.",
+          "status": "canceled",
+          "label": "documentation",
+          "priority": "low"
+        },
+        {
+          "id": "TASK-9874",
+          "title": "Tempora ars totam iste non video.",
+          "status": "done",
+          "label": "feature",
+          "priority": "medium"
+        }
+      ]
+    },
+    {
+      "scenario": "filtered.csv",
+      "path": "D:\\research-first-lab\\export-browser-artifacts\\filtered.csv",
+      "suggestedFilename": "tasks-2026-09-22T08-08-09-083Z.csv",
+      "failure": null,
+      "bytes": 153,
+      "bomHex": "efbbbf",
+      "rows": [
+        {
+          "id": "TASK-9366",
+          "title": "Auctus bardus minus pariatur vobis solitudo tamquam solitudo.",
+          "status": "canceled",
+          "label": "documentation",
+          "priority": "low"
+        }
+      ]
+    },
+    {
+      "scenario": "sorted-descending.csv",
+      "path": "D:\\research-first-lab\\export-browser-artifacts\\sorted-descending.csv",
+      "suggestedFilename": "tasks-2026-09-22T08-08-16-184Z.csv",
+      "failure": null,
+      "bytes": 228,
+      "bomHex": "efbbbf",
+      "rows": [
+        {
+          "id": "TASK-9874",
+          "title": "Tempora ars totam iste non video.",
+          "status": "done",
+          "label": "feature",
+          "priority": "medium"
+        },
+        {
+          "id": "TASK-9366",
+          "title": "Auctus bardus minus pariatur vobis solitudo tamquam solitudo.",
+          "status": "canceled",
+          "label": "documentation",
+          "priority": "low"
+        }
+      ]
+    }
+  ],
+  "browserVersion": "153.0.4234.48",
+  "status": "passed",
+  "completedAt": "2026-09-22T08:08:16.749Z"
+}
