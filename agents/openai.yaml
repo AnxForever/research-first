@@ -1,4 +1,4 @@
 interface:
   display_name: "Research First"
-  short_description: "Inventory every feature and preserve evidence-gap history"
-  default_prompt: "Use $research-first to interpret my purpose, inventory every material feature and lifecycle, separate delivery state from evidence coverage, preserve historical and overclaimed gaps, inspect primary and mature implementation evidence, then act with evidence-backed verification."
+  short_description: "Research existing solutions and make reuse choices visible"
+  default_prompt: "Use $research-first to understand my purpose, investigate existing products, open-source solutions, relevant libraries and primary guidance, show reuse options and tradeoffs before implementing, and verify each material feature with evidence."

@@ -45,7 +45,7 @@ When code reuse or implementation patterns are material:
 
 1. Pin a release, tag, or commit.
 2. Check license, recent activity, releases, and CI.
-3. Read at least two core source files relevant to the question.
+3. Follow the relevant implementation far enough to verify the claimed behavior; file count is not the goal.
 4. Read tests that demonstrate lifecycle and failure behavior.
 5. Inspect relevant issues or advisories for hidden constraints.
 6. Compare with an independent implementation or official specification.
@@ -53,6 +53,12 @@ When code reuse or implementation patterns are material:
 Popularity is a weak signal. Prefer version fit, tests, maintainership, and architectural similarity over stars.
 
 Useful query dimensions include problem wording, protocol/API name, failure message, security boundary, migration path, language/framework, organization, file path, and target version. Use current dates rather than hard-coded year filters.
+
+For a substantial feature, search for existing solutions even when a custom
+implementation seems straightforward. Search by the user's workflow as well as
+technical names so the agent's familiar libraries do not become the whole shortlist.
+Use [reuse-and-alternatives.md](reuse-and-alternatives.md) to turn findings into
+visible options; a search that never informs the user or the decision is incomplete.
 
 ## Product and Design Research
 

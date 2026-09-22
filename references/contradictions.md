@@ -5,14 +5,17 @@ Use this framework.
 
 ## Resolution Priority
 
-Rank references by these criteria (in order):
+Resolve the exact claim using:
 
-1. **Stack match** — Same language/framework as your project? (most important)
-2. **Maintenance** — More recently updated? Active community?
-3. **Test coverage** — Better test suite? Tests cover edge cases?
-4. **Production evidence** — Known production users? Case studies?
-5. **Conceptual clarity** — Code easier to understand and adapt?
-6. **Performance characteristics** — Better fit for your use case's scale?
+1. **Authority** — Which source defines the required contract or reports direct observations?
+2. **Applicability** — Does it match the target version, environment, user, and requirement?
+3. **Reproducibility** — Can source, tests, data, or an experiment demonstrate the claim?
+4. **Independence and currency** — Is corroboration independent and still applicable?
+
+Then compare fit, maintenance, integration effort, and performance when choosing
+between valid options. Same-language code and newer publication dates alone do not
+override an applicable specification or reproduced failure. If runtime behavior
+violates its specification, record both the required contract and observed defect.
 
 ## Resolution Process
 
@@ -26,9 +29,9 @@ Reference A says X. Reference B says Y.
    "A is optimizing for consistency, B for read performance"
    → If yes: choose based on YOUR requirements, not "which is better"
 
-3. CHECK if one is older (superseded by the other)
-   "A is from 2022, B is from 2025 and references A's limitations"
-   → If yes: prefer the newer one, but verify it actually improves things
+3. CHECK version applicability and whether one actually supersedes the other
+   "B documents a changed contract in the target version"
+   → Prefer the applicable contract, not simply the newer page
 
 4. CHECK the tests for edge case behavior
    "A's tests show it handles cache failure gracefully, B's tests don't cover this"
@@ -45,7 +48,7 @@ In the Step 8 report, always note the disagreement:
 ```
 ### Conflicts Resolved
 A uses [pattern X], B uses [pattern Y].
-Chose A because: [stack match + better test coverage].
+Chose A because: [applicable contract + reproduced behavior + local fit].
 B's approach is better for: [scenario]. We may adopt it later if [condition].
 ```
 
@@ -53,14 +56,20 @@ B's approach is better for: [scenario]. We may adopt it later if [condition].
 
 If two references agree on an approach that feels wrong for your project:
 
-1. Trust your Step 1 knowledge — you understand the project's constraints
+1. Recheck Step 1 evidence for the project's constraints; do not elevate intuition above evidence
 2. Search specifically for `"{approach} problems"` or `"{approach} limitations"`
 3. Look for a third reference that takes a different approach entirely
 4. If only two approaches exist and both feel wrong, the problem might need reframing
 
 ## When You Can't Decide
 
-Ask the user:
+If a material user preference or constraint is missing, recommend an option and
+ask about that tradeoff before dependent work. Continue independent investigation.
+Do not ask the user to adjudicate a technical fact that a bounded experiment can
+resolve. If the user already delegated selection and the choice is reversible,
+explain the evidence and proceed.
+
+Example of an unresolved user tradeoff:
 ```
 Two strong references disagree on [specific point]:
 

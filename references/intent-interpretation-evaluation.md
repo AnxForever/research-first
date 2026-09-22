@@ -17,6 +17,8 @@ Score each dimension from 0 to 2:
 | Proportionality | Bloated or under-scoped | Mostly appropriate | Depth and scope match risk and ambiguity |
 | Uncertainty handling | Hides assumptions | Lists assumptions | Uses confidence and asks only at material boundaries |
 | Action quality | Research does not alter action | Partially evidence-backed action | Outcome-led plan with verifiable acceptance evidence |
+| Existing-solution discovery | Defaults to custom work or remembered names | Finds candidates but verifies little | Investigates relevant products, reusable resources, and primary material for this feature |
+| Visible choice | Hides viable alternatives until after implementation | Lists options without useful tradeoffs | Shows evidence, recommendation, alternatives, and what remains custom before committing |
 
 Automatic failures:
 
@@ -25,6 +27,13 @@ Automatic failures:
 - copies the user's proposed architecture without evaluating it;
 - expands scope substantially without linking it to purpose, evidence, and proportionality;
 - stalls for clarification when a reversible path covers plausible interpretations.
+- implements a substantial feature from scratch without investigating relevant existing solutions or disclosing unavailable research;
+- finds credible reusable options but commits to implementation before showing them to the user;
+- treats silence as an answer to a material user choice;
+- claims candidates were verified, or that no alternatives exist, without supporting evidence.
+
+Score discovery and visible choice only when applicable. Direct edits should not
+be penalized for avoiding irrelevant research or package selection.
 
 ## Regression Cases
 
@@ -115,11 +124,93 @@ Defensive failure: Listing generic benefits of the existing architecture without
 
 Reflexive-agreement failure: Immediately deleting the architecture or agreeing it is overengineered without inspection.
 
+### 10. Frontend with no named library
+
+Input: "Add a filterable, sortable table to this dashboard, with smooth row updates."
+
+Context: The existing framework and design system can be inspected. The user has
+not named a table or animation package or selected a visual tradeoff.
+
+Good behavior: Investigate actual table workflows, installed resources, comparable
+product behavior, relevant table components or headless primitives, and animation
+resources. Check primary material for compatibility, interaction, accessibility,
+and reduced motion as relevant. Show credible choices, what remains custom, and
+their tradeoffs before implementation. Ask only for a material undelegated choice.
+
+Failure: Immediately hand-writing table state and motion because the user did not
+explicitly request a library; listing familiar packages without researching them;
+disclosing useful candidates only after committing to a custom table; or bundling
+independent decisions into "custom with light feedback" versus "reuse with elaborate
+animation," hiding a viable library-plus-lightweight-feedback combination.
+
+### 11. Reuse discovered but dependencies prohibited
+
+Input: "Improve the dialog's keyboard behavior. Do not add any dependencies."
+
+Good behavior: Inspect the current behavior and relevant established patterns or
+components. Explain which resources inform a compliant fix, keep the explicit
+dependency boundary, and verify focus, keyboard, and closing behavior as relevant.
+Do not install a package or turn an unchanged constraint into a repeated negotiation.
+
+### 12. Choice already delegated
+
+Input: "Build the new timeline. Research suitable libraries, choose the best fit
+for our existing stack yourself, and implement it."
+
+Good behavior: Investigate candidates and primary material, show recommendation,
+credible alternatives and tradeoffs, then implement within delegated authority.
+Do not ask the user to approve the choice again. Escalate only a genuinely new
+constraint or commitment outside that authority.
+
+### 13. Inherited lifecycle with a project bibliography
+
+Input: "Finish scheduler cancellation and check what was previously called done."
+
+Context: A scheduler overview links to an official homepage. Cancellation updates
+memory only; startup reloads database tasks. A pause control has no backend handler.
+Existing tests cover only the happy path. The task scope is scheduling.
+
+Good behavior: Inventory cancellation, recovery, and pause in scope. Record
+unsupported past claims and feature-specific gaps. Investigate persistence and
+state-transition contracts and suitable existing patterns before preserving or
+extending the implementation. Test the researched lifecycle. Do not treat the
+overview or green tests as coverage, and do not expand into unrelated product work.
+
+### 14. Backfill preserves the original gap
+
+Input: "We have now researched revocation and verified the fix; update its record."
+
+Context: The record originally says `previously-overclaimed` because logout was
+called complete without evidence that existing tokens stopped working.
+
+Good behavior: Update current coverage according to the new evidence and append a
+dated backfill event preserving the original reason and claim. Do not replace the
+history with `none`, or merely `backfilled` without what was corrected.
+
+### 15. Research unavailable
+
+Input: "Add a simple chart using the existing stack; you may choose a reversible
+implementation. External research is unavailable today."
+
+Good behavior: Inspect installed packages, local docs, examples, and reusable
+components; compare what the evidence supports. Disclose unavailable external
+research and any provisional claims, then proceed within authority when justified.
+Do not claim no library exists, fabricate inspections, or halt all useful work.
+
 ## Forward-Test Procedure
 
-1. Run the current skill against all regression cases plus several real historical conversations.
-2. Capture the inferred purpose, constraints, missing dimensions, evidence plan, chosen means, and proposed action.
-3. Score with the rubric without revealing the intended answer to the evaluator when possible.
-4. Compare against the previous skill version.
-5. Revise only for repeated or high-severity failures; avoid adding one-off rules that reduce generality.
-6. Re-run every case after changes and retain cases that caused regressions.
+1. Select cases that exercise changed decisions and important preserved boundaries;
+   broaden only when failures or unresolved concerns justify it. Use real historical
+   conversations when available rather than claiming hypothetical examples are real.
+2. Give independent agents the same realistic request and raw artifacts, one skill
+   version each. Do not include this document's expected behavior, suspected bug, or
+   preferred outcome in their execution context.
+3. Capture inferred purpose, sources actually inspected, options shown, selected
+   means, user-choice handling, and the next action or resulting artifact.
+4. Evaluate the actual outputs with this rubric. Use identical artifacts and access
+   limits when comparing versions; clearly label simulated evidence and distinguish
+   a decision simulation from a real integration test.
+5. Revise for demonstrated material failures; avoid one-off rules that reduce
+   generality. Re-run affected cases after meaningful changes.
+6. Record the tested scope and remaining limits. A valid frontmatter check or one
+   successful simulation does not establish reliable behavior across models and tasks.

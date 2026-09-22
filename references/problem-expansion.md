@@ -2,16 +2,18 @@
 
 ## Why Expand?
 
-Users ask "add X feature." They mean "add X, correctly, securely, efficiently,
-maintainably, in a way that fits the project, handles edge cases, and won't
-need rewriting next month."
+Users often compress their purpose into "add X feature." Recover the intended
+outcome and explicit constraints first, then investigate what completeness means
+in this project. Do not assume every request needs a production platform.
 
-The surface question finds "how to load a file." The expanded question finds
-the complete architecture that production systems converged on.
+The surface question finds "how to load a file." The expanded question asks which
+existing approach fits the needed inputs, lifecycle, failures, and user workflow.
 
 ## 10 Dimensions — Detail
 
-For any feature X, ask ALL of these:
+Use these prompts to discover relevant unknowns, not as mandatory output sections.
+First define the outcome and acceptance criteria. Investigate a dimension when it
+could materially change the result; omit it when evidence shows it is irrelevant.
 
 ### 1. Data
 - What data does X need? Where does it come from?
@@ -78,6 +80,11 @@ For any feature X, ask ALL of these:
 
 Surface: "How to add Redis cache?"
 
+First establish the measured bottleneck and whether caching is needed. Compare
+the existing stack's facilities, reusable caching solutions, and direct query or
+data-flow improvements. If Redis is explicitly required, preserve that constraint.
+The questions below apply if a Redis cache is selected; they do not select it.
+
 Expanded:
 ```
 1. Data       → cache key design, serialization format, TTL strategy, cache invalidation
@@ -96,6 +103,11 @@ Expanded:
 
 Surface: "How to add JWT login?"
 
+First establish the users, trust boundaries, session requirements, and existing
+identity provider. Compare established authentication solutions before choosing
+custom token handling. If JWT is required, research within that boundary; the
+following questions are an investigation aid, not a prescription for JWT.
+
 Expanded:
 ```
 1. Data       → user table, password hash storage, token claims, session storage
@@ -110,7 +122,20 @@ Expanded:
 10. Evolution  → adding OAuth, MFA, passwordless, migrating hash algorithms
 ```
 
-## Minimum Bar
+## Frontend Example: A Filterable Data Table
 
-Expand at least 6/10 dimensions. If you can't think of what to ask for a dimension,
-that dimension is probably an unknown risk — search it anyway.
+Recover the real workflow: what users compare, change, or export; expected row
+count; keyboard use; mobile needs; and empty/loading/error states. Investigate
+similar products, the installed component system, suitable table/grid components,
+and relevant documentation. Consider an animation library only when the requested
+interaction benefits from motion. Compare reuse, adapting headless primitives,
+and custom work with their actual maintenance and styling costs, and show the user
+the options before implementation. Do not default to a hand-built table simply
+because the request did not name a library.
+
+## Completion Bar
+
+Cover the dimensions that can change acceptance, the chosen mechanism, or material
+failure handling. Distinguish irrelevant dimensions from ones you have not yet
+investigated. Add scope only when relevance, evidence, and proportionality support
+it; do not manufacture questions to reach a count.

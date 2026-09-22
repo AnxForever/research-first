@@ -20,14 +20,17 @@ Score each factor from 0 to 2:
 
 User urgency can narrow scope, but it does not justify skipping safeguards for destructive or high-impact work.
 
-## Evidence Minimums
+## Evidence Needed
 
-| Mode | Questions | Evidence | Edge cases | Verification |
-|---|---:|---|---:|---|
-| Direct | 1 | local/source-of-truth | targeted | exact check |
-| Quick | 2-3 | 1 strong stream | 2-3 | focused test or inspection |
-| Standard | 6 dimensions | 2 independent streams | 5+ | tests/build/artifact validation |
-| Deep | 8-10 dimensions | 3+ streams, including primary | adversarial set | staged/dry-run/rollback plus full checks |
+The score is a starting point, not a quota or permission to ignore a material risk.
+A substantial new feature needs Standard research even if coding it feels familiar.
+
+| Mode | Evidence | Failure coverage | Verification |
+|---|---|---|---|
+| Direct | Local source of truth | Behavior affected by the exact edit | Exact check |
+| Quick | Strong source or experiment resolving the bounded unknown | Relevant boundary cases | Focused test or inspection |
+| Standard | Local/user context, relevant existing solutions and primary guidance, credible alternatives | Material states, lifecycle, and failures | Checks tied to acceptance criteria |
+| Deep | Independently corroborated consequential claims | Adversarial cases and recovery | Staged/dry-run/rollback checks as applicable |
 
 An evidence stream is a distinct authority or failure lens: local tests, official spec, production telemetry, user research, independent implementation, or experiment. Two articles quoting the same source are one stream.
 
@@ -35,15 +38,26 @@ An evidence stream is a distinct authority or failure lens: local tests, officia
 
 ### Existing codebase
 
-Inspect local source and tests first. External implementations are required only when reuse, unfamiliar technology, standards, or architecture choices are material.
+Inspect local source and tests first. For substantial new or redesigned features,
+investigate existing products, reusable implementations, and primary guidance before
+custom work. Do not assume that knowing how to implement it makes reuse irrelevant.
+Mechanical edits and bounded diagnoses may stay local when local evidence resolves
+the question. Resume valid, feature-specific comparisons instead of repeating them.
 
 ### Writing or document work
 
-Treat supplied facts and source material as primary evidence. Add style guides, audience examples, or templates only when they can affect structure, tone, compliance, or format.
+Treat supplied facts and source material as primary evidence. For substantial new
+deliverables, investigate relevant exemplars, templates, standards, or methods that
+could improve the result. Supplied/local materials may provide that comparison;
+do not force software-library research onto writing work.
 
 ### Product/design work
 
-Combine actual user evidence when available with established product behavior or design systems. Do not substitute competitor screenshots for user needs.
+Combine actual user evidence with established product behavior and design systems.
+For substantial frontend work, investigate relevant component libraries, specialized
+components, and interaction or animation resources where appropriate. Show credible
+options and tradeoffs before implementing. A screenshot is not proof of usability,
+and motion is not a requirement simply because an animation library exists.
 
 ### Diagnosis
 
@@ -66,6 +80,11 @@ After reasonable attempts:
 3. Choose the most reversible path.
 4. Add instrumentation or tests that expose wrong assumptions early.
 5. Ask the user only when the gap creates a material irreversible choice or requires new authority.
+
+Research unavailability is not evidence that no existing solution exists. Clearly
+label a provisional custom implementation and avoid locking in a choice that still
+requires the user's answer. No answer is not approval. If the user delegated the
+selection and the path is reversible, disclose limitations and continue.
 
 ## Failure Modes
 

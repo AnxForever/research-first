@@ -1,63 +1,43 @@
-# Research Summary: [Problem Being Solved]
+# Research Summary: [Outcome or Decision]
 
-## Project Identity (Step 1)
-> What problem does this project solve? Who uses it? What are the hard constraints?
+<!-- Adapt to the task. Omit inapplicable sections and empty rows. Repeat feature sections only for material research units. Link an existing feature ledger instead of duplicating it. -->
 
-[Brief: this project is a ____ that solves ____ for ____. Key constraint: ____.]
+## Purpose and Context
 
-## References Found (Step 4–5)
+[What the user wants to improve, for whom, and what success looks like. State the relevant existing stack/artifact, explicit constraints, and consequential assumptions.]
 
-### 1. [Project Name](URL)
-- **Files read**: `[path/to/core.ts]`, `[path/to/handler.py]`
-- **Key insight**: [One sentence — the most important thing you learned]
-- **Decision**: REUSE | ADAPT | LEARN-FROM
-- **Why**: [License: MIT | Stack: matches ours | Maintained: yes, last commit <1mo]
+## Feature or Research Unit: [ID / Name]
 
-### 2. [Project Name](URL)
-- **Files read**: `[path/to/main.go]`, `[path/to/service.rs]`
-- **Key insight**: [One sentence]
-- **Decision**: REUSE | ADAPT | LEARN-FROM
-- **Why**: [reasoning]
+**Outcome:** [User-visible result or independently failing lifecycle.]
 
-## Complete Pattern (Step 6)
+**Evidence status:** [Covered / partial / gap / stale, with the material limitation. For inherited work, retain any historical gap marker in the linked ledger.]
 
-### Data Model
-[Structures, schemas, fields, relationships]
+### Evidence That Affects the Choice
 
-### Lifecycle
-```
-startup → [what happens] → runtime → [what happens] → shutdown → [cleanup]
-Error path: [what fails] → [how it recovers]
-```
+| Question | Source and inspected material | Finding and confidence | Local consequence |
+|---|---|---|---|
+| [What could change the approach?] | [Link to product behavior, relevant source/tests/API, official guidance, local artifact, or experiment; version/date when relevant] | [Verified finding or labeled uncertainty] | [Decision, constraint, or acceptance condition] |
 
-### Error Handling
-- **Strategy**: [retry with backoff? circuit breaker? graceful degradation?]
-- **Specific cases**:
-  - [Error type] → [how handled]
+### Options and Recommendation
 
-### Security
-- **Threats identified**: [list]
-- **Defenses**: [list]
+| Option | Fit for this outcome | Important tradeoff or limitation | Evidence / verification gap |
+|---|---|---|---|
+| [Credible candidate or custom approach] | [What is reusable or applicable and what needs adaptation] | [Relevant integration, license, maintenance, compatibility, accessibility, control, or cost consequence] | [Source link and unverified claim, if any] |
 
-## Edge Cases (≥5, Step 6)
+**Recommendation — reuse / adapt / combine / build:** [Selected option and why it fits better here. Explain relevant rejected alternatives. If building, name the mismatch or user preference that justifies it and any established patterns being used.]
 
-| # | Edge Case | How Reference Handles It |
-|---|-----------|-------------------------|
-| 1 | [e.g., empty input] | [mechanism] |
-| 2 | [e.g., concurrent access] | [mechanism] |
-| 3 | [e.g., network timeout] | [mechanism] |
-| 4 | [e.g., large payload] | [mechanism] |
-| 5 | [e.g., invalid credentials] | [mechanism] |
+**Choice and authority:** [Record the existing user selection or delegated authority and proceed. If a material tradeoff remains outside that authority, ask one specific question, recommend an option, and identify work that can continue while awaiting the answer.]
 
-## What I Initially Got Wrong
-- [The assumption I had before reading source code]
-- **Correction**: [What I learned from the reference that changed my approach]
+**Research limits:** [Missing evidence, unavailable sources, or unresolved comparisons that could change the recommendation. A limited search does not prove no alternative exists.]
 
-## Implementation Plan
-1. [Step] — following `[reference]`
-2. [Step] — adapted for our conventions
-3. [Step] — from official docs
+## Plan and Acceptance Evidence
 
----
+| Work slice | Evidence applied | Important failure or quality condition | How it will be checked |
+|---|---|---|---|
+| [Concrete change within scope] | [Finding or selected pattern] | [Relevant behavioral, lifecycle, accessibility, factual, or audience requirement] | [Focused test, experiment, review, or artifact inspection] |
 
-**Ready to proceed?** [Ask user before writing code]
+**Correction from research, if any:** [An assumption or proposed approach that changed, and the evidence that changed it.]
+
+## Delivery Update
+
+[After execution: what was delivered, what verification showed, and which material uncertainties remain. Update the feature ledger where used. Do not claim unperformed validation or treat successful tests as proof that the product decision was correct.]

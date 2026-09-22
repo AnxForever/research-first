@@ -1,66 +1,41 @@
-# Case Studies — Research-First in Action
+# Illustrative Case Studies
 
-## Case 1: Adding MCP Client to Axiom
+These walkthroughs are fictional teaching scenarios. They do not document historical projects, verified library behavior, production readiness, or measured improvement. Scenario facts are assumptions for reasoning; a real task must establish them from its own artifacts and evidence.
 
-**Task**: "Add MCP support to the agent platform"
+## Inherited Scheduling: "Finish Cancellation and Check What Was Called Done"
 
-**Without skill (what would have happened)**:
-- Search "how to implement JSON-RPC Python"
-- Build from scratch based on blog tutorial
-- Miss: SSE transport, OAuth, process lifecycle, tool caching
+**Scenario facts:** Cancellation changes memory only. Startup reloads database jobs. A pause control exists without confirmed backend handling. Available tests cover successful scheduling, and prior research links only to a scheduler's homepage. The authorized scope is scheduling.
 
-**With skill (what actually happened)**:
-- Step 1: Axiom is an AI agent platform. MCP is how agents connect to external tools.
-- Step 3: Expanded "add MCP" to 10 dimensions → found tool naming, caching, security, lifecycle
-- Step 4–5: Found OpenCode's 1013-line `mcp/index.ts`, read source code + tests
-- Step 6 (extract): Extracted: 3 transports, 5 connection states, OAuth PKCE, process tree cleanup
-- Step 6 (decide): LEARN-FROM — different language (TypeScript→Python) but same patterns
-- Step 7: All readiness boxes checked
-- Step 8: Output structured findings, identified 25+ gaps vs naive implementation
+**Interpret the purpose:** Make cancellation reliable across the scheduling lifecycle and reassess earlier completion claims. A visible control or a passing happy-path test does not prove the promised behavior works. The instruction also makes previously claimed scheduling features relevant; it does not authorize a review of unrelated product areas.
 
-**Result**: Production-grade MCP client with StreamableHTTP, tool caching, connection robustness.
-30+ gaps found that a blog tutorial would never have mentioned.
+**Establish the inventory:** Reconcile scheduling UI, APIs, persistence, startup/shutdown behavior, configuration, tests, and prior claims. Track cancellation, recovery, and pause separately because they can fail independently. Record implementation state separately from evidence coverage. Mark inherited unassessed or overclaimed behavior as a historical gap, and retain that history when evidence is later backfilled.
 
-## Case 2: Adding Skill System to Axiom
+**Research mechanisms before preserving the design:** Trace the local state transitions, then inspect version-matched scheduler guidance, maintained source/tests, and relevant implementations of durable cancellation or pause. Look for evidence that could overturn the current design: a stored cancellation marker may be necessary, but may still fail if dispatch races with cancellation or an executing task ignores it. Distinguish stopping future dispatch from interrupting running work.
 
-**Task**: "Add skill auto-loading to agents"
+| Possible route | What must be established |
+|---|---|
+| Repair the application's persisted job state and reload rules | Which component owns state, when dispatch reads it, how races are handled, and whether running work can cooperate |
+| Adapt cancellation or pause facilities in the current scheduler | Whether the actual version supports the required lifecycle, persistence, and execution boundaries |
+| Adopt a different scheduling mechanism | A demonstrated gap the current mechanism cannot reasonably address, plus migration, operational, and compatibility costs |
 
-**Without skill**:
-- Dump all skill content into system prompt
-- No dedup, no budget control, no progressive disclosure
+**Make the options visible:** Explain the current defect, the validated alternatives, and the recommended scope before implementing. If local and reference evidence support repairing persistence and dispatch, say why replacement adds no needed capability. If a library offers part of the solution, explain what is reused and what remains application logic. Continue with authorized, reversible fixes. Clarify the meaning of cancellation only when plausible interpretations lead to materially different outcomes that evidence cannot resolve.
 
-**With skill**:
-- Step 1: Agent platform → skills = reusable agent knowledge
-- Step 3: Expanded to data (schema), lifecycle (discovery→load→unload), security (injection)
-- Step 4–5: Found agentskills.io spec, Claude Code skill architecture, OpenCode skill system
-- Step 6 (extract): Extracted 3-tier progressive disclosure, XML metadata format, user-message injection
-- Step 6 (decide): ADAPT — same concept, different implementation
-- Step 8: Output showed metadata-only registry saves 80%+ context vs dumping content
+**Delivery and failure acceptance:** Verify cancellation before dispatch, cancellation around dispatch, repeated cancellation, restart after cancellation, and cancellation of already running work under the chosen contract. Verify pause behavior separately and revisit earlier completion claims against their actual acceptance conditions. Surface unsupported behavior as an explicit remaining gap instead of treating a disabled control or a green test suite as completion. Update current evidence coverage without erasing the historical gap.
 
-**Result**: Claude Code-compatible skill system with on-demand loading, session dedup, budget cap.
+**What this scenario teaches:** Research can preserve a sound implementation, adapt a library facility, or reverse a design. Its value is the connection between discovered options, lifecycle decisions, and demonstrated user outcomes.
 
-## Case 3: Adding Scheduler to Axiom
+## A Report That "Looks Untrustworthy"
 
-**Task**: "Add scheduled/cron tasks to FastAPI"
+**Scenario facts:** A report uses internal sales data. Its charts cover different periods. The underlying source can be inspected, external browsing is unavailable, and there is no established audience preference.
 
-**Without skill**:
-- Write `while True: await asyncio.sleep(60)`
-- No persistence, no cron syntax, breaks with multiple workers
+**Interpret the purpose without inventing it:** The user may mean unreliable numbers, misleading comparisons, missing provenance, or presentation that obscures the argument. Inspect the report and underlying data first. Do not infer a desired visual style or discard conclusions merely because the user doubts them.
 
-**With skill**:
-- Step 3: Expanded to lifecycle (startup→shutdown), performance (multi-worker dedup)
-- Step 4–5: Found APScheduler 4.x best practices (2025), sodipto/fastapi-starter-boilerplate
-- Step 6 (extract): Extracted: lifespan management (not deprecated on_event), AsyncIOScheduler, timezone
-- Step 6 (decide): Found pickle issue with SQLAlchemyJobStore → switched to MemoryJobStore
+**Discover reusable approaches:** Look for available internal reporting standards, approved report templates, prior well-supported reports, and bundled chart guidance. In an online environment, relevant official statistical guidance and credible report exemplars would also be candidates. Here, name the external evidence gap and use available material; do not claim an external search occurred or wait indefinitely for it.
 
-**Result**: APScheduler 4.x with FastAPI lifespan, SQLite-persisted jobs, proper cleanup.
+**Validate evidence and choices:** Trace claims to source records and calculations, check definitions, inspect chart axes and time windows, and distinguish whole-period results from comparisons over shared periods. A template's existence is not proof that its visual encoding suits these data. A different period is not automatically an error, but a comparison must disclose or resolve the difference.
 
-## Pattern: What All Three Cases Share
+**Show the options before the substantial rewrite:** Present the viable routes supported by inspection: align comparable charts to a justified common period; retain distinct periods with explicit limits on comparison; or remove a conclusion whose evidence is inadequate. Explain which approach is recommended for each affected claim. Reuse an appropriate internal format when it helps provenance and readability, or explain why a simpler structure fits better. Continue with reversible corrections already authorized. Ask a focused audience or purpose question only if it changes a material editorial decision.
 
-1. Started with project identity, not just the task
-2. Expanded from surface question to 10+ dimensions before searching
-3. Found at least 2 independent production references
-4. Read source code and tests, not just README
-5. Made explicit reuse/adapt/learn-from decisions
-6. Found at least one "I would have missed this" insight per case
-7. Output structured findings before writing code
+**Deliver and verify:** Recompute the affected metrics, make sources and periods visible, and check that narrative claims match the charts and data. Separate observed findings from interpretation and unresolved uncertainty. Completion means the report's relevant claims are traceable and its comparisons defensible under the available evidence; attractive styling alone does not establish trustworthiness. State what could not be externally corroborated without inventing a result.
+
+**What this scenario teaches:** Research-first applies to documents as well as code. Reuse may mean adopting a reporting convention or a proven visual structure, and a good recommendation can proceed despite bounded evidence gaps.

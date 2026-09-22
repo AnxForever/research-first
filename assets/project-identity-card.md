@@ -1,6 +1,8 @@
 # Project Identity Card
 
-> Fill this out ONCE per project. Use as a lens for ALL subsequent research.
+> Optional reusable context for a longer project. Fill from evidence, mark unknowns,
+> and update when requirements or external state change. It does not replace
+> feature-specific research or the user's current instructions.
 
 ---
 
@@ -36,6 +38,8 @@
 - [Technical debt that's accumulating]
 
 **Research implications** (how identity shapes search)
-- When searching for "[feature X]", always add: "[project type] [domain]"
-- Never search for generic "[feature X]" without these qualifiers
-- Preferred reference types: [production repos? official docs? specs?]
+- Relevant search context: [project type, domain, stack, audience, target version]
+- Existing reusable resources: [installed libraries, design system, templates]
+- Prior-art questions: [similar products, open-source implementations, better techniques]
+- Preferred reference types: [primary docs, source/tests, product examples, datasets]
+- Last checked: [date and source revisions; assumptions requiring recheck]

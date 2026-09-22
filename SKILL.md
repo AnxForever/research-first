@@ -1,4 +1,22 @@
+---
+name: research-first
+description: >-
+  Understand user intent and research existing products, open-source solutions,
+  reusable libraries, and primary documentation before choosing how to implement
+  a substantial feature, design, integration, or other deliverable. Use for
+  research requests, compressed ideas, proposed technologies, frontend work that
+  could reuse components or animation libraries, and doubts about ongoing work.
+  Surface viable alternatives and tradeoffs before building from scratch. Skip
+  routine lookups and fully specified, low-risk mechanical edits. Resume valid
+  research rather than repeating it.
+---
 
+# Research First
+
+Understand the outcome, find how others solve it, and give the user an informed
+choice before implementing. Do not make the user's vocabulary or the agent's
+memory the limit of the solution. Research must change or substantiate decisions,
+not merely produce a source list.
 
 ## Operating Contract
 
@@ -8,11 +26,13 @@
 4. Use the evidence types that fit the task; do not force every task into GitHub research.
 5. Prefer primary evidence and independently corroborate material claims.
 6. Convert findings into an expanded problem definition, decisions, implementation constraints, and tests.
-7. If the user already authorized execution, continue after a concise research update. Ask before implementation only when authority or a material product choice is missing.
+7. If the user already authorized execution and no material user choice remains unresolved, continue after a concise research update. Ask only about missing authority or a consequential choice, not permission already given.
 8. Preserve an evidence trail sufficient to explain important decisions without flooding the user.
 9. Treat every material feature and independently failing lifecycle as its own research unit. Project-level research does not automatically cover its subfeatures.
-10. Maintain a complete feature inventory, including promised, implemented, hidden, disabled, inherited, and operational capabilities. An unlisted feature is an unassessed gap, not implicitly covered.
+10. Maintain a complete feature inventory within the task's scope, including promised, implemented, hidden, disabled, inherited, and operational capabilities. An unlisted feature is an unassessed gap, not implicitly covered.
 11. Mark inherited features with missing, stale, indirect, or generic evidence as historical research gaps; do not grandfather them as correct or erase the historical marker after later backfill.
+12. Before implementing a substantial feature, investigate relevant products, reusable implementations or assets, and primary guidance. Local inspection establishes context; it does not replace investigating suitable existing solutions.
+13. Show credible alternatives, a recommendation, and material tradeoffs before committing to implementation. Reuse is a choice, not an obligation; building from scratch also needs an evidence-backed reason.
 
 ## Step 0: Resume Before Restarting
 
@@ -25,9 +45,9 @@ First inspect the conversation, active plan/goal, existing research notes, recen
 
 ### Maintain a Per-Feature Evidence Ledger
 
-For multi-feature products, refactors, and long-running goals, create or update a compact feature evidence ledger before substantial implementation. A feature is a user-visible outcome or independently failing lifecycle, not merely a file, component, endpoint, or sprint item.
+For multi-feature products, refactors, and long-running goals, create or update a compact feature evidence ledger before substantial implementation. A feature is a user-visible outcome or independently failing lifecycle, not merely a file, component, endpoint, or sprint item. Inventory every such feature within the task's scope; whole-product work needs a whole-product inventory. Record discovered out-of-scope gaps without silently expanding into unrelated remediation.
 
-For each feature record a stable feature ID, parent capability, lifecycle scope, user outcome, delivery state, local/runtime evidence, primary guidance, mature product or open-source evidence, adopt/adapt/combine/decline decision, acceptance and failure evidence, current coverage, historical gap state, and priority.
+For each feature record a stable feature ID, parent capability, lifecycle scope, user outcome, delivery state, local/runtime evidence, primary guidance, mature product or open-source evidence, reuse alternatives and the choice shown to the user, acceptance and failure evidence, current coverage, historical gap state, and priority.
 
 Use **covered** only for current feature-specific evidence that supports material lifecycle, security, UX, and failure decisions. Use **partial** when a material dimension remains unverified, **gap** when the implementation rests on intuition, user wording, generic project research, code existence, or tests, and **stale** when versions, requirements, runtime state, or product direction changed.
 
@@ -39,7 +59,7 @@ Keep **delivery state**, **current evidence coverage**, and **research history**
 - Evidence coverage: `covered`, `partial`, `gap`, `stale`.
 - Historical gap: `none`, `inherited-unassessed`, `previously-overclaimed`, `reopened-by-change`, `backfilled`.
 
-Backfilling may improve current coverage, but it must change the historical marker to `backfilled`, not delete the fact that the feature was previously unassessed or overclaimed. Before planning broad work, reconcile the inventory against product copy, routes, controls, APIs, schemas, flags, tests, deployment configuration, operations docs, and prior completion claims. Add every missing item as `gap` before implementation.
+Backfilling may improve current coverage, but it must retain the original gap type, reason, and supporting evidence alongside the `backfilled` event. Before planning broad work, reconcile the in-scope inventory against product copy, routes, controls, APIs, schemas, flags, tests, deployment configuration, operations docs, and prior completion claims. Add every missing item as `gap` before implementation.
 
 Read [references/feature-evidence-ledger.md](references/feature-evidence-ledger.md) for the structure and backfill rules.
 
@@ -94,10 +114,10 @@ Expansion is justified only when it passes all three tests:
 
 If an addition fails one of these tests, omit it or present it as an optional follow-up rather than silently enlarging scope.
 
-Literal execution is appropriate only when the user clearly specifies a hard constraint, exact artifact, or
-deliberately chosen method. Even then, research how to implement it correctly in context. If literal wording
-conflicts with the larger purpose, surface the conflict and pursue the purpose unless the user explicitly confirms
-that the method itself is the requirement.
+An explicit hard constraint, exact artifact, or deliberately chosen method is binding immediately; the user
+does not need to confirm it twice. Research how to implement it correctly within that boundary. If it conflicts
+with the larger purpose, explain the conflict and ask before substituting a different method. Treat genuinely
+ambiguous mechanisms as candidates, using context and evidence to interpret them.
 
 Examples:
 
@@ -161,9 +181,11 @@ Use the smallest depth that responsibly reduces the important uncertainty.
 | Mode | Use when | Minimum evidence |
 |---|---|---|
 | Direct | Mechanical or fully specified, low-risk change | Local/source evidence and targeted verification |
-| Quick | Familiar, reversible task with one meaningful unknown | 1 strong evidence stream; 2-3 relevant dimensions |
-| Standard | New feature, design, plan, integration, or customer-facing change | 2 independent evidence streams; at least 6 relevant dimensions; 5 edge cases |
-| Deep | Security, auth, money, privacy, destructive operations, core architecture, migration, regulated work | 3+ evidence streams; 8-10 dimensions; adversarial and rollback analysis |
+| Quick | Familiar, reversible task with one meaningful unknown | Resolve that unknown with a strong source or experiment |
+| Standard | Substantial feature, design, plan, integration, or deliverable | Local/user context, relevant prior art and primary guidance, credible alternatives, material lifecycle and failure cases |
+| Deep | High-impact or hard-to-reverse work, core architecture, conflicting evidence | Independently corroborate consequential claims; investigate adversarial cases and recovery/rollback |
+
+A familiar library does not make a new feature mechanical. Substantial frontend work needs the existing-solution investigation in Step 4 even when the agent knows how to code it. Do not pad sources or edge cases to meet a quota, or use proportionality to skip a material uncertainty or reuse investigation.
 
 Escalate depth when evidence conflicts, the domain is unfamiliar, the action is hard to reverse, or the user previously found the work shallow. Reduce breadth—not validation integrity—when time is constrained.
 
@@ -171,7 +193,7 @@ Read [references/adapting-depth.md](references/adapting-depth.md) for depth scor
 
 ## Step 3: Expand the Real Question
 
-Select the dimensions that can materially affect the outcome. Standard work should cover at least six; Deep work should normally cover all applicable dimensions.
+Select the dimensions that can materially affect the outcome. Investigate uncertain dimensions before dismissing them; cover all material ones at the chosen depth rather than meeting a numeric quota.
 
 1. Outcome and acceptance criteria
 2. Data, inputs, provenance, and validation
@@ -208,13 +230,27 @@ Choose evidence by the question being answered. Two streams are independent when
 | Papers, benchmarks, authoritative datasets | Algorithms, scientific or quantitative claims |
 | Safe prototypes, spikes, dry runs, experiments | Feasibility and ambiguous runtime behavior |
 
-When external code reuse or architecture is central, inspect at least two independent implementations; for each serious reuse candidate, read core source and tests rather than only its README.
+### Investigate Existing Solutions Before Custom Work
+
+For every substantial feature or deliverable, actively investigate:
+
+- **Products and prior work:** how established products or practitioners solve this user problem, including workflows, states, and tradeoffs.
+- **Reusable implementations and assets:** suitable open-source projects, SDKs, libraries, components, templates, or existing local modules; what can be reused, adapted, combined, or learned from.
+- **Primary guidance and better techniques:** documentation, specifications, maintainer material, and domain references that could improve the approach.
+
+For frontend work, explicitly look for relevant open-source component libraries, specialized components, and interaction or animation libraries where motion serves the requested experience. Compare them with the existing stack and design system. Check required states, accessibility, styling flexibility, integration cost, maintenance, and license as relevant. Do not invent an animation requirement just to add a library.
+
+Start from local constraints, then investigate external candidates. Familiarity or a tight schedule is not a reason to silently default to hand-building. Reuse an earlier comparison when it covers this feature and remains current. If research access is unavailable, disclose the gap; do not claim no reusable solution exists.
+
+For serious code reuse candidates, inspect relevant core source, tests, official APIs, or runnable examples rather than only a README. Compare credible alternatives using evidence relevant to the actual choice.
+
+Read [references/reuse-and-alternatives.md](references/reuse-and-alternatives.md) for the investigation and user-facing choice.
 
 Read [references/search-quality.md](references/search-quality.md) for source priority, quality signals, corroboration, stop conditions, and anti-patterns.
 
 ## Step 5: Gather Evidence Efficiently
 
-- **Local-first tasks.** Start with the workspace. Search narrowly, follow data/control flow, inspect nearby tests, and check recent changes. Search externally only for unresolved behavior, unfamiliar APIs, security guidance, standards, or prior art that can change the design.
+- **Local-first tasks.** Start with the workspace. Search narrowly, follow data/control flow, inspect nearby tests, and check recent changes. For substantial features, continue with Step 4's investigation of prior art and reusable resources even if the local implementation seems straightforward. Mechanical edits and bounded diagnoses need external research only when it can resolve a relevant unknown.
 - **External research.** Prefer official documentation and specifications, then primary source and maintainer artifacts, then independent analysis. Pin versions, dates, commits, or document revisions when behavior can drift. Check license before copying code or assets.
 - **Creative and design work.** Study relevant exemplars, templates, style guides, and reusable assets; extract structure, interaction, visual language, states, accessibility, and the reason the example works. Do not add design research to a backend-only change unless it affects a user-facing contract.
 - **Operational actions.** Research the exact target version and environment. Prefer read-only inspection and dry runs. Identify rollback, blast radius, credential scope, and success signals before mutating state.
@@ -232,12 +268,18 @@ Question → Evidence → Confidence → Decision/constraint → Verification
 
 Resolve conflicts by preferring evidence that is primary, version-matched, reproducible, maintained, and closest to the actual environment. Document consequential conflicts and why one source won.
 
+Use [references/contradictions.md](references/contradictions.md) when sources disagree on a material claim or implementation choice.
+
 Classify reuse decisions:
 
 - REUSE: compatible, licensed, maintained, and fits directly.
 - ADAPT: sound pattern but local constraints require changes.
 - LEARN-FROM: useful principle, incompatible implementation or license.
 - REJECT: evidence shows it does not fit.
+
+The resulting implementation strategy may be **reuse**, **adapt**, **combine**, or **build**. Before committing to substantial implementation, show credible candidates and their sources, what each provides, material costs, your recommendation, and what remains custom. Include a viable alternative when one exists, especially when recommending custom work. Explain why promising candidates were declined; do not invent weak alternatives just to fill a table. Keep independent choices separate: reusing table state does not imply adopting row animations, and lightweight visuals do not imply hand-building the table logic.
+
+Give the user an opportunity to choose when viable options entail a material product, dependency, cost, maintenance, or visual tradeoff they have not delegated. Recommend one and ask one focused question before dependent implementation; continue independent work while waiting. If the user already chose or authorized you to decide, disclose the comparison and proceed. Routine compatible details do not require a vote for every package. Do not hide reusable options until the final report.
 
 ## Step 7: Readiness Gate
 
@@ -248,7 +290,7 @@ Before creating or changing anything substantial, confirm:
 - [ ] Material unknowns were expanded across relevant dimensions.
 - [ ] Primary evidence was used where available.
 - [ ] Material claims have independent support or are labeled uncertain.
-- [ ] At least five edge cases exist for Standard/Deep work.
+- [ ] Material lifecycle and failure cases are addressed with evidence appropriate to the stakes.
 - [ ] Security and failure/rollback were considered when relevant.
 - [ ] Reuse/license/version decisions are explicit when relevant.
 - [ ] Findings map to implementation constraints and verification.
@@ -257,6 +299,8 @@ Before creating or changing anything substantial, confirm:
 - [ ] The plan optimizes for the inferred outcome rather than mirroring the latest wording.
 - [ ] Every material feature being changed has a ledger entry or is explicitly one low-risk mechanical unit.
 - [ ] Existing features with weak historical evidence are marked partial/gap/stale rather than presumed correct.
+- [ ] Relevant reusable options were investigated and shown to the user, or the research gap is disclosed.
+- [ ] Any material choice requiring the user's answer has actually been resolved.
 
 If a box is inapplicable, mark it inapplicable rather than manufacturing research.
 
@@ -272,15 +316,18 @@ Research summary: [topic]
 - Corrections: [assumptions changed by evidence, if any]
 - Edge cases: [important cases and mechanisms]
 - Decision: [reuse/adapt/learn-from/reject]
+- Options: [credible candidates and sources, benefits, costs, recommendation, and remaining custom work]
 - Execution plan: [ordered slices and verification]
 ```
 
 Then:
 
-- If execution is already authorized, continue immediately.
+- If execution is already authorized and no material user choice remains unresolved, continue immediately.
 - If the user asked only for analysis/review, stop at findings.
 - If a missing choice materially changes scope, cost, risk, or external state, ask that question.
 - If research disproves the requested approach, explain the evidence and propose the closest viable alternative.
+
+Use [assets/research-report-template.md](assets/research-report-template.md) for a written decision report and [assets/project-identity-card.md](assets/project-identity-card.md) for reusable context when useful. Keep the update proportional; it need not repeat a comparison already shown in Step 6.
 
 ## Step 9: Verify and Self-Audit
 
@@ -318,3 +365,8 @@ After execution, test in proportion to risk and revisit the evidence-to-decision
 - Historical grandfathering: preserving inherited behavior because it exists or passes tests despite missing feature-specific evidence.
 - Green-test substitution: using build/test success as proof that the chosen product behavior or security boundary is correct.
 - Ledger theater: collecting links without recording the decision changed and the failure evidence required.
+- Silent custom default: building from scratch without investigating and showing credible reusable alternatives.
+- Invisible research: discovering useful libraries or patterns but withholding them until after implementation.
+- Library shopping theater: naming packages without verifying task fit, compatibility, rights, or the work they actually replace.
+
+The scenarios in [references/research-examples.md](references/research-examples.md) and [references/case-studies.md](references/case-studies.md) illustrate the workflow; they are not evidence for a current implementation.
