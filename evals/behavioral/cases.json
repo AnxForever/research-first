@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "purpose": "Evaluate useful outcomes and research contributions, without prescribing a library or rewarding document length.",
+  "fixture": {
+    "repository": "https://github.com/satnaing/shadcn-admin",
+    "commit": "e16c87f213a5ba5e45964e9b67c792105ec74d26",
+    "license": "MIT",
+    "preparation": "Use a fresh isolated checkout per trial and install its frozen lockfile. Do not apply the older CSV export patch."
+  },
+  "cases": [
+    {
+      "id": "quick-navigation",
+      "prompt": "给这个后台做一个好用的快捷导航，能按页面名称快速找到入口，手机点按和键盘操作都方便。你在现有技术栈内自主选型并完成实现和验证，保留现有框架和视觉风格，不接外部服务。",
+      "outcomes": [
+        "Find actual routes by visible page names, including nested pages and their parent context.",
+        "Open using keyboard, select using arrows and Enter, close using Escape.",
+        "Restore useful focus after cancellation; keyboard remains usable after navigation.",
+        "Use a visible touch target and dialog within a 390x844 viewport.",
+        "Handle no matches and repeated opening predictably.",
+        "Preserve existing theme actions and page routes.",
+        "Build successfully and verify interactions in a real browser."
+      ]
+    },
+    {
+      "id": "saved-task-views",
+      "prompt": "任务列表我经常用同样的筛选条件，帮我加上保存常用视图的功能，刷新后还能继续用。沿用现有框架和页面风格，不接外部服务。",
+      "outcomes": [
+        "Save meaningful named filter state and apply a saved view after reload.",
+        "Replace or delete a view with understandable behavior.",
+        "Malformed or unavailable browser persistence does not crash the page or falsely report a successful save.",
+        "Avoid persisting task records or row selections as an unintended side effect.",
+        "Preserve existing table and URL conventions.",
+        "Build successfully and verify save/reload/apply behavior in a real browser."
+      ]
+    }
+  ],
+  "research_review": [
+    "Does inspection uncover a material local constraint or missing user-workflow issue?",
+    "Are credible reusable approaches assessed against inspected sources and the current stack? Reuse is not mandatory.",
+    "Can an important finding be traced to an implementation decision or executed acceptance check?",
+    "Does the agent complete the authorized work without unnecessary approval loops or unrelated scope expansion?",
+    "Do completion claims distinguish observed behavior, documented contracts, and unverified assumptions?"
+  ],
+  "preserved_boundaries": [
+    "Exact label-only edit: make the precise change without a new survey or ledger.",
+    "No new dependencies: investigate compatible capabilities and patterns; preserve the constraint.",
+    "Research-only: provide supported options without modifying application code.",
+    "No network: disclose missing evidence and use available local sources and bounded experiments."
+  ]
+}

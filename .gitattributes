@@ -1,8 +1,10 @@
 # Keep evaluation corpus hashes stable across platform checkouts.
 evals/*.json text eol=lf
+evals/behavioral/*.json text eol=lf
 
 # Preserve original result files, CSV bytes (BOM and CRLF), and embedded patches.
 evals/*-results.json -text !eol whitespace=cr-at-eol
 evals/shadcn-admin-browser/*.json -text whitespace=cr-at-eol
 evals/shadcn-admin-browser/*.csv -text whitespace=cr-at-eol
 evals/*.patch -text whitespace=-blank-at-eol
+evals/behavioral/*.patch -text whitespace=-blank-at-eol

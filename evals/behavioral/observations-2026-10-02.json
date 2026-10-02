@@ -1,0 +1,643 @@
+{
+  "navigation": {
+    "no_skill": {
+      "sample": "sample-A-final",
+      "url": "http://127.0.0.1:4311",
+      "browser": "Microsoft Edge via Playwright channel=msedge",
+      "run": "20261002T152113",
+      "checks": {
+        "ctrl_k": {
+          "status": "pass",
+          "evidence": "Ctrl+K opened a visible search field."
+        },
+        "arrow_enter": {
+          "status": "pass",
+          "evidence": "Query Tasks returned ['Tasks', 'Secured by Clerk / User Management', 'Close']; ArrowDown selected 'General Secured by Clerk / User Management'; Enter ended at http://127.0.0.1:4311/clerk/user-management, expected /clerk/user-management."
+        },
+        "duplicate_names": {
+          "status": "pass",
+          "evidence": "Entries=['General Secured by Clerk / Sign In', 'Pages Auth / Sign In', 'Pages Auth / Sign In (2 Col)']; selected routes={'auth': '/sign-in', 'clerk': '/clerk/sign-in'}; visually confirm if row/context selectors missed."
+        },
+        "escape_focus": {
+          "status": "fail",
+          "evidence": "Escape closed=True; focus returned=False."
+        },
+        "reopen": {
+          "status": "pass",
+          "evidence": "Reopen by click=True, by Ctrl+K=True."
+        },
+        "empty_state": {
+          "status": "pass",
+          "evidence": "Recognized empty copy=True, stale page results=0, visible text='No pages found. Try another name.\\n\\nUse ↑ ↓ to move, Enter to open, and Esc to close.\\n\\nClose'."
+        },
+        "theme_actions": {
+          "status": "pass",
+          "evidence": "Theme actions/states={'Light': 'font-inter light', 'Dark': 'font-inter dark', 'System': 'font-inter light'}; inspect the saved menu screenshot when an action/state selector did not match."
+        },
+        "mobile_touch": {
+          "status": "pass",
+          "evidence": "Tap search + Tasks; URL=http://127.0.0.1:4311/tasks; inspect screenshot if result selector missed."
+        },
+        "mobile_layout": {
+          "status": "pass",
+          "evidence": "390x844 bounds: trigger={'x': 105, 'y': 10, 'width': 141, 'height': 44}, result={'x': 25, 'y': 399.5, 'width': 340, 'height': 44}, panel={'x': 16, 'y': 318.5, 'width': 358, 'height': 207}; no clipping/overflow=True; target size is recorded for human usability judgment."
+        },
+        "runtime_errors": {
+          "status": "pass",
+          "evidence": "Non-Clerk runtime errors=[]; Clerk demo-route errors are separately recorded and excluded from navigation regression judgement."
+        }
+      },
+      "console_errors": [],
+      "page_errors": [],
+      "integration_route_errors": [],
+      "screenshots": [
+        "desktop-home.png",
+        "desktop-tasks-results.png",
+        "desktop-trigger-open.png",
+        "desktop-empty.png",
+        "desktop-duplicate-sign-in.png",
+        "desktop-theme-options.png",
+        "mobile-trigger-open.png",
+        "mobile-search-results.png",
+        "mobile-after-tap.png"
+      ]
+    },
+    "published_f20cff5": {
+      "sample": "sample-B-final",
+      "url": "http://127.0.0.1:4312",
+      "browser": "Microsoft Edge via Playwright channel=msedge",
+      "run": "20261002T152003",
+      "checks": {
+        "ctrl_k": {
+          "status": "pass",
+          "evidence": "Ctrl+K opened a visible search field."
+        },
+        "arrow_enter": {
+          "status": "pass",
+          "evidence": "Query Tasks returned ['Tasks /tasks', 'Secured by Clerk User Management /clerk/user-management', 'Close']; ArrowDown selected 'General Secured by Clerk User Management /clerk/user-management User Management in Secured by Clerk'; Enter ended at http://127.0.0.1:4312/clerk/user-management, expected /clerk/user-management."
+        },
+        "duplicate_names": {
+          "status": "pass",
+          "evidence": "Entries=['General Secured by Clerk Sign In /clerk/sign-in Sign In in Secured by Clerk', 'Pages Auth Sign In /sign-in Sign In in Auth', 'Pages Auth Sign In (2 Col) /sign-in-2 Sign In (2 Col) in Auth']; selected routes={'auth': '/sign-in', 'clerk': '/clerk/sign-in'}; visually confirm if row/context selectors missed."
+        },
+        "escape_focus": {
+          "status": "fail",
+          "evidence": "Escape closed=True; focus returned=False."
+        },
+        "reopen": {
+          "status": "pass",
+          "evidence": "Reopen by click=True, by Ctrl+K=True."
+        },
+        "empty_state": {
+          "status": "pass",
+          "evidence": "Recognized empty copy=True, stale page results=0, visible text='No pages found.\\n↑ ↓ Move\\n↵ Open\\nEsc Close\\nClose'."
+        },
+        "theme_actions": {
+          "status": "pass",
+          "evidence": "Theme actions/states={'Light': 'font-inter light', 'Dark': 'font-inter dark', 'System': 'font-inter light'}; inspect the saved menu screenshot when an action/state selector did not match."
+        },
+        "mobile_touch": {
+          "status": "pass",
+          "evidence": "Tap search + Tasks; URL=http://127.0.0.1:4312/tasks; inspect screenshot if result selector missed."
+        },
+        "mobile_layout": {
+          "status": "pass",
+          "evidence": "390x844 bounds: trigger={'x': 117, 'y': 8, 'width': 125.828125, 'height': 48}, result={'x': 25, 'y': 403.5, 'width': 347, 'height': 48}, panel={'x': 16, 'y': 322.5, 'width': 365, 'height': 215}; no clipping/overflow=True; target size is recorded for human usability judgment."
+        },
+        "runtime_errors": {
+          "status": "pass",
+          "evidence": "Non-Clerk runtime errors=[]; Clerk demo-route errors are separately recorded and excluded from navigation regression judgement."
+        }
+      },
+      "console_errors": [],
+      "page_errors": [],
+      "integration_route_errors": [],
+      "screenshots": [
+        "desktop-home.png",
+        "desktop-tasks-results.png",
+        "desktop-trigger-open.png",
+        "desktop-empty.png",
+        "desktop-duplicate-sign-in.png",
+        "desktop-theme-options.png",
+        "mobile-trigger-open.png",
+        "mobile-search-results.png",
+        "mobile-after-tap.png"
+      ]
+    },
+    "first_revision": {
+      "sample": "sample-C",
+      "url": "http://127.0.0.1:4313",
+      "browser": "Microsoft Edge via Playwright channel=msedge",
+      "run": "20261002T152813",
+      "checks": {
+        "ctrl_k": {
+          "status": "pass",
+          "evidence": "Ctrl+K opened a visible search field."
+        },
+        "arrow_enter": {
+          "status": "pass",
+          "evidence": "Query Tasks returned ['Tasks', 'Close']; ArrowDown selected 'General Tasks'; Enter ended at http://127.0.0.1:4313/tasks, expected /tasks."
+        },
+        "duplicate_names": {
+          "status": "pass",
+          "evidence": "Entries=['General Secured by Clerk Sign In', 'Pages Auth Sign In', 'Pages Auth Sign In (2 Col)']; selected routes={'auth': '/sign-in', 'clerk': '/clerk/sign-in'}; visually confirm if row/context selectors missed."
+        },
+        "escape_focus": {
+          "status": "pass",
+          "evidence": "Escape closed=True; focus returned=True."
+        },
+        "reopen": {
+          "status": "pass",
+          "evidence": "Reopen by click=True, by Ctrl+K=True."
+        },
+        "empty_state": {
+          "status": "pass",
+          "evidence": "Recognized empty copy=True, stale page results=0, visible text='Find a page\\n\\nSearch dashboard pages by name. Use the arrow keys to choose a page, Enter to open it, or Escape to close.\\n\\nNo pages found. Try another page name.\\n↑↓ Move\\nEnter Open\\nEsc Close\\nClose'."
+        },
+        "theme_actions": {
+          "status": "pass",
+          "evidence": "Theme actions/states={'Light': 'font-inter light', 'Dark': 'font-inter dark', 'System': 'font-inter light'}; inspect the saved menu screenshot when an action/state selector did not match."
+        },
+        "mobile_touch": {
+          "status": "pass",
+          "evidence": "Tap search + Tasks; URL=http://127.0.0.1:4313/tasks; inspect screenshot if result selector missed."
+        },
+        "mobile_layout": {
+          "status": "pass",
+          "evidence": "390x844 bounds: trigger={'x': 117, 'y': 10, 'width': 117, 'height': 44}, result={'x': 25, 'y': 421.5, 'width': 340, 'height': 44}, panel={'x': 16, 'y': 340.5, 'width': 358, 'height': 163}; no clipping/overflow=True; target size is recorded for human usability judgment."
+        },
+        "runtime_errors": {
+          "status": "pass",
+          "evidence": "Non-Clerk runtime errors=[]; Clerk demo-route errors are separately recorded and excluded from navigation regression judgement."
+        }
+      },
+      "console_errors": [],
+      "page_errors": [],
+      "integration_route_errors": [],
+      "screenshots": [
+        "desktop-home.png",
+        "desktop-tasks-results.png",
+        "desktop-trigger-open.png",
+        "desktop-empty.png",
+        "desktop-duplicate-sign-in.png",
+        "desktop-theme-options.png",
+        "mobile-trigger-open.png",
+        "mobile-search-results.png",
+        "mobile-after-tap.png"
+      ]
+    }
+  },
+  "saved_views": {
+    "lifecycle": {
+      "status": "PASS",
+      "details": "Cold load, named save, filter restore, refresh and reselect, duplicate-name rejection, deletion, deleted-after-refresh, exact minimal storage shape, and no persisted row selection passed.",
+      "initial_matching_rows": 5,
+      "persisted_keys": [
+        "id",
+        "name",
+        "priority",
+        "search",
+        "status"
+      ]
+    },
+    "corrupt_storage": {
+      "status": "PASS",
+      "details": "Malformed feature key did not crash the page, showed an empty saved-view state without false success, and accepted a later valid save."
+    },
+    "setitem_failure": {
+      "status": "PASS",
+      "details": "Only the feature key's setItem was faulted; save showed an error, did not claim success or persist data, left the dialog usable, and the page remained live."
+    }
+  },
+  "provenance": {
+    "note": "Copied from independent browser reports; port URLs refer to isolated local public-project fixtures. Early harness failures remain in local raw artifacts and are described in the accompanying report.",
+    "raw_transcript_available": false,
+    "model_usage_available": false
+  },
+  "packaged_replay": {
+    "navigation": {
+      "sample": "packaged-navigation-final",
+      "url": "http://127.0.0.1:4413",
+      "browser": "Microsoft Edge via Playwright channel=msedge",
+      "run": "20261002T155754437533",
+      "checks": {
+        "ctrl_k": {
+          "status": "pass",
+          "evidence": "Ctrl+K opened a visible search field."
+        },
+        "arrow_enter": {
+          "status": "pass",
+          "evidence": "Query Tasks returned ['Tasks', 'Close']; ArrowDown selected 'General Tasks'; Enter ended at http://127.0.0.1:4413/tasks, expected /tasks."
+        },
+        "duplicate_names": {
+          "status": "pass",
+          "evidence": "Entries=['General Secured by Clerk Sign In', 'Pages Auth Sign In', 'Pages Auth Sign In (2 Col)']; selected routes={'auth': '/sign-in', 'clerk': '/clerk/sign-in'}; visually confirm if row/context selectors missed."
+        },
+        "escape_focus": {
+          "status": "pass",
+          "evidence": "Escape closed=True; focus returned=True."
+        },
+        "reopen": {
+          "status": "pass",
+          "evidence": "Reopen by click=True, by Ctrl+K=True."
+        },
+        "empty_state": {
+          "status": "pass",
+          "evidence": "Recognized empty copy=True, stale page results=0, visible text='Find a page\\n\\nSearch dashboard pages by name. Use the arrow keys to choose a page, Enter to open it, or Escape to close.\\n\\nNo pages found. Try another page name.\\n↑↓ Move\\nEnter Open\\nEsc Close\\nClose'."
+        },
+        "theme_actions": {
+          "status": "pass",
+          "evidence": "Theme actions/states={'Light': 'font-inter light', 'Dark': 'font-inter dark', 'System': 'font-inter light'}; inspect the saved menu screenshot when an action/state selector did not match."
+        },
+        "mobile_touch": {
+          "status": "pass",
+          "evidence": "Tap search + Tasks; URL=http://127.0.0.1:4413/tasks; inspect screenshot if result selector missed."
+        },
+        "mobile_layout": {
+          "status": "pass",
+          "evidence": "390x844 bounds: trigger={'x': 117, 'y': 10, 'width': 117, 'height': 44}, result={'x': 25, 'y': 421.5, 'width': 340, 'height': 44}, panel={'x': 16, 'y': 340.5, 'width': 358, 'height': 163}; no clipping/overflow=True; target size is recorded for human usability judgment."
+        },
+        "runtime_errors": {
+          "status": "pass",
+          "evidence": "Local non-Clerk runtime errors=[]; errors from intentionally blocked external resource URLs and Clerk demo routes are separately recorded and excluded from navigation regression judgement."
+        }
+      },
+      "console_errors": [
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        }
+      ],
+      "page_errors": [],
+      "integration_route_errors": [],
+      "screenshots": [
+        "desktop-home.png",
+        "desktop-tasks-results.png",
+        "desktop-trigger-open.png",
+        "desktop-empty.png",
+        "desktop-duplicate-sign-in.png",
+        "desktop-theme-options.png",
+        "mobile-trigger-open.png",
+        "mobile-search-results.png",
+        "mobile-after-tap.png"
+      ],
+      "blocked_external_requests": [
+        "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+      ],
+      "blocked_resource_errors": [
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        }
+      ]
+    },
+    "saved_views": {
+      "lifecycle": {
+        "status": "PASS",
+        "details": "Cold load, named save, filter restore, refresh and reselect, duplicate-name rejection, deletion, deleted-after-refresh, exact minimal storage shape, and no persisted row selection passed.",
+        "initial_matching_rows": 5,
+        "persisted_keys": [
+          "id",
+          "name",
+          "priority",
+          "search",
+          "status"
+        ]
+      },
+      "corrupt_storage": {
+        "status": "PASS",
+        "details": "Malformed feature key did not crash the page, showed an empty saved-view state without false success, and accepted a later valid save."
+      },
+      "setitem_failure": {
+        "status": "PASS",
+        "details": "Only the feature key's setItem was faulted; save showed an error, did not claim success or persist data, left the dialog usable, and the page remained live."
+      }
+    },
+    "note": "Fresh production-preview runs using the packaged scripts after harness-only selector/close-wait corrections. Final navigation additionally restricts requests to the fixture origin and records exact blocked resource URLs/errors separately. Distinct from original matched A/B/C grading.",
+    "navigation_before_request_isolation": {
+      "sample": "packaged-navigation-stable",
+      "url": "http://127.0.0.1:4413",
+      "browser": "Microsoft Edge via Playwright channel=msedge",
+      "run": "20261002T154201163392",
+      "checks": {
+        "ctrl_k": {
+          "status": "pass",
+          "evidence": "Ctrl+K opened a visible search field."
+        },
+        "arrow_enter": {
+          "status": "pass",
+          "evidence": "Query Tasks returned ['Tasks', 'Close']; ArrowDown selected 'General Tasks'; Enter ended at http://127.0.0.1:4413/tasks, expected /tasks."
+        },
+        "duplicate_names": {
+          "status": "pass",
+          "evidence": "Entries=['General Secured by Clerk Sign In', 'Pages Auth Sign In', 'Pages Auth Sign In (2 Col)']; selected routes={'auth': '/sign-in', 'clerk': '/clerk/sign-in'}; visually confirm if row/context selectors missed."
+        },
+        "escape_focus": {
+          "status": "pass",
+          "evidence": "Escape closed=True; focus returned=True."
+        },
+        "reopen": {
+          "status": "pass",
+          "evidence": "Reopen by click=True, by Ctrl+K=True."
+        },
+        "empty_state": {
+          "status": "pass",
+          "evidence": "Recognized empty copy=True, stale page results=0, visible text='Find a page\\n\\nSearch dashboard pages by name. Use the arrow keys to choose a page, Enter to open it, or Escape to close.\\n\\nNo pages found. Try another page name.\\n↑↓ Move\\nEnter Open\\nEsc Close\\nClose'."
+        },
+        "theme_actions": {
+          "status": "pass",
+          "evidence": "Theme actions/states={'Light': 'font-inter light', 'Dark': 'font-inter dark', 'System': 'font-inter light'}; inspect the saved menu screenshot when an action/state selector did not match."
+        },
+        "mobile_touch": {
+          "status": "pass",
+          "evidence": "Tap search + Tasks; URL=http://127.0.0.1:4413/tasks; inspect screenshot if result selector missed."
+        },
+        "mobile_layout": {
+          "status": "pass",
+          "evidence": "390x844 bounds: trigger={'x': 117, 'y': 10, 'width': 117, 'height': 44}, result={'x': 25, 'y': 421.5, 'width': 340, 'height': 44}, panel={'x': 16, 'y': 340.5, 'width': 358, 'height': 163}; no clipping/overflow=True; target size is recorded for human usability judgment."
+        },
+        "runtime_errors": {
+          "status": "pass",
+          "evidence": "Non-Clerk runtime errors=[]; Clerk demo-route errors are separately recorded and excluded from navigation regression judgement."
+        }
+      },
+      "console_errors": [],
+      "page_errors": [],
+      "integration_route_errors": [],
+      "screenshots": [
+        "desktop-home.png",
+        "desktop-tasks-results.png",
+        "desktop-trigger-open.png",
+        "desktop-empty.png",
+        "desktop-duplicate-sign-in.png",
+        "desktop-theme-options.png",
+        "mobile-trigger-open.png",
+        "mobile-search-results.png",
+        "mobile-after-tap.png"
+      ]
+    }
+  },
+  "skill_entry_sha256": {
+    "first_revision": "3375b9b3e319f1f6b43524bdbeed7e31c7ba7bf40bb104c7fc5c4a45be433db5",
+    "final_revision": "3cf8d0ac2d5616cd387773806fe94b564c0434c5de5a71b417efe1b1fae6b50a"
+  },
+  "final_diagnostic": {
+    "independent_acceptance": {
+      "sample": "sample-D-final-blocked-url-attribution",
+      "url": "http://127.0.0.1:4315",
+      "browser": "Microsoft Edge via Playwright channel=msedge",
+      "run": "20261002T155759665298",
+      "checks": {
+        "ctrl_k": {
+          "status": "pass",
+          "evidence": "Ctrl+K opened a visible search field."
+        },
+        "arrow_enter": {
+          "status": "pass",
+          "evidence": "Query Tasks returned ['Tasks /tasks', 'Secured by Clerk User Management /clerk/user-management', 'Close']; ArrowDown selected 'General Secured by Clerk User Management /clerk/user-management User Management in Secured by Clerk'; Enter ended at http://127.0.0.1:4315/clerk/user-management, expected /clerk/user-management."
+        },
+        "duplicate_names": {
+          "status": "pass",
+          "evidence": "Entries=['General Secured by Clerk Sign In /clerk/sign-in Sign In in Secured by Clerk', 'Pages Auth Sign In /sign-in Sign In in Auth', 'Pages Auth Sign In (2 Col) /sign-in-2 Sign In (2 Col) in Auth']; selected routes={'auth': '/sign-in', 'clerk': '/clerk/sign-in'}; visually confirm if row/context selectors missed."
+        },
+        "escape_focus": {
+          "status": "pass",
+          "evidence": "Escape closed=True; focus returned=True."
+        },
+        "reopen": {
+          "status": "pass",
+          "evidence": "Reopen by click=True, by Ctrl+K=True."
+        },
+        "empty_state": {
+          "status": "pass",
+          "evidence": "Recognized empty copy=True, stale page results=0, visible text='No pages found.\\n↑ ↓ Move\\n↵ Open\\nEsc Close\\nClose'."
+        },
+        "theme_actions": {
+          "status": "pass",
+          "evidence": "Theme actions/states={'Light': 'font-inter light', 'Dark': 'font-inter dark', 'System': 'font-inter light'}; inspect the saved menu screenshot when an action/state selector did not match."
+        },
+        "mobile_touch": {
+          "status": "pass",
+          "evidence": "Tap search + Tasks; URL=http://127.0.0.1:4315/tasks; inspect screenshot if result selector missed."
+        },
+        "mobile_layout": {
+          "status": "pass",
+          "evidence": "390x844 bounds: trigger={'x': 117, 'y': 8, 'width': 125.828125, 'height': 48}, result={'x': 21, 'y': 395.5, 'width': 348, 'height': 48}, panel={'x': 12, 'y': 314.5, 'width': 366, 'height': 215}; no clipping/overflow=True; target size is recorded for human usability judgment."
+        },
+        "runtime_errors": {
+          "status": "pass",
+          "evidence": "Local non-Clerk runtime errors=[]; errors from intentionally blocked external resource URLs and Clerk demo routes are separately recorded and excluded from navigation regression judgement."
+        }
+      },
+      "console_errors": [
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        }
+      ],
+      "page_errors": [],
+      "integration_route_errors": [],
+      "screenshots": [
+        "desktop-home.png",
+        "desktop-tasks-results.png",
+        "desktop-trigger-open.png",
+        "desktop-empty.png",
+        "desktop-duplicate-sign-in.png",
+        "desktop-theme-options.png",
+        "mobile-trigger-open.png",
+        "mobile-search-results.png",
+        "mobile-after-tap.png"
+      ],
+      "blocked_external_requests": [
+        "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+      ],
+      "blocked_resource_errors": [
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        },
+        {
+          "path": "/",
+          "message": "Failed to load resource: net::ERR_FAILED",
+          "source_url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        }
+      ]
+    },
+    "worker_targeted_checks": {
+      "browser": "Microsoft Edge via Playwright channel=msedge, headless",
+      "baseUrl": "http://127.0.0.1:4315",
+      "externalRequests": "All non-local requests were intercepted and aborted",
+      "blockedExternalHosts": [
+        "fonts.googleapis.com",
+        "randomuser.me"
+      ],
+      "pageErrors": [],
+      "measurements": {
+        "desktopKeyboardNavigation": "/tasks via Ctrl+K, filter, arrows, Enter",
+        "editableFieldShortcut": "Ctrl+K leaves the chat search focused and unchanged",
+        "desktopDialogFocusAndReturn": "focus trap, Escape, and launcher restoration passed",
+        "mobile390x844": {
+          "left": 12,
+          "top": 127.3046875,
+          "right": 378,
+          "bottom": 716.6953125,
+          "width": 366,
+          "height": 589.390625,
+          "viewportWidth": 390,
+          "viewportHeight": 844,
+          "inputFocused": true
+        },
+        "mobileTouchNavigation": "390x844 tap opens Tasks",
+        "mobile390x430": {
+          "left": 12,
+          "top": 44.5,
+          "right": 378,
+          "bottom": 385.5,
+          "width": 366,
+          "height": 341,
+          "viewportWidth": 390,
+          "viewportHeight": 430,
+          "inputFocused": true
+        },
+        "mobileShortViewportScroll": "390x430 results scroll and Help Center is tappable",
+        "mobile320x568": {
+          "left": 12,
+          "top": 128.1015625,
+          "right": 308,
+          "bottom": 551.8984375,
+          "width": 296,
+          "height": 423.796875,
+          "viewportWidth": 320,
+          "viewportHeight": 568,
+          "inputFocused": true
+        }
+      },
+      "screenshots": [
+        "desktop-command-menu.png",
+        "mobile-390x844-command-menu.png",
+        "mobile-390x430-command-menu.png",
+        "mobile-320x568-command-menu.png"
+      ]
+    },
+    "note": "Different review/fix prompt using inherited B implementation and final instruction snapshot. Not another matched A/B/C trial. Worker-owned extra viewport/input checks are distinguished from independent acceptance. Initial task-relevant memory exposure is disclosed in the report."
+  }
+}

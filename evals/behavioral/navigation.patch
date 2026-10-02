@@ -1,0 +1,377 @@
+diff --git a/src/components/command-menu.tsx b/src/components/command-menu.tsx
+index 223b04d..98562df 100644
+--- a/src/components/command-menu.tsx
++++ b/src/components/command-menu.tsx
+@@ -13,12 +13,11 @@ import {
+   CommandSeparator,
+ } from '@/components/ui/command'
+ import { sidebarData } from './layout/data/sidebar-data'
+-import { ScrollArea } from './ui/scroll-area'
+ 
+ export function CommandMenu() {
+   const navigate = useNavigate()
+   const { setTheme } = useTheme()
+-  const { open, setOpen } = useSearch()
++  const { open, setOpen, restoreFocus } = useSearch()
+ 
+   const runCommand = React.useCallback(
+     (command: () => unknown) => {
+@@ -29,63 +28,76 @@ export function CommandMenu() {
+   )
+ 
+   return (
+-    <CommandDialog modal open={open} onOpenChange={setOpen}>
+-      <CommandInput placeholder='Type a command or search...' />
++    <CommandDialog
++      modal
++      open={open}
++      onOpenChange={setOpen}
++      onCloseAutoFocus={restoreFocus}
++      title='Find a page'
++      description='Search dashboard pages by name. Use the arrow keys to choose a page, Enter to open it, or Escape to close.'
++    >
++      <CommandInput placeholder='Search pages by name...' />
+       <CommandList>
+-        <ScrollArea type='hover' className='h-72 pe-1'>
+-          <CommandEmpty>No results found.</CommandEmpty>
+-          {sidebarData.navGroups.map((group) => (
+-            <CommandGroup key={group.title} heading={group.title}>
+-              {group.items.map((navItem, i) => {
+-                if (navItem.url)
+-                  return (
+-                    <CommandItem
+-                      key={`${navItem.url}-${i}`}
+-                      value={navItem.title}
+-                      onSelect={() => {
+-                        runCommand(() => navigate({ to: navItem.url }))
+-                      }}
+-                    >
+-                      <div className='flex size-4 items-center justify-center'>
+-                        <ArrowRight className='size-2 text-muted-foreground/80' />
+-                      </div>
+-                      {navItem.title}
+-                    </CommandItem>
+-                  )
+-
+-                return navItem.items?.map((subItem, i) => (
++        <CommandEmpty>No pages found. Try another page name.</CommandEmpty>
++        {sidebarData.navGroups.map((group) => (
++          <CommandGroup key={group.title} heading={group.title}>
++            {group.items.map((navItem, i) => {
++              if (navItem.url)
++                return (
+                   <CommandItem
+-                    key={`${navItem.title}-${subItem.url}-${i}`}
+-                    value={`${navItem.title}-${subItem.url}`}
++                    key={`${navItem.url}-${i}`}
++                    value={`${navItem.title} ${navItem.url}`}
+                     onSelect={() => {
+-                      runCommand(() => navigate({ to: subItem.url }))
++                      runCommand(() => navigate({ to: navItem.url }))
+                     }}
+                   >
+                     <div className='flex size-4 items-center justify-center'>
+                       <ArrowRight className='size-2 text-muted-foreground/80' />
+                     </div>
+-                    {navItem.title} <ChevronRight /> {subItem.title}
++                    {navItem.title}
+                   </CommandItem>
+-                ))
+-              })}
+-            </CommandGroup>
+-          ))}
+-          <CommandSeparator />
+-          <CommandGroup heading='Theme'>
+-            <CommandItem onSelect={() => runCommand(() => setTheme('light'))}>
+-              <Sun /> <span>Light</span>
+-            </CommandItem>
+-            <CommandItem onSelect={() => runCommand(() => setTheme('dark'))}>
+-              <Moon className='scale-90' />
+-              <span>Dark</span>
+-            </CommandItem>
+-            <CommandItem onSelect={() => runCommand(() => setTheme('system'))}>
+-              <Laptop />
+-              <span>System</span>
+-            </CommandItem>
++                )
++
++              return navItem.items?.map((subItem, i) => (
++                <CommandItem
++                  key={`${navItem.title}-${subItem.url}-${i}`}
++                  value={`${navItem.title} ${subItem.title} ${subItem.url}`}
++                  onSelect={() => {
++                    runCommand(() => navigate({ to: subItem.url }))
++                  }}
++                >
++                  <div className='flex size-4 items-center justify-center'>
++                    <ArrowRight className='size-2 text-muted-foreground/80' />
++                  </div>
++                  {navItem.title} <ChevronRight /> {subItem.title}
++                </CommandItem>
++              ))
++            })}
+           </CommandGroup>
+-        </ScrollArea>
++        ))}
++        <CommandSeparator />
++        <CommandGroup heading='Theme'>
++          <CommandItem onSelect={() => runCommand(() => setTheme('light'))}>
++            <Sun /> <span>Light</span>
++          </CommandItem>
++          <CommandItem onSelect={() => runCommand(() => setTheme('dark'))}>
++            <Moon className='scale-90' />
++            <span>Dark</span>
++          </CommandItem>
++          <CommandItem onSelect={() => runCommand(() => setTheme('system'))}>
++            <Laptop />
++            <span>System</span>
++          </CommandItem>
++        </CommandGroup>
+       </CommandList>
++      <div
++        aria-hidden='true'
++        className='flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t px-3 py-2 text-xs text-muted-foreground'
++      >
++        <span>↑↓ Move</span>
++        <span>Enter Open</span>
++        <span>Esc Close</span>
++      </div>
+     </CommandDialog>
+   )
+ }
+diff --git a/src/components/search.tsx b/src/components/search.tsx
+index a152edb..3b8abf4 100644
+--- a/src/components/search.tsx
++++ b/src/components/search.tsx
+@@ -5,18 +5,24 @@ import { Button } from './ui/button'
+ 
+ export function Search({
+   className = '',
+-  placeholder = 'Search',
++  placeholder = 'Find page',
+   ...props
+ }: React.ComponentProps<'button'> & { placeholder?: string }) {
+   const { setOpen } = useSearch()
++  const shortcutModifier = /Mac|iPhone|iPad|iPod/.test(navigator.platform)
++    ? '⌘'
++    : 'Ctrl'
++
+   return (
+     <Button
+       {...props}
+       variant='outline'
+       className={cn(
+-        'group relative h-8 w-full flex-1 justify-start rounded-md bg-muted/25 text-sm font-normal text-muted-foreground shadow-none hover:bg-accent sm:w-40 sm:pe-12 md:flex-none lg:w-52 xl:w-64',
++        'group relative h-11 w-full flex-1 justify-start rounded-md bg-muted/25 text-sm font-normal text-muted-foreground shadow-none hover:bg-accent sm:h-8 sm:w-40 sm:pe-12 md:flex-none lg:w-52 xl:w-64',
+         className
+       )}
++      data-search-trigger
++      aria-label='Search pages'
+       aria-keyshortcuts='Meta+K Control+K'
+       onClick={() => setOpen(true)}
+     >
+@@ -26,8 +32,11 @@ export function Search({
+         size={16}
+       />
+       <span className='ms-4'>{placeholder}</span>
+-      <kbd className='pointer-events-none absolute inset-e-[0.3rem] top-[0.3rem] hidden h-5 items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 select-none group-hover:bg-accent sm:flex'>
+-        <span className='text-xs'>⌘</span>K
++      <kbd
++        aria-hidden='true'
++        className='pointer-events-none absolute inset-e-[0.3rem] top-[0.3rem] hidden h-5 items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 select-none group-hover:bg-accent sm:flex'
++      >
++        {shortcutModifier} K
+       </kbd>
+     </Button>
+   )
+diff --git a/src/components/ui/command.tsx b/src/components/ui/command.tsx
+index e71975d..9ae0840 100644
+--- a/src/components/ui/command.tsx
++++ b/src/components/ui/command.tsx
+@@ -32,23 +32,28 @@ function CommandDialog({
+   children,
+   className,
+   showCloseButton = true,
++  onCloseAutoFocus,
+   ...props
+ }: React.ComponentProps<typeof Dialog> & {
+   title?: string
+   description?: string
+   className?: string
+   showCloseButton?: boolean
++  onCloseAutoFocus?: React.ComponentProps<
++    typeof DialogContent
++  >['onCloseAutoFocus']
+ }) {
+   return (
+     <Dialog {...props}>
+-      <DialogHeader className='sr-only'>
+-        <DialogTitle>{title}</DialogTitle>
+-        <DialogDescription>{description}</DialogDescription>
+-      </DialogHeader>
+       <DialogContent
+         className={cn('overflow-hidden p-0', className)}
+         showCloseButton={showCloseButton}
++        onCloseAutoFocus={onCloseAutoFocus}
+       >
++        <DialogHeader className='sr-only'>
++          <DialogTitle>{title}</DialogTitle>
++          <DialogDescription>{description}</DialogDescription>
++        </DialogHeader>
+         <Command className='**:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-muted-foreground **:[[cmdk-group]]:px-2 **:[[cmdk-input]]:h-12 **:[[cmdk-item]]:px-2 **:[[cmdk-item]]:py-3'>
+           {children}
+         </Command>
+diff --git a/src/context/search-provider.test.tsx b/src/context/search-provider.test.tsx
+index 3476d85..9ea6fa1 100644
+--- a/src/context/search-provider.test.tsx
++++ b/src/context/search-provider.test.tsx
+@@ -3,7 +3,7 @@ import { render, type RenderResult } from 'vitest-browser-react'
+ import { userEvent } from 'vitest/browser'
+ import { SearchProvider } from '@/context/search-provider'
+ 
+-const COMMAND_MENU_PLACEHOLDER = 'Type a command or search...'
++const COMMAND_MENU_PLACEHOLDER = 'Search pages by name...'
+ 
+ const mocks = vi.hoisted(() => ({
+   navigate: vi.fn(),
+@@ -62,7 +62,7 @@ describe('SearchProvider and CommandMenu', () => {
+ 
+   it('renders the command palette when the palette is open', async () => {
+     const screen = await renderWithSearchProvider()
+-    const { getByPlaceholder, getByText } = screen
++    const { getByPlaceholder, getByRole, getByText } = screen
+ 
+     await openCommandPalette(screen)
+ 
+@@ -73,7 +73,9 @@ describe('SearchProvider and CommandMenu', () => {
+     await expect.element(getByText('Light')).toBeInTheDocument()
+     await expect.element(getByText('Dark')).toBeInTheDocument()
+     await expect.element(getByText('System')).toBeInTheDocument()
+-    await expect.element(getByText('Dashboard')).toBeInTheDocument()
++    await expect
++      .element(getByRole('option', { name: 'Dashboard' }))
++      .toBeInTheDocument()
+   })
+ 
+   it('does not show the dialog content when search is closed', async () => {
+@@ -131,6 +133,24 @@ describe('SearchProvider and CommandMenu', () => {
+       .not.toBeInTheDocument()
+   })
+ 
++  it('finds nested pages by title and opens the selected result with Enter', async () => {
++    const screen = await renderWithSearchProvider()
++    const { getByPlaceholder, getByRole } = screen
++
++    await openCommandPalette(screen)
++    await userEvent.fill(getByPlaceholder(COMMAND_MENU_PLACEHOLDER), 'Profile')
++
++    await expect
++      .element(getByRole('option', { name: 'Settings Profile' }))
++      .toBeInTheDocument()
++    await userEvent.keyboard('{Enter}')
++
++    expect(mocks.navigate).toHaveBeenCalledWith({ to: '/settings' })
++    await expect
++      .element(getByPlaceholder(COMMAND_MENU_PLACEHOLDER))
++      .not.toBeInTheDocument()
++  })
++
+   it('applies theme and closes the palette when a theme command is chosen', async () => {
+     const screen = await renderWithSearchProvider()
+ 
+@@ -155,7 +175,7 @@ describe('SearchProvider and CommandMenu', () => {
+     )
+ 
+     await expect
+-      .element(screen.getByText('No results found.'))
++      .element(screen.getByText('No pages found. Try another page name.'))
+       .toBeInTheDocument()
+   })
+ })
+diff --git a/src/context/search-provider.tsx b/src/context/search-provider.tsx
+index c4c5ebd..f882a3c 100644
+--- a/src/context/search-provider.tsx
++++ b/src/context/search-provider.tsx
+@@ -1,9 +1,17 @@
+-import { createContext, useContext, useEffect, useState } from 'react'
++import {
++  createContext,
++  useCallback,
++  useContext,
++  useEffect,
++  useRef,
++  useState,
++} from 'react'
+ import { CommandMenu } from '@/components/command-menu'
+ 
+ type SearchContextType = {
+   open: boolean
+   setOpen: React.Dispatch<React.SetStateAction<boolean>>
++  restoreFocus: (event: Event) => void
+ }
+ 
+ const SearchContext = createContext<SearchContextType | null>(null)
+@@ -14,20 +22,60 @@ type SearchProviderProps = {
+ 
+ export function SearchProvider({ children }: SearchProviderProps) {
+   const [open, setOpen] = useState(false)
++  const returnFocusRef = useRef<HTMLElement | null>(null)
++
++  const setSearchOpen = useCallback<
++    React.Dispatch<React.SetStateAction<boolean>>
++  >(
++    (value) => {
++      const nextOpen = typeof value === 'function' ? value(open) : value
++
++      if (nextOpen && !open) {
++        const activeElement = document.activeElement
++        const activeTrigger =
++          activeElement instanceof HTMLElement &&
++          activeElement !== document.body
++            ? activeElement
++            : null
++
++        returnFocusRef.current =
++          activeTrigger ??
++          document.querySelector<HTMLElement>('[data-search-trigger]')
++      }
++
++      setOpen(nextOpen)
++    },
++    [open]
++  )
++
++  const restoreFocus = useCallback((event: Event) => {
++    const lastTrigger = returnFocusRef.current
++    const currentSearchTrigger = document.querySelector<HTMLElement>(
++      '[data-search-trigger]'
++    )
++    const focusTarget = lastTrigger?.isConnected
++      ? lastTrigger
++      : currentSearchTrigger
++
++    if (focusTarget) {
++      event.preventDefault()
++      focusTarget.focus({ preventScroll: true })
++    }
++  }, [])
+ 
+   useEffect(() => {
+     const down = (e: KeyboardEvent) => {
+       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+         e.preventDefault()
+-        setOpen((open) => !open)
++        setSearchOpen((open) => !open)
+       }
+     }
+     document.addEventListener('keydown', down)
+     return () => document.removeEventListener('keydown', down)
+-  }, [])
++  }, [setSearchOpen])
+ 
+   return (
+-    <SearchContext value={{ open, setOpen }}>
++    <SearchContext value={{ open, setOpen: setSearchOpen, restoreFocus }}>
+       {children}
+       <CommandMenu />
+     </SearchContext>

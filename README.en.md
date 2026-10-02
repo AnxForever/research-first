@@ -29,6 +29,12 @@ The same principle applies to backend work, architecture, integrations, document
 
 Install with the Skills CLI:
 
+As checked on 2026-10-02, [`skills@1.7.0`](https://registry.npmjs.org/skills/1.7.0)
+requires **Node.js >=22.20.0**; discovery was verified on Node 22.21.1. The command
+below does not pin the CLI. Use `npx skills@1.7.0 add AnxForever/research-first`
+to reproduce the tested CLI version; later versions may change their requirements.
+Manual cloning does not require Node.js.
+
 ```bash
 npx skills add AnxForever/research-first
 ```
@@ -66,7 +72,8 @@ and official guidance. Before implementing, show me the options, your
 recommendation, and what still needs custom code.
 ```
 
-If you want the agent to select an approach and continue autonomously, say so:
+An implementation request already includes routine, reversible choices within the
+existing stack and scope. To emphasize autonomous execution, you can say:
 
 ```text
 Use $research-first to complete this feature. You can choose the implementation
@@ -113,7 +120,7 @@ After implementation, report what was delivered, what verification showed, and w
 
 - **Research substantial work.** New features, pages, interactions, integrations, and important implementation choices qualify. Clear, low-risk changes that only alter copy and introduce no behavior can proceed directly; a small code change that introduces behavior is still a substantial feature.
 - **Match evidence to the claim.** Support important claims with primary evidence. Add independent corroboration for high-risk claims or evidence disputes that could materially affect the outcome.
-- **The user can choose or delegate.** Material product, dependency, cost, or visual tradeoffs require a choice when they have not been delegated. When the user has selected an approach or delegated selection, and authorized execution, disclose the evidence and continue without asking for permission again.
+- **Implementation includes routine choices.** Explain and proceed with reversible choices within the existing stack and scope. Ask about an unauthorized change to the product outcome, explicit constraints, paid/external commitments, or substantial migration or maintenance obligations. Respect explicit requests to present options or wait first.
 - **Respect constraints and match the task's scale.** Honor required technologies and restrictions such as no new dependencies. Small edits do not need an industry survey, and frontend work does not automatically need an animation library.
 - **Reuse valid evidence and revisit affected conclusions.** Do not repeat current research. When the user questions the work, seek evidence that could overturn the approach instead of only defending it.
 - **Disclose research gaps.** If browsing is unavailable, sources are insufficient, or a candidate remains unverified, distinguish facts, inferences, and assumptions. A failed search does not prove that no existing solution exists.
@@ -143,7 +150,7 @@ trial produced a low-confidence disagreement with a pre-recorded evaluator label
 so there is no automatic approval threshold.
 
 See [the Jev guide](references/jev-checkpoints.md) for setup and boundaries, and
-[the evaluation record](evals/README.md) for the real-project experiment, pre-labeled
+[the evaluation record](evals/README.en.md) for the real-project experiment, pre-labeled
 cases, and raw results. The core workflow remains usable without Jev.
 
 ## File guide
@@ -162,6 +169,14 @@ cases, and raw results. The core workflow remains usable without Jev.
 | [Evaluation record](evals/README.en.md) · [Boundary cases](evals/jev-cases.json) | Real-project experiment, reproducible material, and limitations |
 
 Supporting material is read as needed. Short tasks do not require every template.
+
+For outcome-based testing, use the [real-task evaluation procedure and fixed cases](evals/behavioral/README.md).
+Judge delivered behavior, research contribution, scope, and effort separately;
+package validation does not establish a quality improvement.
+
+The [2026-10-02 outcome evaluation](evals/behavioral/2026-10-02.md) records navigation
+trials against no skill and the published version, a saved-views task, browser
+acceptance, replayable patches, and limitations (report in Chinese).
 
 ## License
 

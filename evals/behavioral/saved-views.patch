@@ -1,0 +1,357 @@
+diff --git a/src/features/tasks/components/tasks-table.tsx b/src/features/tasks/components/tasks-table.tsx
+index 1383a50..615a352 100644
+--- a/src/features/tasks/components/tasks-table.tsx
++++ b/src/features/tasks/components/tasks-table.tsx
+@@ -27,6 +27,7 @@ import { priorities, statuses } from '../data/data'
+ import { type Task } from '../data/schema'
+ import { DataTableBulkActions } from './data-table-bulk-actions'
+ import { tasksColumns as columns } from './tasks-columns'
++import { TasksSavedViews } from './tasks-saved-views'
+ 
+ const route = getRouteApi('/_authenticated/tasks/')
+ 
+@@ -111,6 +112,7 @@ export function TasksTable({ data }: DataTableProps) {
+         'flex flex-1 flex-col gap-4'
+       )}
+     >
++      <TasksSavedViews table={table} />
+       <DataTableToolbar
+         table={table}
+         searchPlaceholder='Filter by title or ID...'
+diff --git a/src/features/tasks/components/tasks-saved-views.tsx b/src/features/tasks/components/tasks-saved-views.tsx
+new file mode 100644
+--- /dev/null
++++ b/src/features/tasks/components/tasks-saved-views.tsx
+@@ -0,0 +1,332 @@
++import { type FormEvent, useState } from 'react'
++import { type Table } from '@tanstack/react-table'
++import { BookmarkPlus, Trash2 } from 'lucide-react'
++import { toast } from 'sonner'
++import { Button } from '@/components/ui/button'
++import {
++  Dialog,
++  DialogContent,
++  DialogDescription,
++  DialogFooter,
++  DialogHeader,
++  DialogTitle,
++} from '@/components/ui/dialog'
++import { Input } from '@/components/ui/input'
++import { Label } from '@/components/ui/label'
++import {
++  Select,
++  SelectContent,
++  SelectItem,
++  SelectTrigger,
++  SelectValue,
++} from '@/components/ui/select'
++import { priorities, statuses } from '../data/data'
++import { type Task } from '../data/schema'
++
++const STORAGE_KEY = 'shadcn-admin.tasks.saved-views.v1'
++
++type TaskViewFilters = {
++  search: string
++  status: string[]
++  priority: string[]
++}
++
++type SavedTaskView = TaskViewFilters & {
++  id: string
++  name: string
++}
++
++type TasksSavedViewsProps = {
++  table: Table<Task>
++}
++
++const validStatuses = new Set<string>(statuses.map((status) => status.value))
++const validPriorities = new Set<string>(
++  priorities.map((priority) => priority.value)
++)
++
++function readSavedViews(): SavedTaskView[] {
++  try {
++    const stored = window.localStorage.getItem(STORAGE_KEY)
++    if (!stored) return []
++
++    const parsed: unknown = JSON.parse(stored)
++    if (!Array.isArray(parsed)) return []
++
++    return parsed.flatMap((value): SavedTaskView[] => {
++      if (!value || typeof value !== 'object') return []
++
++      const item = value as Record<string, unknown>
++      if (
++        typeof item.id !== 'string' ||
++        typeof item.name !== 'string' ||
++        typeof item.search !== 'string' ||
++        !Array.isArray(item.status) ||
++        !Array.isArray(item.priority)
++      ) {
++        return []
++      }
++
++      const name = item.name.trim()
++      if (!name) return []
++
++      return [
++        {
++          id: item.id,
++          name,
++          search: item.search,
++          status: item.status.filter(
++            (value): value is string =>
++              typeof value === 'string' && validStatuses.has(value)
++          ),
++          priority: item.priority.filter(
++            (value): value is string =>
++              typeof value === 'string' && validPriorities.has(value)
++          ),
++        },
++      ]
++    })
++  } catch {
++    return []
++  }
++}
++
++function getFilterValues(table: Table<Task>, columnId: string): string[] {
++  const value = table
++    .getState()
++    .columnFilters.find((filter) => filter.id === columnId)?.value
++
++  return Array.isArray(value)
++    ? value.filter((item): item is string => typeof item === 'string')
++    : []
++}
++
++function normalizeValues(values: string[]) {
++  return [...new Set(values)].sort()
++}
++
++function matchesFilters(left: TaskViewFilters, right: TaskViewFilters) {
++  const leftStatus = normalizeValues(left.status)
++  const rightStatus = normalizeValues(right.status)
++  const leftPriority = normalizeValues(left.priority)
++  const rightPriority = normalizeValues(right.priority)
++
++  return (
++    left.search === right.search &&
++    leftStatus.length === rightStatus.length &&
++    leftStatus.every((value, index) => value === rightStatus[index]) &&
++    leftPriority.length === rightPriority.length &&
++    leftPriority.every((value, index) => value === rightPriority[index])
++  )
++}
++
++function createId() {
++  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
++}
++
++export function TasksSavedViews({ table }: TasksSavedViewsProps) {
++  const [views, setViews] = useState<SavedTaskView[]>(readSavedViews)
++  const [saveDialogOpen, setSaveDialogOpen] = useState(false)
++  const [viewName, setViewName] = useState('')
++  const [nameError, setNameError] = useState('')
++
++  const state = table.getState()
++  const currentFilters: TaskViewFilters = {
++    search: typeof state.globalFilter === 'string' ? state.globalFilter : '',
++    status: getFilterValues(table, 'status'),
++    priority: getFilterValues(table, 'priority'),
++  }
++  const activeView = views.find((view) => matchesFilters(view, currentFilters))
++
++  const persistViews = (nextViews: SavedTaskView[]) => {
++    try {
++      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextViews))
++      setViews(nextViews)
++      return true
++    } catch {
++      toast.error('Could not save views in this browser.')
++      return false
++    }
++  }
++
++  const applyView = (view: SavedTaskView) => {
++    table.setGlobalFilter(view.search)
++    table.setColumnFilters([
++      ...(view.status.length
++        ? [{ id: 'status', value: [...view.status] }]
++        : []),
++      ...(view.priority.length
++        ? [{ id: 'priority', value: [...view.priority] }]
++        : []),
++    ])
++    table.setPageIndex(0)
++  }
++
++  const saveCurrentView = (event: FormEvent<HTMLFormElement>) => {
++    event.preventDefault()
++    const name = viewName.trim()
++
++    if (!name) {
++      setNameError('Enter a name for this view.')
++      return
++    }
++
++    if (
++      views.some(
++        (view) => view.name.toLocaleLowerCase() === name.toLocaleLowerCase()
++      )
++    ) {
++      setNameError('A saved view with this name already exists.')
++      return
++    }
++
++    const nextView: SavedTaskView = {
++      id: createId(),
++      name,
++      search: currentFilters.search,
++      status: normalizeValues(currentFilters.status),
++      priority: normalizeValues(currentFilters.priority),
++    }
++
++    if (persistViews([...views, nextView])) {
++      setViewName('')
++      setNameError('')
++      setSaveDialogOpen(false)
++      toast.success(`Saved view "${name}".`)
++    }
++  }
++
++  const deleteActiveView = () => {
++    if (!activeView) return
++
++    const nextViews = views.filter((view) => view.id !== activeView.id)
++    if (persistViews(nextViews)) {
++      toast.success(`Deleted view "${activeView.name}".`)
++    }
++  }
++
++  return (
++    <>
++      <div className='flex flex-wrap items-center gap-2'>
++        <Select
++          value={activeView?.id ?? ''}
++          onValueChange={(id) => {
++            const view = views.find((savedView) => savedView.id === id)
++            if (view) applyView(view)
++          }}
++          disabled={views.length === 0}
++        >
++          <SelectTrigger aria-label='Saved task views' className='h-8 w-52'>
++            <SelectValue
++              placeholder={
++                views.length ? 'Choose a saved view' : 'No saved views'
++              }
++            />
++          </SelectTrigger>
++          <SelectContent align='start'>
++            {views.map((view) => (
++              <SelectItem key={view.id} value={view.id}>
++                {view.name}
++              </SelectItem>
++            ))}
++          </SelectContent>
++        </Select>
++
++        <Button
++          variant='outline'
++          size='sm'
++          onClick={() => {
++            setViewName('')
++            setNameError('')
++            setSaveDialogOpen(true)
++          }}
++        >
++          <BookmarkPlus />
++          Save current view
++        </Button>
++
++        <Button
++          variant='ghost'
++          size='icon'
++          className='size-8'
++          onClick={deleteActiveView}
++          disabled={!activeView}
++          aria-label={
++            activeView
++              ? `Delete saved view ${activeView.name}`
++              : 'Delete saved view'
++          }
++          title={
++            activeView
++              ? `Delete ${activeView.name}`
++              : 'Select a saved view to delete'
++          }
++        >
++          <Trash2 />
++        </Button>
++
++        <span className='text-xs text-muted-foreground'>
++          Saved in this browser
++        </span>
++      </div>
++
++      <Dialog
++        open={saveDialogOpen}
++        onOpenChange={(open) => {
++          setSaveDialogOpen(open)
++          if (!open) setNameError('')
++        }}
++      >
++        <DialogContent>
++          <DialogHeader>
++            <DialogTitle>Save current view</DialogTitle>
++            <DialogDescription>
++              Save the current search, status, and priority filters for later.
++            </DialogDescription>
++          </DialogHeader>
++
++          <form onSubmit={saveCurrentView} className='space-y-4'>
++            <div className='grid gap-2'>
++              <Label htmlFor='saved-task-view-name'>View name</Label>
++              <Input
++                id='saved-task-view-name'
++                autoFocus
++                maxLength={60}
++                value={viewName}
++                onChange={(event) => {
++                  setViewName(event.target.value)
++                  if (nameError) setNameError('')
++                }}
++                aria-invalid={Boolean(nameError)}
++                aria-describedby={
++                  nameError ? 'saved-task-view-error' : undefined
++                }
++                placeholder='e.g. High priority in progress'
++              />
++              {nameError && (
++                <p
++                  id='saved-task-view-error'
++                  role='alert'
++                  className='text-sm text-destructive'
++                >
++                  {nameError}
++                </p>
++              )}
++            </div>
++
++            <DialogFooter>
++              <Button
++                type='button'
++                variant='outline'
++                onClick={() => setSaveDialogOpen(false)}
++              >
++                Cancel
++              </Button>
++              <Button type='submit'>Save view</Button>
++            </DialogFooter>
++          </form>
++        </DialogContent>
++      </Dialog>
++    </>
++  )
++}

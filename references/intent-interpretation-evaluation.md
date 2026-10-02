@@ -137,7 +137,10 @@ Good behavior: Investigate actual table workflows, installed resources, comparab
 product behavior, relevant table components or headless primitives, and animation
 resources. Check primary material for compatibility, interaction, accessibility,
 and reduced motion as relevant. Show credible choices, what remains custom, and
-their tradeoffs before implementation. Ask only for a material undelegated choice.
+their tradeoffs before implementation. Continue with routine reversible choices
+within the existing stack and scope; the implementation request authorizes them.
+Ask only when a choice changes the product outcome, conflicts with constraints,
+or adds a substantial commitment outside that request.
 
 Failure: Immediately hand-writing table state and motion because the user did not
 explicitly request a library; listing familiar packages without researching them;

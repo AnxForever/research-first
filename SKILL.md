@@ -81,6 +81,12 @@ or examples to support adoption claims. Check target versions, fit, maintenance,
 license and integration cost where relevant. Package names or marketing alone
 do not verify behavior.
 
+Trace the chosen capability through the project's actual wrappers and call path.
+Separate what the reusable resource supplies from what the application still owns,
+such as state, focus restoration, persistence, cleanup, or error recovery. Test a
+small integration when that boundary is uncertain; a documented capability is
+not proof that this composition preserves it.
+
 For frontend work, investigate suitable component libraries, specialized primitives,
 and interaction or animation resources where motion serves the requested experience.
 Compare states, keyboard/focus behavior, styling control, reduced motion, and
@@ -128,11 +134,14 @@ tradeoffs, the recommendation, and remaining custom work. The strategy may be
 user preference that justifies custom work; do not invent weak alternatives to
 fill a table. Keep independent choices separate, such as table state and animation.
 
-If selection and execution are already delegated, disclose the comparison and
-continue within that authority. Ask one focused question only for an unresolved
-material product, dependency, cost, maintenance or visual choice outside that
-mandate. Continue independent work while waiting; silence is not a choice.
-Routine compatible details do not require another permission request.
+A request to implement a feature normally includes choosing routine, reversible
+details within the existing stack and scope. Disclose the comparison and continue;
+the user need not separately say "you may choose." Respect an explicit request to
+present options or wait first. Ask one focused question when a choice would change
+the intended product, violate a constraint, add a paid/external commitment, or
+create a substantial migration or maintenance obligation outside the request.
+Continue independent work while waiting; silence is not a choice. Research-only
+requests do not authorize implementation.
 
 ## Step 7: Keep a Proportionate Evidence Record
 
@@ -181,6 +190,19 @@ Check the requested behavior and important failure cases with appropriate tests,
 experiments, builds, artifact inspection, or runtime evidence. Revisit assumptions
 that the results challenge. Report delivered behavior, executed verification,
 and remaining limits; update the summary or ledger used in Step 7.
+
+Exercise the complete user journey at the boundary where success is promised:
+for an interaction, enter, act, exit, and return; for saved state, save and reload;
+for an export, inspect the produced file. Check the consequential finding from
+research in the assembled result. A build or mocked call alone cannot establish
+those outcomes. If the relevant runtime is unavailable, report that acceptance
+as unverified and narrow the completion claim accordingly.
+
+Make acceptance observable: "keyboard works" is too vague. For a modal workflow,
+check where focus starts, how selection works, and where focus goes after cancel
+or navigation; closing the panel alone does not verify the return path. For saved
+state, check restored values and the visible result of a failed write, not merely
+the presence of a storage key. Choose only checks relevant to the promised outcome.
 
 Tests establish behavior within their coverage, not that a product decision is
 correct. Planned or skipped checks are not passes; local tests do not prove live

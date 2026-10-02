@@ -72,7 +72,7 @@ and reusable tools.
 
 Inspect enough of serious candidates to establish fit: documentation plus relevant source, tests, live behavior, or examples as available. A list of package names is discovery, not a comparison. Record what can be adopted directly, adapted, combined, or declined. Custom work is a valid decision when the comparison supports it.
 
-Show the user a concise shortlist with useful links, tradeoffs, and a recommendation before committing to the implementation choice. Include viable alternatives even when recommending custom work. Record that update in the ledger; a private shortlist does not satisfy disclosure. If execution and routine choices are delegated, present the options and continue with the recommendation. Wait only for a material choice that existing instructions do not resolve.
+Show the user a concise shortlist with useful links, tradeoffs, and a recommendation before committing to the implementation choice. Include viable alternatives even when recommending custom work. Record that update in the ledger; a private shortlist does not satisfy disclosure. An implementation request normally includes routine, reversible choices within the existing stack and scope: present the options and continue with the recommendation. Respect an explicit request to wait or research only. Wait only for a material choice that existing instructions do not resolve.
 
 When relevant evidence or candidates cannot be found, record what was checked and the limitation. Do not imply that no solution exists merely because a search failed. Keep the gap visible and use a reversible, verified path when authorized.
 

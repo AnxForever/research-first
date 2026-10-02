@@ -39,6 +39,21 @@ Inspect enough primary material to support the claims that would drive adoption.
 
 Record source links and the relevant version, revision, or date when behavior can drift. If a needed check is unavailable, mark it unverified and explain its effect on the recommendation. Never present a search result or remembered capability as a verified candidate.
 
+## Prove Fit at the Integration Boundary
+
+Follow the actual local entry point through wrappers to the candidate API and back
+to application state or output. Identify which guarantees depend on local wiring:
+for example, a dialog primitive may manage focus only when its trigger or callbacks
+are connected; a table state API does not decide what survives a reload. Verify
+the relevant connection in source and, when uncertain, a small isolated experiment.
+Do not replace this check with the library's feature list or a screenshot.
+
+Turn the important finding into a concrete acceptance check on the assembled
+feature. Keep a short link: inspected fact -> local consequence -> executed check.
+Research may confirm the original approach; do not manufacture a design change
+to look productive. Review-only tasks may use permitted isolated probes but must
+leave the reviewed artifact unchanged.
+
 ## Make the Choice Visible Before Implementation
 
 Before substantial implementation, give a concise comparison of the recommendation and credible alternatives, including a custom implementation when it is a meaningful option. For each serious option, state what it provides, what must change locally, the important tradeoff, and the evidence behind those claims. Exclude weak candidates with a short reason when their rejection affects the decision; do not fill a table with unrelated names.
@@ -63,8 +78,9 @@ Building is a valid result of research. Explain the specific mismatch or benefit
 
 Give the user a real choice without inventing an approval gate:
 
-- If an unresolved product, dependency, cost, or control tradeoff needs the user's preference and is not already authorized, ask one concrete question with the recommendation and its consequence. Continue independent research, inspection, or preparation while awaiting the answer; defer the implementation that depends on it.
-- If the user already selected an approach or authorized you to make these decisions, disclose the recommendation and evidence, then proceed within that authority. Do not ask again for each package or each implementation step.
+- A feature implementation request normally authorizes routine, reversible choices within the existing stack and scope. Show the recommendation and evidence, then proceed without requiring a separate delegation phrase. Respect a request to present options or wait first; research-only work does not authorize implementation.
+- If a choice changes the intended product, conflicts with an explicit constraint, adds a paid/external commitment, or creates a substantial migration or maintenance obligation outside the request, ask one concrete question with the recommendation and consequence. Continue independent work while awaiting the answer; defer only dependent action.
+- If the user already selected an approach or delegated that material choice, proceed within that authority. Do not ask again for each package or implementation step.
 - If the user prohibits new dependencies, respect that constraint. Still explain relevant reusable patterns and resources, and how they inform a compliant implementation; do not install a dependency or ask to override the constraint as a routine step.
 
 An update such as "I found libraries and will use one" does not expose a meaningful choice. An update should let the user understand what they gain, what they take on, and why the recommendation fits their feature.
