@@ -1,0 +1,2 @@
+# Used only by package validation and its tests; not a skill runtime dependency.
+PyYAML==6.0.3

@@ -1,6 +1,6 @@
 # Research Summary: [Outcome or Decision]
 
-<!-- Adapt to the task. Omit inapplicable sections and empty rows. Repeat feature sections only for material research units. Link an existing feature ledger instead of duplicating it. -->
+<!-- Optional written-report template. A concise update can be the evidence record for one reversible, single-session feature without Deep research; do not create this entire document by default. Omit inapplicable sections and empty rows. Repeat feature sections only for material research units. Link an existing feature ledger instead of duplicating it. -->
 
 ## Purpose and Context
 

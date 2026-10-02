@@ -48,6 +48,8 @@
 
 三次 `download.failure()` 均为 `null`，BOM 为 `efbbbf`。清除筛选恢复两页原有选择；清空选择后没有导出按钮或额外下载事件。见 [原始浏览器结果](shadcn-admin-browser/result.json) 和 [可复跑脚本](verify-shadcn-export.mjs)。
 
+为便于分发，原始结果 JSON 中仅将三条机器专属的绝对下载路径改为同目录下的相对 artifact 文件名；字节数、BOM、下载状态、实际行值及其他观测字段均保留原样。本次记录没有 SHA 字段。
+
 先前 agent-browser 0.37.1 / Chrome 153.0.8010.47 的下载路径多次返回 `Download was canceled`，显式指定下载目录也未解决。其根因尚未确定；随后使用项目已有 Playwright 和本机 Edge 下载成功，应用代码没有为此改变。因此只能报告 Edge 路径通过，不能声称已修好该 CLI 或完成跨浏览器验证。
 
 ### 复现实现
@@ -101,14 +103,20 @@ node evals/verify-shadcn-export.mjs ../shadcn-admin ../new-export-artifacts
 
 ### 复现 Jev 检查
 
-在 research-first 根目录执行。默认预览不联网，不需要 SDK 或密钥：
+在 research-first 根目录执行。默认预览不联网，不需要 SDK、额外依赖或密钥：
 
 ```bash
-python -m unittest discover -s tests -v
 python evals/run_jev_cases.py evals/jev-cases.json preview-results.json
 ```
 
-本轮在已安装固定版本 SDK 的虚拟环境中运行，适配器与 runner 的 **19 项离线测试通过**，覆盖显式联网、输出校验、错误/超时、模型版本、报告预留及探针失败统计等行为。未安装可选 SDK 时，其中 2 项 SDK 契约测试会跳过。不会把这些本地测试算成模型能力测试。
+运行当前完整维护测试时，先安装校验和可选 SDK 依赖。安装需要联网，测试本身使用本地数据和 mock，不发送真实 API 请求：
+
+```bash
+python -m pip install -r scripts/requirements-dev.txt -r scripts/requirements-jev.txt
+python -m unittest discover -s tests -v
+```
+
+在 2026-09-22 这次评估中，代码在已安装固定版本 SDK 的虚拟环境里运行，适配器与 runner 的 **19 项离线测试通过**，覆盖显式联网、输出校验、错误/超时、模型版本、报告预留及探针失败统计等行为。未安装可选 SDK 时，其中 2 项 SDK 契约测试会跳过。这是当时仓库状态下的历史结果，不代表后续版本当前测试数；这些本地测试也不衡量模型能力。
 
 已启用 TypeSafe 调用、通过运行环境安全提供 `TYPESAFE_API_KEY` 时：
 
@@ -118,6 +126,8 @@ python evals/run_jev_cases.py evals/jev-cases.json new-boundary-results.json --l
 python evals/run_jev_cases.py evals/shadcn-admin-before.json new-project-results.json --live
 python evals/run_jev_cases.py evals/shadcn-admin-after.json new-completion-results.json --live
 ```
+
+只有显式启用 `--live` 才会联网。单独使用 `--probe-latest` 时，runner 只生成预览 payload，不解析 `jev-latest`；报告会记录 `probe_status: not_run`、`request_attempted: false`，且 `resolved_model` 为空。只有 `--live --probe-latest` 才发送别名探针并记录实际返回的模型。若在线探针失败，runner 会保留失败报告并返回非零退出码，即使卡片调用成功。
 
 每张卡发送一次，无自动重试；输出路径必须是新文件，既有报告不会被覆盖。首轮边界报告由等价的一次性 runner 产生，早于仓库 runner，故缺少后增的 `mode` 等报告字段；其中 `source: jev`、实际模型和 usage 均来自真实响应。重新运行可能得到不同结果，不要替换历史报告。
 

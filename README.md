@@ -33,13 +33,29 @@
 npx skills add AnxForever/research-first
 ```
 
-也可手动克隆到 agent 的技能目录。若你的环境使用 `~/.agents/skills`：
+也可手动克隆到 agent 的技能发现目录。`npx skills add` 适用于已安装 Node.js/npm 的常见 shell。手动克隆时，目标文件夹必须尚不存在；以下示例以 `~/.agents/skills/research-first` 为目标：
 
 ```bash
-git clone https://github.com/AnxForever/research-first.git ~/.agents/skills/research-first
+mkdir -p "$HOME/.agents/skills"
+git clone https://github.com/AnxForever/research-first.git "$HOME/.agents/skills/research-first"
 ```
 
-其他环境请使用该 agent 的技能发现目录，并保留完整文件夹，使 `SKILL.md` 能找到它引用的资料。
+Windows PowerShell：
+
+```powershell
+$skillRoot = Join-Path $HOME ".agents/skills"
+New-Item -ItemType Directory -Force -Path $skillRoot | Out-Null
+git clone https://github.com/AnxForever/research-first.git (Join-Path $skillRoot "research-first")
+```
+
+Windows 命令提示符（cmd）：
+
+```bat
+if not exist "%USERPROFILE%\.agents\skills" mkdir "%USERPROFILE%\.agents\skills"
+git clone https://github.com/AnxForever/research-first.git "%USERPROFILE%\.agents\skills\research-first"
+```
+
+其他环境请将仓库克隆到该 agent 的技能发现目录，并保留完整文件夹，使 `SKILL.md` 能找到它引用的资料。若目标目录已存在，请在该目录中更新已有克隆，不要重复克隆到同一路径。
 
 安装后，在支持 `$skill-name` 调用的 agent 中输入：
 
@@ -88,11 +104,12 @@ git clone https://github.com/AnxForever/research-first.git ~/.agents/skills/rese
 
 推荐复用时，要说明仍需处理的业务逻辑和集成工作；推荐自研时，要说明为什么可信候选不适合。表格逻辑与动画是不同的选择，不应捆绑成「全套引库」或「全部手写」二选一。
 
-实现完成后，报告实际交付内容、验证结果和仍未确认的事项。多个功能或长期项目还会使用[逐功能证据台账](references/feature-evidence-ledger.md)，防止一篇项目级调研被用来替所有子功能背书。
+实现完成后，报告实际交付内容、验证结果和仍未确认的事项。只有单个可逆功能在单次会话内完成、且无需深度（Deep）研究时，简短的「证据 → 决策 → 验证」记录才足够；实施前摘要可以记录证据与决策，再在完成说明中补上验证。多功能、跨会话或高风险任务使用[逐功能证据台账](references/feature-evidence-ledger.md)，防止一篇项目级调研被用来替所有子功能背书。
 
 ## 适用边界
 
-- **实质功能需要调研。** 新功能、页面、交互、集成和重要方案选择都适用；改按钮文字等明确、低风险的机械修改直接处理。
+- **实质功能需要调研。** 新功能、页面、交互、集成和重要方案选择都适用。仅改文案等不引入新行为的明确、低风险修改可以直接处理；代码改动虽小但引入新行为，仍属于实质功能。
+- **证据强度匹配主张。** 重要主张优先用一手依据支持；高风险主张，或可能重大影响结果的证据争议，还要寻找独立佐证或用独立检查核实。
 - **用户保留选择，也可以委托决策。** 尚未委托的重要产品、依赖、费用或视觉取舍需要用户选择；用户已选定或委托选型、且已授权执行时，说明依据后继续，不重复索要许可。
 - **尊重约束，按任务分量研究。** 明确指定的技术和禁止新增依赖等要求应当遵守；无需为每次小改动做全行业调查，也不会为了前端任务硬加动画库。
 - **复用已有证据，重新审视受影响的结论。** 有效调研不重复做；用户提出质疑时，寻找可能推翻当前方案的证据，而非只替已有实现辩护。
@@ -137,3 +154,15 @@ Jev 的输出仅是建议：不能证明来源真实、代替运行测试、决�
 ## 许可
 
 [MIT](LICENSE)
+
+## 维护者校验
+
+仓库维护者可用 Python 3.12 安装校验依赖、检查可分发包并运行离线测试：
+
+```bash
+python -m pip install -r scripts/requirements-dev.txt -r scripts/requirements-jev.txt
+python scripts/validate_package.py
+python -m unittest discover --start-directory tests --pattern "test_*.py" --verbose
+```
+
+这些依赖和命令只用于维护与校验，不是技能的运行依赖；日常使用只需 Markdown 指令。测试中的 Jev SDK 契约检查使用 mock，不发送真实 API 请求。

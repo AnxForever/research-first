@@ -1,6 +1,18 @@
 # Per-Feature Evidence Ledger
 
-Use this ledger for multi-feature work, inherited behavior, or work that spans sessions. Its purpose is to connect each material outcome to its design evidence, reuse choices, and verification. A project bibliography cannot establish coverage for every feature.
+Every material feature needs evidence linked to its decisions and verification.
+For one reversible feature completed within a single session without Deep
+research, a concise summary shown before implementation is
+enough: outcome and constraints, decision question, inspected evidence and limits,
+options and selected approach, and acceptance checks. Update it with actual results.
+No separate ledger file is required for that case.
+
+Use the fuller ledger below for multi-feature, cross-session, or high-risk work,
+including inherited lifecycles within that scope. These conditions take precedence
+over the single-feature summary allowance. A project bibliography cannot
+establish coverage for every feature. A small new feature is still new behavior;
+it must not be called a mechanical edit to avoid a record. Exact label or formatting
+edits that add no behavior need only targeted verification.
 
 ## Inventory and Scope
 
@@ -8,7 +20,11 @@ State the active outcome and scope before building the inventory. Include every 
 
 A feature is a user or audience outcome, or a lifecycle that can fail independently. Split authentication from session renewal and revocation when their decisions and failure modes differ. Do not create a row for every file or component. For non-code work, units may be a report's evidence claims, an audience workflow, or a decision with separate acceptance conditions.
 
-Whole-project construction or assessment requires a whole-project inventory. A scoped change requires a complete inventory of the affected capabilities and dependencies. Record discovered out-of-scope gaps separately; finding them does not authorize fixing them. A low-risk mechanical change can remain one unit without creating a project ledger.
+Whole-project construction or assessment requires a whole-project inventory.
+For a scoped change using this ledger, inventory the affected material capabilities
+and dependencies. Record discovered out-of-scope gaps separately; finding them
+does not authorize fixing them. Do not inventory unrelated product areas for a
+single-feature change.
 
 ## Compact Record
 
@@ -47,7 +63,12 @@ Use actual source locators and name the claim each supports. Mark inapplicable f
 
 Before substantial implementation of each feature, actively investigate relevant products, open-source implementations, technical resources, and primary documentation. Identify existing solutions before choosing a custom implementation. Reuse current prior research when its applicability to this feature is explicit.
 
-For frontend work, include relevant component libraries and animation libraries or existing motion facilities. Assess interaction states, accessibility, reduced motion, compatibility, and integration cost where applicable. For documents and other non-code work, investigate relevant established outputs, templates, methods, source material, and reusable tools.
+For frontend work, include relevant component libraries and, where motion serves
+the requested experience, animation libraries or existing motion facilities.
+Assess interaction states, accessibility, reduced motion, compatibility, and
+integration cost where applicable. For documents and other non-code work,
+investigate relevant established outputs, templates, methods, source material,
+and reusable tools.
 
 Inspect enough of serious candidates to establish fit: documentation plus relevant source, tests, live behavior, or examples as available. A list of package names is discovery, not a comparison. Record what can be adopted directly, adapted, combined, or declined. Custom work is a valid decision when the comparison supports it.
 

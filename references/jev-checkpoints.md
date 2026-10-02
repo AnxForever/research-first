@@ -119,4 +119,12 @@ errors and abstentions, and record which disagreements changed an actual decisio
 Do not tune on a test set and then report it as held-out evidence.
 
 For the real-project experiment and its practical limits, see
-[evals/README.md](../evals/README.md).
+[evals/README.en.md](../evals/README.en.md) ([中文](../evals/README.md)).
+
+The batch runner and recorded evaluation cards are documented there. If you use
+`--probe-latest` without `--live`, the runner only creates a preview payload: it
+does not contact TypeSafe or resolve the alias, so `probe_status` is
+`not_run` and `resolved_model` is empty. Only an explicit
+`--live --probe-latest` sends the probe and records the returned model. A failed
+live probe is preserved in the report and makes the runner exit nonzero, even
+when the card checks themselves complete.

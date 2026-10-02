@@ -33,13 +33,29 @@ Install with the Skills CLI:
 npx skills add AnxForever/research-first
 ```
 
-Alternatively, clone the repository into your agent's skills directory. If your environment uses `~/.agents/skills`:
+Alternatively, clone the repository into your agent's skill discovery directory. `npx skills add` works in common shells when Node.js/npm are installed. For a manual clone, the destination folder must not already exist. These examples use `~/.agents/skills/research-first`:
 
 ```bash
-git clone https://github.com/AnxForever/research-first.git ~/.agents/skills/research-first
+mkdir -p "$HOME/.agents/skills"
+git clone https://github.com/AnxForever/research-first.git "$HOME/.agents/skills/research-first"
 ```
 
-For other environments, use the directory where that agent discovers skills. Keep the entire folder so `SKILL.md` can resolve its references.
+Windows PowerShell:
+
+```powershell
+$skillRoot = Join-Path $HOME ".agents/skills"
+New-Item -ItemType Directory -Force -Path $skillRoot | Out-Null
+git clone https://github.com/AnxForever/research-first.git (Join-Path $skillRoot "research-first")
+```
+
+Windows Command Prompt (`cmd`):
+
+```bat
+if not exist "%USERPROFILE%\.agents\skills" mkdir "%USERPROFILE%\.agents\skills"
+git clone https://github.com/AnxForever/research-first.git "%USERPROFILE%\.agents\skills\research-first"
+```
+
+For other environments, clone the repository into the directory where that agent discovers skills. Keep the entire folder so `SKILL.md` can resolve its references. If the destination already exists, update the existing clone there instead of cloning again to the same path.
 
 After installation, invoke it in an agent that supports `$skill-name`:
 
@@ -91,11 +107,12 @@ A table decision could use the following structure. This is an illustration of c
 
 A reuse recommendation must explain the remaining business logic and integration work. A custom recommendation must explain why credible candidates do not fit. Table logic and animation are separate decisions; they should not be bundled into a choice between adopting an entire library stack and hand-building everything.
 
-After implementation, report what was delivered, what verification showed, and what remains unverified. Multi-feature and long-running work also uses a [per-feature evidence ledger](references/feature-evidence-ledger.md), so a project-wide research report cannot stand in for evidence about every feature.
+After implementation, report what was delivered, what verification showed, and what remains unverified. A concise evidence → decision → verification record is sufficient only when one reversible feature is completed in a single session without Deep research; the pre-implementation update can capture the evidence and decision, with verification added to the completion report. Use a [per-feature evidence ledger](references/feature-evidence-ledger.md) for multi-feature, cross-session, or high-risk work, so a project-wide research report cannot stand in for evidence about every feature.
 
 ## Boundaries
 
-- **Research substantial work.** New features, pages, interactions, integrations, and important implementation choices qualify. Exact, low-risk mechanical edits such as changing a button label can proceed directly.
+- **Research substantial work.** New features, pages, interactions, integrations, and important implementation choices qualify. Clear, low-risk changes that only alter copy and introduce no behavior can proceed directly; a small code change that introduces behavior is still a substantial feature.
+- **Match evidence to the claim.** Support important claims with primary evidence. Add independent corroboration for high-risk claims or evidence disputes that could materially affect the outcome.
 - **The user can choose or delegate.** Material product, dependency, cost, or visual tradeoffs require a choice when they have not been delegated. When the user has selected an approach or delegated selection, and authorized execution, disclose the evidence and continue without asking for permission again.
 - **Respect constraints and match the task's scale.** Honor required technologies and restrictions such as no new dependencies. Small edits do not need an industry survey, and frontend work does not automatically need an animation library.
 - **Reuse valid evidence and revisit affected conclusions.** Do not repeat current research. When the user questions the work, seek evidence that could overturn the approach instead of only defending it.
@@ -142,10 +159,26 @@ cases, and raw results. The core workflow remains usable without Jev.
 | [Research report template](assets/research-report-template.md) · [Project identity card](assets/project-identity-card.md) | Capture findings and long-term project context when useful |
 | [agents/openai.yaml](agents/openai.yaml) | Skill display metadata and default invocation prompt |
 | [Jev guide](references/jev-checkpoints.md) · [Optional adapter](scripts/jev_check.py) | Bounded cards, official SDK calls, and interpreting results |
-| [Evaluation record](evals/README.md) · [Boundary cases](evals/jev-cases.json) | Real-project experiment, reproducible material, and limitations |
+| [Evaluation record](evals/README.en.md) · [Boundary cases](evals/jev-cases.json) | Real-project experiment, reproducible material, and limitations |
 
 Supporting material is read as needed. Short tasks do not require every template.
 
 ## License
 
 [MIT](LICENSE)
+
+## Maintainer validation
+
+Repository maintainers can use Python 3.12 to install validation dependencies,
+check the distributable package, and run the offline test suite:
+
+```bash
+python -m pip install -r scripts/requirements-dev.txt -r scripts/requirements-jev.txt
+python scripts/validate_package.py
+python -m unittest discover --start-directory tests --pattern "test_*.py" --verbose
+```
+
+These dependencies and commands are for maintenance and validation; they are
+not skill runtime dependencies. Everyday use only needs the Markdown
+instructions. Jev SDK contract tests use a mock and do not send live API
+requests.

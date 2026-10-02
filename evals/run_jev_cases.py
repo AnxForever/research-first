@@ -17,7 +17,8 @@ def main():
     parser.add_argument("cases", type=Path)
     parser.add_argument("report", type=Path, help="New output file; existing reports are preserved")
     parser.add_argument("--live", action="store_true", help="Send each card once using TYPESAFE_API_KEY")
-    parser.add_argument("--probe-latest", action="store_true", help="Also resolve jev-latest with one separate card")
+    parser.add_argument("--probe-latest", action="store_true",
+                        help="Record preview as not_run; send the probe only when --live is supplied")
     args = parser.parse_args()
     if args.report.exists():
         parser.error("The report already exists; choose a new output path.")
@@ -50,6 +51,12 @@ def main():
             "state": {"claim": "The documentation identifies jev-1.13.0 as the current stable model.",
                       "excerpt": "Current models: Jev 1.13 — jev-1.13.0. jev-latest points to jev-1.13.0, the most recent stable official release."}
         }, live=args.live, model="jev-latest")
+        probe["mode"] = "live" if args.live else "preview"
+        probe["probe_status"] = (
+            "resolved" if args.live and probe["source"] == "jev" else
+            "failed" if args.live else "not_run"
+        )
+        probe["resolved_model"] = probe["model"] if probe["probe_status"] == "resolved" else None
         progress["latest_probe"] = probe
         persist(progress)
     rows = []
@@ -80,7 +87,9 @@ def main():
         "summary": {
             "cases": len(cases), "completed": len(completed),
             "errors": sum(row["result"]["status"] == "requires_review" for row in rows),
-            "probe_error": bool(probe and probe["status"] == "requires_review"),
+            "probe_status": probe["probe_status"] if probe else None,
+            "probe_error": (None if probe and probe["probe_status"] == "not_run"
+                            else bool(probe and probe["probe_status"] == "failed")),
             "labeled_completed": len(labeled),
             "matches_expected": sum(row["matches_expected"] for row in labeled),
             "mean_latency_ms": round(statistics.mean(row["result"]["latency_ms"] for row in completed), 1) if completed else None,
@@ -93,7 +102,7 @@ def main():
     persist(report)
     report_stream.close()
     print(json.dumps(report["summary"]))
-    return 1 if report["summary"]["errors"] or report["summary"]["probe_error"] else 0
+    return 1 if report["summary"]["errors"] or report["summary"]["probe_error"] is True else 0
 
 
 if __name__ == "__main__":

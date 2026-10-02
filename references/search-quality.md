@@ -86,7 +86,7 @@ Pin the target environment and exact version. Verify prerequisites, permissions,
 ## Corroboration Rules
 
 - Material claim: support with primary evidence or label as inference.
-- High-risk claim: require primary evidence plus an independent stream.
+- High-risk claim or consequential disagreement: require primary evidence plus an independent stream.
 - Conflicting sources: prefer version-matched, reproducible, proximate evidence and document the conflict.
 - No source: state the gap and use a reversible experiment rather than presenting a guess as fact.
 

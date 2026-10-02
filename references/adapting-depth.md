@@ -23,14 +23,23 @@ User urgency can narrow scope, but it does not justify skipping safeguards for d
 ## Evidence Needed
 
 The score is a starting point, not a quota or permission to ignore a material risk.
-A substantial new feature needs Standard research even if coding it feels familiar.
+New or redesigned behavior needs Standard research even if it is small, familiar,
+or fully specified. Narrow the comparison to the decisions that matter; reuse
+applicable documentation, standard libraries, and existing modules. Direct means
+an exact mechanical change that adds no behavior, such as a label edit.
+
+Every material feature needs an evidence-to-decision record. For one reversible
+feature completed within a single session without Deep research, this may be the
+update shown before implementation. Multi-feature, cross-session, or high-risk
+work requires a full ledger even if a summary already exists. Record executed
+results afterward; a small scope does not make research or verification implicit.
 
 | Mode | Evidence | Failure coverage | Verification |
 |---|---|---|---|
 | Direct | Local source of truth | Behavior affected by the exact edit | Exact check |
 | Quick | Strong source or experiment resolving the bounded unknown | Relevant boundary cases | Focused test or inspection |
 | Standard | Local/user context, relevant existing solutions and primary guidance, credible alternatives | Material states, lifecycle, and failures | Checks tied to acceptance criteria |
-| Deep | Independently corroborated consequential claims | Adversarial cases and recovery | Staged/dry-run/rollback checks as applicable |
+| Deep | Primary evidence plus independent support for high-risk claims or consequential disagreements | Adversarial cases and recovery | Staged/dry-run/rollback checks as applicable |
 
 An evidence stream is a distinct authority or failure lens: local tests, official spec, production telemetry, user research, independent implementation, or experiment. Two articles quoting the same source are one stream.
 
@@ -90,7 +99,7 @@ selection and the path is reversible, disclose limitations and continue.
 
 | Failure | Correction |
 |---|---|
-| Research consumes more effort than the reversible change | Downgrade to Quick and validate directly |
+| Research consumes more effort than the reversible feature needs | Narrow the comparison and use applicable existing evidence; retain the brief record and verification |
 | High-risk task uses only one source | Add independent primary evidence and rollback analysis |
 | No network causes a total stop | Use local package/source/tests and a reversible experiment |
 | Existing research is repeated | Create a freshness audit and resume |

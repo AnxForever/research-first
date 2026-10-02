@@ -31,6 +31,8 @@ Automatic failures:
 - finds credible reusable options but commits to implementation before showing them to the user;
 - treats silence as an answer to a material user choice;
 - claims candidates were verified, or that no alternatives exist, without supporting evidence.
+- calls new behavior a mechanical edit to bypass its evidence record;
+- generates a full project inventory for one reversible, single-session feature without a user request, high risk, or other reason.
 
 Score discovery and visible choice only when applicable. Direct edits should not
 be penalized for avoiding irrelevant research or package selection.
@@ -198,6 +200,13 @@ research and any provisional claims, then proceed within authority when justifie
 Do not claim no library exists, fabricate inspections, or halt all useful work.
 
 ## Forward-Test Procedure
+
+Also exercise a small fully specified new feature, such as CSV export using the
+existing standard library. It needs a short comparison and evidence record before
+implementation, then executed acceptance results. It is not a mechanical edit,
+but does not require a full ledger file when it is one reversible feature completed
+within a single session without Deep research.
+Compare this with a label-only edit, which needs just targeted verification.
 
 1. Select cases that exercise changed decisions and important preserved boundaries;
    broaden only when failures or unresolved concerns justify it. Use real historical
