@@ -1,0 +1,158 @@
+--- a/README.md
++++ b/README.md
+@@ -1,12 +1,16 @@
+ # Reading Shelf fixture
+ 
+-这是一个仅依赖 Python 标准库的离线小工具。它从同目录的 `shelf.json` 读取资料，当前支持按原始顺序列出条目：
++这是一个仅依赖 Python 标准库的离线小工具。它从同目录的 `shelf.json` 读取资料，支持按原始顺序列出条目，也支持把勾选的条目导出成交接用的 Markdown 阅读清单：
+ 
+ ```powershell
+ python .\reading_shelf.py list
+ python .\reading_shelf.py list --format markdown
++python .\reading_shelf.py export
++python .\reading_shelf.py export -o .\handoff\reading-list.md
+ ```
++
++`export` 只导出 `selected` 为 `true` 的条目，保持数组顺序，每条带上 `render_markdown_link` 生成的来源链接和 `note` 备注（备注里的换行会合并成一行），写入 UTF-8、LF 换行的文件；默认写到当前目录的 `reading-list.md`，可用 `-o/--output` 改路径。导出只读取 `shelf.json`：`--output` 指向数据文件本身会直接报错退出，目标文件已存在时会先提示再覆盖，某条 `selected` 不是布尔值时也会报错并且不写任何文件。
+ 
+ 数据文件是 JSON 数组；数组顺序就是列表顺序。每条记录包含 `id`、`title`、`url`、`note` 和 `selected`。不要把本地数据上传或改写来生成交接内容。
+ 
+-`reading_shelf.py` 中的 `render_markdown_link(title, url)` 已用于 Markdown 列表，适合需要同样链接格式的功能复用。
++`reading_shelf.py` 中的 `render_markdown_link(title, url)` 已用于 Markdown 列表，适合需要同样链接格式的功能复用。
+--- a/reading_shelf.py
++++ b/reading_shelf.py
+@@ -3,6 +3,7 @@
+ 
+ import argparse
+ import json
++import sys
+ from pathlib import Path
+ from urllib.parse import quote
+ 
+@@ -25,13 +26,23 @@
+     return "[{}]({})".format(safe_title, safe_url)
+ 
+ 
++def flatten_note(note):
++    """Collapse one note onto a single line, keeping its wording intact."""
++    return " ".join(str(note or "").splitlines())
++
++
++def selected_items(items):
++    """The checked rows, in stored order; the same test the list marker uses."""
++    return [item for item in items if item.get("selected")]
++
++
+ def render_list(items, output_format):
+     """Print every shelf row in stored order."""
+     for index, item in enumerate(items, start=1):
+         marker = "x" if item.get("selected") else " "
+         title = str(item.get("title", ""))
+         url = str(item.get("url", ""))
+-        note = " ".join(str(item.get("note", "")).splitlines())
++        note = flatten_note(item.get("note", ""))
+         if output_format == "markdown":
+             label = render_markdown_link(title, url)
+             suffix = " — {}".format(note) if note else ""
+@@ -42,6 +53,64 @@
+                 print("   note: {}".format(note))
+ 
+ 
++def render_export(items):
++    """Render the checked rows as a Markdown reading list, in stored order."""
++    lines = []
++    for item in items:
++        label = render_markdown_link(item.get("title", ""), item.get("url", ""))
++        note = flatten_note(item.get("note", ""))
++        lines.append("- {}{}".format(label, " — {}".format(note) if note else ""))
++    if not lines:
++        return "# 阅读清单\n"
++    return "# 阅读清单\n\n{}\n".format("\n".join(lines))
++
++
++def check_flags(items, data_path):
++    """A row may omit `selected`, but an unreadable value is never guessed at."""
++    for item in items:
++        value = item.get("selected")
++        if value is not None and not isinstance(value, bool):
++            print(
++                "error: {}: item {!r} has a non-boolean selected value {!r}".format(
++                    data_path, item.get("id", "?"), value
++                ),
++                file=sys.stderr,
++            )
++            return False
++    return True
++
++
++def export_selected(items, output_path, data_path):
++    """Write the checked rows to a file; the shelf data itself is never written."""
++    if output_path.resolve() == data_path.resolve():
++        print(
++            "error: refusing to overwrite the shelf data file: {}".format(output_path),
++            file=sys.stderr,
++        )
++        return 1
++    if not check_flags(items, data_path):
++        print("error: nothing written; fix the data and run export again", file=sys.stderr)
++        return 1
++    chosen = selected_items(items)
++    for item in chosen:
++        if not str(item.get("url", "")).strip():
++            print(
++                "warning: item {!r} is checked but has no url".format(item.get("id", "?")),
++                file=sys.stderr,
++            )
++    if output_path.exists():
++        print("overwriting existing file: {}".format(output_path), file=sys.stderr)
++    try:
++        output_path.write_text(render_export(chosen), encoding="utf-8", newline="\n")
++    except OSError as error:
++        print("error: cannot write {}: {}".format(output_path, error), file=sys.stderr)
++        return 1
++    if not chosen:
++        print("warning: no item is checked, wrote an empty list", file=sys.stderr)
++    print("exported {} item(s) to {}".format(len(chosen), output_path))
++    return 0
++
++
+ def build_parser():
+     parser = argparse.ArgumentParser(description="Offline reading shelf")
+     parser.add_argument("--data", type=Path, default=DEFAULT_DATA, help="path to shelf JSON")
+@@ -49,6 +118,16 @@
+     list_parser = commands.add_parser("list", help="list saved reading items")
+     list_parser.add_argument(
+         "--format", choices=("text", "markdown"), default="text", help="list output format"
++    )
++    export_parser = commands.add_parser(
++        "export", help="write the checked items as a Markdown reading list"
++    )
++    export_parser.add_argument(
++        "-o",
++        "--output",
++        type=Path,
++        default=Path("reading-list.md"),
++        help="file to write (default: %(default)s)",
+     )
+     return parser
+ 
+@@ -59,8 +138,10 @@
+     if args.command == "list":
+         render_list(items, args.format)
+         return 0
++    if args.command == "export":
++        return export_selected(items, args.output, args.data)
+     return 0
+ 
+ 
+ if __name__ == "__main__":
+-    raise SystemExit(main())
++    raise SystemExit(main())
+--- /dev/null
++++ b/reading-list.md
+@@ -0,0 +1,5 @@
++# 阅读清单
++
++- [Field notes: reading from evidence](https://example.org/field-notes) — 先看证据链，再看结论。
++- [When titles use \[brackets\]](https://example.org/guides/reading%20notes_%28v2%29) — 保留 [原文中的标记]，下次讨论时检查。 重点看第三节。
++- [A short follow-up checklist](https://example.org/follow-up)

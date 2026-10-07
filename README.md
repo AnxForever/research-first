@@ -168,6 +168,7 @@ Jev 的输出仅是建议：不能证明来源真实、代替运行测试、决�
 | [搜索质量](references/search-quality.md) · [调研深度](references/adapting-depth.md) | 选择证据、控制深度、判断何时停止搜索 |
 | [问题扩展](references/problem-expansion.md) · [证据冲突](references/contradictions.md) | 补齐重要问题，处理资料之间的矛盾 |
 | [逐功能证据台账](references/feature-evidence-ledger.md) | 跟踪每个功能的证据、决策和历史缺口 |
+| [执行证据与验收](references/execution-evidence.md) | 区分工具失败原因，定义支持边界，用反例检查操作后的实际结果 |
 | [调研示例](references/research-examples.md) · [案例](references/case-studies.md) · [评估场景](references/intent-interpretation-evaluation.md) | 理解工作方式，检查常见判断偏差 |
 | [调研报告模板](assets/research-report-template.md) · [项目背景卡](assets/project-identity-card.md) | 按需保存调研结论和长期项目背景 |
 | [agents/openai.yaml](agents/openai.yaml) | 技能展示信息和默认调用提示 |
@@ -199,3 +200,7 @@ python -m unittest discover --start-directory tests --pattern "test_*.py" --verb
 [Windows Claude Code 评测](evals/discovery/README.md)另行检查自动触发、简单任务不触发、调研贡献和成品验收，保存失败案例与后续回归；宿主能调用 skill 不等于成品已通过验收。
 
 [2026-10-03 成对测试](evals/discovery/2026-10-03-quality-round.md)检验了流程发现、选型依据和失败路径验收的加强版。结果仍有错误输入处理和来源核实的缺口，目前不能据此声称稳定提升；试用时请检查实际产物与证据。
+
+[2026-10-07 执行证据测试](evals/discovery/2026-10-07-execution-evidence.md)记录了工具预检、导入回归与异步搜索新题。该轮候选版未通过畸形输入检查，并出现来源表述和任务范围问题；失败快照和结果保留在报告中。
+
+后续的[决策流程测试](evals/discovery/2026-10-07-decision-loop.md)重写并缩短了主入口。两组导入对照中，新候选均通过 5/5 条要求，已发布版均因静默接受坏记录而只通过 4/5；阅读交接新题双方均通过 6/6。它在本轮失败路径上表现更好，但功能通过不代表研究依据充分；单一宿主与模型配置下的小样本仍不能证明普遍稳定提升。

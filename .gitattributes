@@ -2,6 +2,9 @@
 evals/*.json text eol=lf
 evals/behavioral/*.json text eol=lf
 evals/discovery/*.json text eol=lf
+evals/discovery/*.py text eol=lf
+# This maintainer test is fingerprinted in the archived evaluation protocol.
+tests/test_trace_index.py text eol=lf
 evals/discovery/fixtures/** -text whitespace=cr-at-eol
 evals/discovery/artifacts/** -text
 # Preserve blank context/EOF lines within archived patch text.

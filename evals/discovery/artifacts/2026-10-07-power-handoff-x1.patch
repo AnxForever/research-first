@@ -1,0 +1,137 @@
+--- a/README.md
++++ b/README.md
+@@ -5,8 +5,13 @@
+ ```powershell
+ python .\reading_shelf.py list
+ python .\reading_shelf.py list --format markdown
++python .\reading_shelf.py export
++python .\reading_shelf.py export --output .\handoff.md
++python .\reading_shelf.py export --output -
+ ```
+ 
+ 数据文件是 JSON 数组；数组顺序就是列表顺序。每条记录包含 `id`、`title`、`url`、`note` 和 `selected`。不要把本地数据上传或改写来生成交接内容。
+ 
+-`reading_shelf.py` 中的 `render_markdown_link(title, url)` 已用于 Markdown 列表，适合需要同样链接格式的功能复用。
++`export` 只导出 `selected` 为真的条目，并保持它们在数组中的先后顺序，写成一份可以直接交给同事的 Markdown 清单（默认 `reading-list.md`，UTF-8、LF）。`--output -` 写到标准输出，方便重定向。如果一条都没勾选，仍然会生成文件，并在标准错误给出提示。`--data` 是主命令的参数，要写在子命令前面，例如 `python .\reading_shelf.py --data other.json export`。
++
++`reading_shelf.py` 中的 `render_markdown_link(title, url)` 已用于 Markdown 列表，适合需要同样链接格式的功能复用；`render_markdown_entry(item)` 把「链接 + 备注」合成一条，列表视图和导出共用它。
+--- a/reading_shelf.py
++++ b/reading_shelf.py
+@@ -3,10 +3,14 @@
+ 
+ import argparse
+ import json
++import sys
+ from pathlib import Path
+ from urllib.parse import quote
+ 
+ DEFAULT_DATA = Path(__file__).with_name("shelf.json")
++DEFAULT_EXPORT = Path("reading-list.md")
++EXPORT_HEADING = "# 阅读清单"
++STDOUT_TARGET = "-"
+ 
+ 
+ def load_items(path):
+@@ -25,21 +29,55 @@
+     return "[{}]({})".format(safe_title, safe_url)
+ 
+ 
++def render_markdown_entry(item):
++    """Render one item as `<link> — <note>`; shared by the list view and the export."""
++    label = render_markdown_link(item.get("title", ""), item.get("url", ""))
++    note = one_line_note(item)
++    return "{} — {}".format(label, note) if note else label
++
++
++def one_line_note(item):
++    """Flatten a note so it stays on the entry's own line."""
++    return " ".join(str(item.get("note", "")).splitlines())
++
++
+ def render_list(items, output_format):
+     """Print every shelf row in stored order."""
+     for index, item in enumerate(items, start=1):
+         marker = "x" if item.get("selected") else " "
+         title = str(item.get("title", ""))
+         url = str(item.get("url", ""))
+-        note = " ".join(str(item.get("note", "")).splitlines())
++        note = one_line_note(item)
+         if output_format == "markdown":
+-            label = render_markdown_link(title, url)
+-            suffix = " — {}".format(note) if note else ""
+-            print("- [{}] {}{}".format(marker, label, suffix))
++            print("- [{}] {}".format(marker, render_markdown_entry(item)))
+         else:
+             print("{}. [{}] {} — {}".format(index, marker, title, url))
+             if note:
+                 print("   note: {}".format(note))
++
++
++def build_export(items):
++    """Build the handoff document: selected rows only, in their stored order."""
++    lines = [EXPORT_HEADING, ""]
++    lines.extend("- {}".format(render_markdown_entry(item)) for item in items)
++    return "\n".join(lines) + "\n"
++
++
++def export_items(items, destination):
++    """Write a handoff list. The document is built in full before the file is touched."""
++    selected = [item for item in items if item.get("selected")]
++    document = build_export(selected)
++    if str(destination) == STDOUT_TARGET:
++        # Keep stdout byte-identical to the file instead of the platform newline.
++        if hasattr(sys.stdout, "reconfigure"):
++            sys.stdout.reconfigure(newline="\n")
++        sys.stdout.write(document)
++    else:
++        destination.write_text(document, encoding="utf-8", newline="\n")
++        print("wrote {} ({} item(s))".format(destination, len(selected)))
++    if not selected:
++        print("warning: no selected items, so the list is empty", file=sys.stderr)
++    return 0
+ 
+ 
+ def build_parser():
+@@ -50,17 +88,31 @@
+     list_parser.add_argument(
+         "--format", choices=("text", "markdown"), default="text", help="list output format"
+     )
++    export_parser = commands.add_parser(
++        "export", help="write a Markdown reading list of the selected items"
++    )
++    export_parser.add_argument(
++        "--output",
++        type=Path,
++        default=DEFAULT_EXPORT,
++        help="where to write the list, or - for stdout (default: reading-list.md)",
++    )
+     return parser
+ 
+ 
+ def main(argv=None):
+     args = build_parser().parse_args(argv)
+-    items = load_items(args.data)
+     if args.command == "list":
+-        render_list(items, args.format)
++        render_list(load_items(args.data), args.format)
+         return 0
++    if args.command == "export":
++        try:
++            return export_items(load_items(args.data), args.output)
++        except (OSError, ValueError) as error:
++            print("error: {}".format(error), file=sys.stderr)
++            return 1
+     return 0
+ 
+ 
+ if __name__ == "__main__":
+-    raise SystemExit(main())
++    raise SystemExit(main())
+--- /dev/null
++++ b/reading-list.md
+@@ -0,0 +1,5 @@
++# 阅读清单
++
++- [Field notes: reading from evidence](https://example.org/field-notes) — 先看证据链，再看结论。
++- [When titles use \[brackets\]](https://example.org/guides/reading%20notes_%28v2%29) — 保留 [原文中的标记]，下次讨论时检查。 重点看第三节。
++- [A short follow-up checklist](https://example.org/follow-up)

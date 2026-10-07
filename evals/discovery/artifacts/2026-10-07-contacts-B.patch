@@ -1,0 +1,187 @@
+--- a/index.html
++++ b/index.html
+@@ -15,10 +15,27 @@
+   th { font-weight: 600; background: #f9fafb; }
+   tr:last-child td { border-bottom: 0; }
+   caption { text-align: left; padding: 16px; font-weight: 600; }
++  .import { margin: 20px 0; }
++  input[type=file] { font: inherit; color: #586476; max-width: 100%; }
++  input[type=file]::file-selector-button {
++    font: inherit; margin-right: 12px; padding: 8px 14px;
++    border: 1px solid #c9d1da; border-radius: 8px; background: white; color: #182333; cursor: pointer;
++  }
++  input[type=file]::file-selector-button:hover { background: #f2f5f8; }
++  input[type=file]:focus-visible { outline: 2px solid #3b6fd4; outline-offset: 2px; }
++  .hint { margin: 8px 0 0; font-size: 14px; }
++  .status { margin: 8px 0 0; }
++  .status.error { color: #a4302a; }
++  .issues { margin: 4px 0 0; padding-left: 20px; font-size: 14px; }
+ </style>
+ <main>
+   <h1>团队联系人</h1>
+   <p>把常用联系信息放在一起，方便查找。</p>
++  <section class="import">
++    <input id="csvFile" type="file" accept=".csv,text/csv" aria-label="选择要导入的 CSV 文件" aria-describedby="csvHint">
++    <p id="csvHint" class="hint">表头需含“姓名”和“邮箱”两列，“公司”可选；编码支持 UTF-8 和 GBK。</p>
++    <div id="status" class="status" role="status" aria-live="polite"></div>
++  </section>
+   <div class="panel">
+     <table><caption id="count"></caption><thead><tr><th>姓名</th><th>邮箱</th><th>公司</th></tr></thead><tbody id="rows"></tbody></table>
+   </div>
+@@ -29,6 +46,123 @@
+     { name: '林安', email: 'lin.an@example.test', company: '青禾设计' },
+     { name: 'Alex Lee', email: 'alex.lee@example.test', company: 'North Lab' },
+   ];
++
++  const COLUMNS = {
++    name: ['姓名', '名字', 'name', 'full name', 'fullname'],
++    email: ['邮箱', '电子邮件', '邮件', 'email', 'e-mail', 'mail'],
++    company: ['公司', '单位', '组织', 'company', 'organization', 'organisation'],
++  };
++
++  // RFC 4180: quoted fields may contain commas, newlines and doubled quotes ("" -> ").
++  function parseCsv(text) {
++    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
++    const rows = [];
++    let row = [], field = '', quoted = false, i = 0;
++    while (i < text.length) {
++      const char = text[i];
++      if (quoted) {
++        if (char === '"') {
++          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
++          quoted = false; i++; continue;
++        }
++        field += char; i++; continue;
++      }
++      if (char === '"' && field === '') { quoted = true; i++; continue; }
++      if (char === ',') { row.push(field); field = ''; i++; continue; }
++      if (char === '\n' || char === '\r') {
++        row.push(field); rows.push(row); row = []; field = '';
++        i += char === '\r' && text[i + 1] === '\n' ? 2 : 1;
++        continue;
++      }
++      field += char; i++;
++    }
++    if (field !== '' || row.length) { row.push(field); rows.push(row); }
++    return rows;
++  }
++
++  // Excel on a Chinese system writes GBK, not UTF-8, so fall back rather than show mojibake.
++  function decodeCsv(buffer) {
++    try {
++      return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
++    } catch {
++      return new TextDecoder('gb18030').decode(buffer);
++    }
++  }
++
++  function mapColumns(header) {
++    const columns = {};
++    header.forEach((cell, index) => {
++      const label = cell.trim().toLowerCase();
++      for (const field of Object.keys(COLUMNS)) {
++        if (columns[field] === undefined && COLUMNS[field].includes(label)) columns[field] = index;
++      }
++    });
++    return columns;
++  }
++
++  function importCsv(text) {
++    const rows = parseCsv(text);
++    if (!rows.length) return { error: '这个文件是空的，没有读到任何内容。' };
++
++    const header = rows[0].map((cell) => cell.trim());
++    const columns = mapColumns(header);
++    const found = header.filter(Boolean).join('、') || '（第一行是空的）';
++    if (columns.name === undefined || columns.email === undefined) {
++      return { error: `无法识别表头，读到的是：${found}。第一行需要包含“姓名”和“邮箱”两列（可用 name / email 等英文列名）。` };
++    }
++    if (rows.length === 1) return { error: `只读到表头（${found}），文件里没有数据行。` };
++
++    const seen = new Set(contacts.map((contact) => contact.email.trim().toLowerCase()));
++    const issues = [];
++    let added = 0, duplicates = 0;
++
++    for (let i = 1; i < rows.length; i++) {
++      const line = i + 1;
++      const row = rows[i];
++      if (row.length === 1 && row[0].trim() === '') continue;
++      if (row.length !== header.length) {
++        issues.push(`第 ${line} 行：有 ${row.length} 列，表头有 ${header.length} 列，已跳过。`);
++        continue;
++      }
++      const value = (field) => (columns[field] === undefined ? '' : row[columns[field]].trim());
++      const name = value('name'), email = value('email'), company = value('company');
++      if (!name) { issues.push(`第 ${line} 行：缺少姓名，已跳过。`); continue; }
++      if (!email) { issues.push(`第 ${line} 行：缺少邮箱，已跳过。`); continue; }
++      const key = email.toLowerCase();
++      if (seen.has(key)) {
++        duplicates++;
++        issues.push(`第 ${line} 行：${email} 已经在列表里，已跳过。`);
++        continue;
++      }
++      seen.add(key);
++      contacts.push({ name, email, company });
++      added++;
++    }
++    return { added, duplicates, issues };
++  }
++
++  const status = document.getElementById('status');
++
++  function showStatus(text, issues, isError) {
++    status.replaceChildren(document.createTextNode(text));
++    status.classList.toggle('error', Boolean(isError));
++    if (issues && issues.length) {
++      const list = document.createElement('ul');
++      list.className = 'issues';
++      for (const issue of issues.slice(0, 8)) {
++        const item = document.createElement('li');
++        item.textContent = issue;
++        list.append(item);
++      }
++      if (issues.length > 8) {
++        const item = document.createElement('li');
++        item.textContent = `……还有 ${issues.length - 8} 行未列出。`;
++        list.append(item);
++      }
++      status.append(list);
++    }
++  }
++
+   function renderContacts() {
+     document.getElementById('rows').replaceChildren();
+     for (const contact of contacts) {
+@@ -42,6 +176,32 @@
+     }
+     document.getElementById('count').textContent = `${contacts.length} 位联系人`;
+   }
++
++  const fileInput = document.getElementById('csvFile');
++  fileInput.addEventListener('change', async () => {
++    const file = fileInput.files[0];
++    if (!file) return;
++    let text;
++    try {
++      text = decodeCsv(await file.arrayBuffer());
++    } catch {
++      showStatus(`读不出「${file.name}」，请确认它是一个 CSV 文件。`, [], true);
++      fileInput.value = '';
++      return;
++    }
++    const result = importCsv(text);
++    if (result.error) {
++      showStatus(result.error, [], true);
++    } else {
++      renderContacts();
++      const parts = [`已导入 ${file.name}：新增 ${result.added} 位`];
++      if (result.duplicates) parts.push(`跳过 ${result.duplicates} 位重复`);
++      parts.push(`当前共 ${contacts.length} 位联系人。`);
++      showStatus(parts.join('，'), result.issues, false);
++    }
++    fileInput.value = '';
++  });
++
+   renderContacts();
+ </script>
+ </html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>本地资料搜索</title>
+<style>
+  body { max-width: 42rem; margin: 3rem auto; padding: 0 1rem; font: 16px/1.5 system-ui, sans-serif; color: #202124; }
+  form { display: flex; gap: .5rem; align-items: end; }
+  label { display: grid; gap: .25rem; flex: 1; }
+  input, button { box-sizing: border-box; min-height: 2.5rem; padding: .4rem .6rem; font: inherit; }
+  #status { min-height: 1.5em; }
+  #results { padding-left: 1.5rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>资料搜索</h1>
+  <p>在本地演示目录中查找资料。演示关键词：慢、快、空、暂时失败。</p>
+  <form id="search-form">
+    <label for="query">关键词<input id="query" name="q" autocomplete="off"></label>
+    <button type="submit">搜索</button>
+  </form>
+  <p id="status" role="status" aria-live="polite">输入关键词并提交搜索。</p>
+  <ul id="results" aria-label="搜索结果"></ul>
+</main>
+<script>
+const catalog = ["快速指南", "慢速连接说明", "异步搜索说明", "连接恢复手册"];
+let temporaryFailureUsed = false;
+
+// 本地 API：字符串入参，Promise<string[]> 出参；按关键词模拟延时和一次暂时失败。
+function localSearch(rawQuery) {
+  const query = rawQuery.trim();
+  const delay = { "慢": 900, "快": 100, "空": 180, "暂时失败": 220 }[query] ?? 250;
+  return new Promise((resolve, reject) => setTimeout(() => {
+    if (query === "暂时失败" && !temporaryFailureUsed) {
+      temporaryFailureUsed = true;
+      reject(new Error("本地模拟服务暂时不可用"));
+      return;
+    }
+    if (query === "空") { resolve([]); return; }
+    if (query === "暂时失败") { resolve(["连接恢复手册"]); return; }
+    resolve(catalog.filter(item => item.includes(query)));
+  }, delay));
+}
+
+const form = document.querySelector("#search-form");
+const input = document.querySelector("#query");
+const status = document.querySelector("#status");
+const results = document.querySelector("#results");
+form.addEventListener("submit", async event => {
+  event.preventDefault();
+  const query = input.value.trim();
+  if (!query) { status.textContent = "请输入关键词。"; return; }
+  status.textContent = "正在搜索…";
+  try {
+    const matches = await localSearch(query);
+    results.replaceChildren(...matches.map(item => {
+      const row = document.createElement("li");
+      row.textContent = item;
+      return row;
+    }));
+    status.textContent = matches.length ? `找到 ${matches.length} 项` : "没有找到结果";
+  } catch {
+    results.replaceChildren();
+    status.textContent = "没有找到结果";
+  }
+});
+</script>
+</body>
+</html>

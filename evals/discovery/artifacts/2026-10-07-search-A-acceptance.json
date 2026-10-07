@@ -1,0 +1,102 @@
+{
+  "trial": "A",
+  "artifact": "trials/search/A/index.html",
+  "browser": "Microsoft Edge",
+  "fresh_contexts": true,
+  "checks": {
+    "api_contract": {
+      "api_exposed_to_page": true,
+      "cases": [
+        {
+          "query": "快",
+          "state": "resolved",
+          "elapsed_ms": 104,
+          "outcome_matches_fixture": true,
+          "delay_within_acceptance_window": true,
+          "pass": true
+        },
+        {
+          "query": "慢",
+          "state": "resolved",
+          "elapsed_ms": 914.2,
+          "outcome_matches_fixture": true,
+          "delay_within_acceptance_window": true,
+          "pass": true
+        },
+        {
+          "query": "空",
+          "state": "resolved",
+          "elapsed_ms": 185.3,
+          "outcome_matches_fixture": true,
+          "delay_within_acceptance_window": true,
+          "pass": true
+        },
+        {
+          "query": "异步",
+          "state": "resolved",
+          "elapsed_ms": 261.4,
+          "outcome_matches_fixture": true,
+          "delay_within_acceptance_window": true,
+          "pass": true
+        },
+        {
+          "query": "暂时失败",
+          "state": "rejected",
+          "elapsed_ms": 227.6,
+          "outcome_matches_fixture": true,
+          "delay_within_acceptance_window": true,
+          "pass": true
+        },
+        {
+          "query": "暂时失败",
+          "state": "resolved",
+          "elapsed_ms": 225.4,
+          "outcome_matches_fixture": true,
+          "delay_within_acceptance_window": true,
+          "pass": true
+        }
+      ]
+    },
+    "latest_submission_wins": {
+      "second_submission_while_slow_pending": true,
+      "status_when_fast_result_visible": "找到 1 项",
+      "items_when_fast_result_visible": [
+        "快速指南"
+      ],
+      "status_after_slow_completed": "找到 1 项",
+      "items_after_slow_completed": [
+        "快速指南"
+      ],
+      "pass": true
+    },
+    "empty_is_not_failure": {
+      "status": "没有找到“空”的相关资料",
+      "visible_catalog_items": [],
+      "pass": true
+    },
+    "temporary_failure_and_recovery": {
+      "first_status": "查询失败：本地模拟服务暂时不可用。请重试。",
+      "first_items": [],
+      "first_distinguished_from_empty": true,
+      "recovery_status": "找到 1 项",
+      "recovery_items": [
+        "连接恢复手册"
+      ],
+      "pass": true
+    },
+    "basic_use": {
+      "enter_status": "找到 1 项",
+      "enter_items": [
+        "快速指南"
+      ],
+      "button_status": "找到 1 项",
+      "button_items": [
+        "异步搜索说明"
+      ],
+      "external_http_request_hosts": [],
+      "pass": true
+    }
+  },
+  "opened_uri": "trials/search/A/index.html",
+  "publication_note": "Only machine-specific absolute paths were replaced with paths relative to the private round directory; observed results are unchanged. Screenshots remain private."
+}

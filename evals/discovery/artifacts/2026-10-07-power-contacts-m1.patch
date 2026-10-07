@@ -1,0 +1,238 @@
+--- a/README.md
++++ b/README.md
+@@ -7,3 +7,12 @@
+ Contacts currently live only in the page session. Preserve the existing list and
+ keep the result runnable locally; no external service is needed. A typical input
+ is in `example.csv`.
++
++Use the "从 CSV 导入" control to add contacts from a CSV file. The first row must
++be a header containing 姓名 (name); 邮箱 (email) and 公司 (company) are optional,
++and English header names such as `Name` / `E-Mail` / `Company` work too. UTF-8
++(with or without BOM), GBK and UTF-16 files are detected automatically, and comma,
++semicolon and tab separated files are recognised. Rows that are already in the
++list are skipped, and a row without a name is reported rather than imported.
++Imported contacts still live only in the page session: reloading returns to the
++built-in list, and nothing is uploaded anywhere.
+--- a/index.html
++++ b/index.html
+@@ -15,10 +15,25 @@
+   th { font-weight: 600; background: #f9fafb; }
+   tr:last-child td { border-bottom: 0; }
+   caption { text-align: left; padding: 16px; font-weight: 600; }
++  .import { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 24px 0; }
++  .import label { font-weight: 600; }
++  input[type="file"] { max-width: 100%; font: inherit; color: #182333; }
++  input[type="file"]::file-selector-button { font: inherit; margin-right: 12px; padding: 8px 16px; border: 0; border-radius: 8px; background: #182333; color: white; cursor: pointer; }
++  input[type="file"]::file-selector-button:hover { background: #2b3a4d; }
++  .hint, .status { flex-basis: 100%; margin: 0; font-size: 14px; }
++  .status { color: #1f6b3b; }
++  .status.error { color: #a4232b; }
++  .status:empty { display: none; }
+ </style>
+ <main>
+   <h1>团队联系人</h1>
+   <p>把常用联系信息放在一起，方便查找。</p>
++  <div class="import">
++    <label for="csv-file">从 CSV 导入</label>
++    <input id="csv-file" type="file" accept=".csv,text/csv">
++    <p class="hint">CSV 第一行需是表头，含“姓名”列，“邮箱”“公司”列可选；支持 UTF-8 和 GBK 编码。</p>
++    <p id="csv-status" class="status" role="status" aria-live="polite"></p>
++  </div>
+   <div class="panel">
+     <table><caption id="count"></caption><thead><tr><th>姓名</th><th>邮箱</th><th>公司</th></tr></thead><tbody id="rows"></tbody></table>
+   </div>
+@@ -29,6 +44,150 @@
+     { name: '林安', email: 'lin.an@example.test', company: '青禾设计' },
+     { name: 'Alex Lee', email: 'alex.lee@example.test', company: 'North Lab' },
+   ];
++
++  // 表头别名：大小写、全半角空格差异都能对上，方便直接用别人给的表格。
++  const FIELD_ALIASES = {
++    name: ['姓名', '名字', '联系人', 'name', 'full name', 'fullname'],
++    email: ['邮箱', '电子邮箱', '电子邮件', '邮件', 'email', 'e-mail', 'mail'],
++    company: ['公司', '公司名称', '单位', '组织', 'company', 'organization', 'organisation', 'org'],
++  };
++  const DELIMITERS = [',', ';', '\t'];
++
++  // 表头和单元格偶尔会带一个 BOM 字符（U+FEFF），统一去掉。
++  function stripBom(text) {
++    return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
++  }
++
++  function normalizeKey(value) {
++    return stripBom(value).trim().toLowerCase().replace(/\s+/g, ' ');
++  }
++
++  // 先按 UTF-8 严格解码，失败再退回 GBK（中文 Windows 上 Excel 另存为 CSV 的常见编码）。
++  // TextDecoder 会去掉 BOM 字节，这里再去掉可能残留的 BOM 字符，避免它混进第一个单元格。
++  function decodeCsvBytes(buffer) {
++    const bytes = new Uint8Array(buffer);
++    let text;
++    if (bytes[0] === 0xff && bytes[1] === 0xfe) text = new TextDecoder('utf-16le').decode(bytes);
++    else if (bytes[0] === 0xfe && bytes[1] === 0xff) text = new TextDecoder('utf-16be').decode(bytes);
++    else {
++      try {
++        text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
++      } catch (error) {
++        text = new TextDecoder('gb18030').decode(bytes);
++      }
++    }
++    return stripBom(text);
++  }
++
++  function firstLine(text) {
++    let inQuotes = false;
++    for (let index = 0; index < text.length; index += 1) {
++      const char = text[index];
++      if (char === '"') inQuotes = !inQuotes;
++      else if (!inQuotes && (char === '\n' || char === '\r')) return text.slice(0, index);
++    }
++    return text;
++  }
++
++  function countOutsideQuotes(line, delimiter) {
++    let inQuotes = false;
++    let count = 0;
++    for (let index = 0; index < line.length; index += 1) {
++      const char = line[index];
++      if (char === '"') inQuotes = !inQuotes;
++      else if (char === delimiter && !inQuotes) count += 1;
++    }
++    return count;
++  }
++
++  function detectDelimiter(text) {
++    const line = firstLine(text);
++    let best = DELIMITERS[0];
++    let bestCount = 0;
++    for (const delimiter of DELIMITERS) {
++      const count = countOutsideQuotes(line, delimiter);
++      if (count > bestCount) { best = delimiter; bestCount = count; }
++    }
++    return best;
++  }
++
++  // RFC 4180 的常用子集：引号包裹的字段、字段内的逗号/换行、"" 转义的引号、CRLF。
++  function parseDelimited(text, delimiter) {
++    const rows = [];
++    let row = [];
++    let field = '';
++    let inQuotes = false;
++    let index = 0;
++    while (index < text.length) {
++      const char = text[index];
++      if (inQuotes) {
++        if (char === '"' && text[index + 1] === '"') { field += '"'; index += 2; continue; }
++        if (char === '"') { inQuotes = false; index += 1; continue; }
++        field += char; index += 1; continue;
++      }
++      // 只有紧跟分隔符的引号才算“带引号的字段”，和 RFC 4180、PapaParse、Python csv 一致：
++      // 形如 `a, "b" ,c` 的写法会按字面保留引号，不做猜测。
++      if (char === '"' && field === '') { inQuotes = true; index += 1; continue; }
++      if (char === delimiter) { row.push(field); field = ''; index += 1; continue; }
++      if (char === '\r' || char === '\n') {
++        if (char === '\r' && text[index + 1] === '\n') index += 1;
++        row.push(field); rows.push(row); row = []; field = ''; index += 1; continue;
++      }
++      field += char; index += 1;
++    }
++    if (field !== '' || row.length > 0) { row.push(field); rows.push(row); }
++    return rows;
++  }
++
++  function parseCsvBytes(buffer) {
++    const text = decodeCsvBytes(buffer);
++    return parseDelimited(text, detectDelimiter(text));
++  }
++
++  function canonicalField(header) {
++    const key = normalizeKey(header);
++    for (const [field, aliases] of Object.entries(FIELD_ALIASES)) {
++      if (aliases.includes(key)) return field;
++    }
++    return null;
++  }
++
++  function rowsToContacts(rows) {
++    const headerIndex = rows.findIndex((row) => row.some((cell) => cell.trim() !== ''));
++    if (headerIndex === -1) throw new Error('文件里没有内容');
++    const columns = {};
++    rows[headerIndex].forEach((cell, index) => {
++      const field = canonicalField(cell);
++      if (field && columns[field] === undefined) columns[field] = index;
++    });
++    if (columns.name === undefined) {
++      throw new Error('表头里没有“姓名”列，需要“姓名,邮箱,公司”这样的表头');
++    }
++    const imported = [];
++    const nameless = [];
++    rows.slice(headerIndex + 1).forEach((row, offset) => {
++      const cell = (field) => (columns[field] === undefined ? '' : (row[columns[field]] || '').trim());
++      const name = cell('name');
++      if (!name) {
++        if (row.some((value) => value.trim() !== '')) nameless.push(offset + 1);
++        return;
++      }
++      imported.push({ name, email: cell('email'), company: cell('company') });
++    });
++    return { imported, nameless };
++  }
++
++  function contactKey(contact) {
++    return [contact.name, contact.email.toLowerCase(), contact.company].join('\u0000');
++  }
++
++  function describeRecords(numbers) {
++    const shown = numbers.slice(0, 3).join('、');
++    return numbers.length > 3
++      ? `第 ${shown} 条等 ${numbers.length} 条记录`
++      : `第 ${shown} 条记录`;
++  }
++
+   function renderContacts() {
+     document.getElementById('rows').replaceChildren();
+     for (const contact of contacts) {
+@@ -42,6 +201,43 @@
+     }
+     document.getElementById('count').textContent = `${contacts.length} 位联系人`;
+   }
++
++  const fileInput = document.getElementById('csv-file');
++  const statusEl = document.getElementById('csv-status');
++
++  function setStatus(text, isError) {
++    statusEl.textContent = text;
++    statusEl.classList.toggle('error', Boolean(isError));
++  }
++
++  fileInput.addEventListener('change', async () => {
++    const file = fileInput.files && fileInput.files[0];
++    if (!file) return;
++    setStatus('正在导入…', false);
++    try {
++      const { imported, nameless } = rowsToContacts(parseCsvBytes(await file.arrayBuffer()));
++      const seen = new Set(contacts.map(contactKey));
++      let added = 0;
++      let duplicates = 0;
++      for (const contact of imported) {
++        const key = contactKey(contact);
++        if (seen.has(key)) { duplicates += 1; continue; }
++        seen.add(key);
++        contacts.push(contact);
++        added += 1;
++      }
++      renderContacts();
++      const summary = [`已导入 ${added} 位联系人`];
++      if (duplicates) summary.push(`${duplicates} 条与已有联系人重复，已跳过`);
++      if (nameless.length) summary.push(`${describeRecords(nameless)}缺少姓名，已跳过`);
++      setStatus(`${summary.join('；')}。`, false);
++    } catch (error) {
++      setStatus(`导入失败：${error.message}。联系人名单未改动。`, true);
++    } finally {
++      fileInput.value = '';
++    }
++  });
++
+   renderContacts();
+ </script>
+ </html>

@@ -1,0 +1,344 @@
+{
+  "app_dir": "<round>\\trials\\contacts\\m2",
+  "entry": "<round>\\trials\\contacts\\m2\\index.html",
+  "channel": "msedge",
+  "fixture_sha256": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+  "fixture_utf8_text": "姓名,邮箱,公司\n张禾,zhang.he@example.test,星野制作\n\"Morgan, Taylor\",morgan.taylor@example.test,\"Pine, Ltd\"\n陈宁,chen.ning@example.test,山海工作室\n",
+  "cases": {
+    "missing_header": {
+      "file": "missing-required-header.csv",
+      "sha256": "11fb88fc8833f20639e957f29f875597bada532ecf75cb7fd916f7cc433de1da",
+      "utf8_text": "姓名,公司\nMira Missing,Blue Studio\n"
+    },
+    "unterminated_quote": {
+      "file": "unterminated-quote.csv",
+      "sha256": "3aac365e178564d692f7c4a5eed1510e9f7d0b80167c7dbf830040ae6acbd0cd",
+      "utf8_text": "姓名,邮箱,公司\n星野,malformed@example.test,\"unterminated, value\n"
+    }
+  },
+  "criterion_status": {
+    "unicode_and_quoted_comma_plus_existing_contacts": "pass",
+    "repeat_import_duplicate_handling": "pass",
+    "missing_header_rejected_preserved_and_recoverable": "pass",
+    "unterminated_quote_rejected_or_explicitly_skipped": "pass",
+    "no_external_runtime_service_required": "pass"
+  },
+  "criterion_evidence": {
+    "C1": "Visible Edge import retained the three pre-existing contacts and displayed all fixture values, including 张禾/星野制作 and Morgan, Taylor/Pine, Ltd as single fields.",
+    "C2": "Reimport kept the list at five and reported 0 added, 3 duplicates skipped.",
+    "C3": "CSV without the required 邮箱 header showed a useful error and left all three existing contacts unchanged; the later valid fixture import succeeded.",
+    "C4": "Unterminated quote showed explicit rejection feedback and left all three existing contacts unchanged.",
+    "C5": "The three file:// scenarios completed with HTTP/HTTPS blocked and no external requests recorded."
+  },
+  "scenarios": [
+    {
+      "name": "example-and-repeat",
+      "entry": "file:///<round>/trials/contacts/m2/index.html",
+      "launch_mode": "file://",
+      "external_requests": [],
+      "page_errors": [],
+      "steps": [
+        {
+          "name": "first-import",
+          "file": "example.csv",
+          "sha256": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 5,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ],
+              [
+                "张禾",
+                "zhang.he@example.test",
+                "星野制作"
+              ],
+              [
+                "Morgan, Taylor",
+                "morgan.taylor@example.test",
+                "Pine, Ltd"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入 导入完成：新增 2 位，跳过重复 1 位，忽略无效 0 行。 1 位联系人的邮箱已存在，未重复添加。 5 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab 张禾 zhang.he@example.test 星野制作 Morgan, Taylor morgan.taylor@example.test Pine, Ltd",
+            "visible_feedback": [
+              "导入完成：新增 2 位，跳过重复 1 位，忽略无效 0 行。 1 位联系人的邮箱已存在，未重复添加。"
+            ],
+            "screenshot": "example-and-repeat-1-first-import.png"
+          }
+        },
+        {
+          "name": "repeat-import",
+          "file": "example.csv",
+          "sha256": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 5,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ],
+              [
+                "张禾",
+                "zhang.he@example.test",
+                "星野制作"
+              ],
+              [
+                "Morgan, Taylor",
+                "morgan.taylor@example.test",
+                "Pine, Ltd"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入 导入完成：新增 0 位，跳过重复 3 位，忽略无效 0 行。 3 位联系人的邮箱已存在，未重复添加。 5 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab 张禾 zhang.he@example.test 星野制作 Morgan, Taylor morgan.taylor@example.test Pine, Ltd",
+            "visible_feedback": [
+              "导入完成：新增 0 位，跳过重复 3 位，忽略无效 0 行。 3 位联系人的邮箱已存在，未重复添加。"
+            ],
+            "screenshot": "example-and-repeat-2-repeat-import.png"
+          }
+        }
+      ],
+      "error": null,
+      "before": {
+        "visible_row_count": 3,
+        "visible_rows": [
+          [
+            "陈宁",
+            "chen.ning@example.test",
+            "山海工作室"
+          ],
+          [
+            "林安",
+            "lin.an@example.test",
+            "青禾设计"
+          ],
+          [
+            "Alex Lee",
+            "alex.lee@example.test",
+            "North Lab"
+          ]
+        ],
+        "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入 3 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab",
+        "visible_feedback": [],
+        "screenshot": "example-and-repeat-before.png"
+      }
+    },
+    {
+      "name": "missing-header-recovery",
+      "entry": "file:///<round>/trials/contacts/m2/index.html",
+      "launch_mode": "file://",
+      "external_requests": [],
+      "page_errors": [],
+      "steps": [
+        {
+          "name": "missing-header",
+          "file": "missing-required-header.csv",
+          "sha256": "11fb88fc8833f20639e957f29f875597bada532ecf75cb7fd916f7cc433de1da",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 3,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入 没有找到「姓名」和「邮箱」两列，请检查表头。 3 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab",
+            "visible_feedback": [
+              "没有找到「姓名」和「邮箱」两列，请检查表头。"
+            ],
+            "screenshot": "missing-header-recovery-1-missing-header.png"
+          }
+        },
+        {
+          "name": "valid-recovery",
+          "file": "example.csv",
+          "sha256": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 5,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ],
+              [
+                "张禾",
+                "zhang.he@example.test",
+                "星野制作"
+              ],
+              [
+                "Morgan, Taylor",
+                "morgan.taylor@example.test",
+                "Pine, Ltd"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入 导入完成：新增 2 位，跳过重复 1 位，忽略无效 0 行。 1 位联系人的邮箱已存在，未重复添加。 5 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab 张禾 zhang.he@example.test 星野制作 Morgan, Taylor morgan.taylor@example.test Pine, Ltd",
+            "visible_feedback": [
+              "导入完成：新增 2 位，跳过重复 1 位，忽略无效 0 行。 1 位联系人的邮箱已存在，未重复添加。"
+            ],
+            "screenshot": "missing-header-recovery-2-valid-recovery.png"
+          }
+        }
+      ],
+      "error": null,
+      "before": {
+        "visible_row_count": 3,
+        "visible_rows": [
+          [
+            "陈宁",
+            "chen.ning@example.test",
+            "山海工作室"
+          ],
+          [
+            "林安",
+            "lin.an@example.test",
+            "青禾设计"
+          ],
+          [
+            "Alex Lee",
+            "alex.lee@example.test",
+            "North Lab"
+          ]
+        ],
+        "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入 3 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab",
+        "visible_feedback": [],
+        "screenshot": "missing-header-recovery-before.png"
+      }
+    },
+    {
+      "name": "unterminated-quote",
+      "entry": "file:///<round>/trials/contacts/m2/index.html",
+      "launch_mode": "file://",
+      "external_requests": [],
+      "page_errors": [],
+      "steps": [
+        {
+          "name": "malformed-import",
+          "file": "unterminated-quote.csv",
+          "sha256": "3aac365e178564d692f7c4a5eed1510e9f7d0b80167c7dbf830040ae6acbd0cd",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 3,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入 文件里有一个引号没有闭合，无法确定行的边界，已取消导入。 3 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab",
+            "visible_feedback": [
+              "文件里有一个引号没有闭合，无法确定行的边界，已取消导入。"
+            ],
+            "screenshot": "unterminated-quote-1-malformed-import.png"
+          }
+        }
+      ],
+      "error": null,
+      "before": {
+        "visible_row_count": 3,
+        "visible_rows": [
+          [
+            "陈宁",
+            "chen.ning@example.test",
+            "山海工作室"
+          ],
+          [
+            "林安",
+            "lin.an@example.test",
+            "青禾设计"
+          ],
+          [
+            "Alex Lee",
+            "alex.lee@example.test",
+            "North Lab"
+          ]
+        ],
+        "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入 3 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab",
+        "visible_feedback": [],
+        "screenshot": "unterminated-quote-before.png"
+      }
+    }
+  ],
+  "browser_version": "154.0.4258.62",
+  "_archive": {
+    "path_substitutions": [
+      "<round>",
+      "<repo>",
+      "<user-home>"
+    ],
+    "raw_host_events_included": false,
+    "note": "Machine paths are substituted; observed functional values are preserved. Research judgments are archived separately."
+  }
+}

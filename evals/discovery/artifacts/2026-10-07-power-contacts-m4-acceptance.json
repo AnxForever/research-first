@@ -1,0 +1,350 @@
+{
+  "app_dir": "<round>\\trials\\contacts\\m4",
+  "entry": "<round>\\trials\\contacts\\m4\\index.html",
+  "channel": "msedge",
+  "fixture_sha256": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+  "fixture_utf8_text": "姓名,邮箱,公司\n张禾,zhang.he@example.test,星野制作\n\"Morgan, Taylor\",morgan.taylor@example.test,\"Pine, Ltd\"\n陈宁,chen.ning@example.test,山海工作室\n",
+  "cases": {
+    "missing_header": {
+      "file": "missing-required-header.csv",
+      "sha256": "11fb88fc8833f20639e957f29f875597bada532ecf75cb7fd916f7cc433de1da",
+      "missing_required_field": "email",
+      "utf8_text": "姓名,公司\nMira Missing,Blue Studio\n"
+    },
+    "unterminated_quote": {
+      "file": "unterminated-quote.csv",
+      "sha256": "3aac365e178564d692f7c4a5eed1510e9f7d0b80167c7dbf830040ae6acbd0cd",
+      "utf8_text": "姓名,邮箱,公司\n星野,malformed@example.test,\"unterminated, value\n"
+    }
+  },
+  "criterion_status": {
+    "unicode_and_quoted_comma_plus_existing_contacts": "pass",
+    "repeat_import_duplicate_handling": "pass",
+    "missing_header_rejected_preserved_and_recoverable": "pass",
+    "unterminated_quote_rejected_or_explicitly_skipped": "fail",
+    "no_external_runtime_service_required": "pass"
+  },
+  "criterion_evidence": {
+    "C1": "Visible Edge import retained the three initial contacts and displayed all fixture values, including Morgan, Taylor and Pine, Ltd as single fields.",
+    "C2": "Reimport kept the list at five and reported three duplicate emails skipped.",
+    "C3": "Missing the required 邮箱 header showed a useful error and left the initial three contacts unchanged; a later valid fixture import succeeded.",
+    "C4": "The unterminated quote was silently accepted as a fourth contact with success feedback and no warning.",
+    "C5": "All file:// scenarios completed with HTTP/HTTPS blocked and no external requests recorded."
+  },
+  "scenarios": [
+    {
+      "name": "example-and-repeat",
+      "entry": "file:///<round>/trials/contacts/m4/index.html",
+      "launch_mode": "file://",
+      "external_requests": [],
+      "page_errors": [],
+      "steps": [
+        {
+          "name": "first-import",
+          "file": "example.csv",
+          "sha256": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 5,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ],
+              [
+                "张禾",
+                "zhang.he@example.test",
+                "星野制作"
+              ],
+              [
+                "Morgan, Taylor",
+                "morgan.taylor@example.test",
+                "Pine, Ltd"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入联系人 选择或拖入一个 CSV 文件。表头需包含「姓名」和「邮箱」，「公司」可选。 支持 UTF-8（含 BOM）和 Excel 在中文 Windows 下默认的 GBK 编码。 已存在的邮箱（按邮箱判断）会自动跳过。 已读取「example.csv」：导入 2 位联系人，跳过 1 位重复（邮箱已存在），编码 UTF-8。 5 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab 张禾 zhang.he@example.test 星野制作 Morgan, Taylor morgan.taylor@example.test Pine, Ltd",
+            "visible_feedback": [
+              "已读取「example.csv」：导入 2 位联系人，跳过 1 位重复（邮箱已存在），编码 UTF-8。"
+            ],
+            "screenshot": "example-and-repeat-1-first-import.png"
+          }
+        },
+        {
+          "name": "repeat-import",
+          "file": "example.csv",
+          "sha256": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 5,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ],
+              [
+                "张禾",
+                "zhang.he@example.test",
+                "星野制作"
+              ],
+              [
+                "Morgan, Taylor",
+                "morgan.taylor@example.test",
+                "Pine, Ltd"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入联系人 选择或拖入一个 CSV 文件。表头需包含「姓名」和「邮箱」，「公司」可选。 支持 UTF-8（含 BOM）和 Excel 在中文 Windows 下默认的 GBK 编码。 已存在的邮箱（按邮箱判断）会自动跳过。 已读取「example.csv」：导入 0 位联系人，跳过 3 位重复（邮箱已存在），编码 UTF-8。 5 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab 张禾 zhang.he@example.test 星野制作 Morgan, Taylor morgan.taylor@example.test Pine, Ltd",
+            "visible_feedback": [
+              "已读取「example.csv」：导入 0 位联系人，跳过 3 位重复（邮箱已存在），编码 UTF-8。"
+            ],
+            "screenshot": "example-and-repeat-2-repeat-import.png"
+          }
+        }
+      ],
+      "error": null,
+      "before": {
+        "visible_row_count": 3,
+        "visible_rows": [
+          [
+            "陈宁",
+            "chen.ning@example.test",
+            "山海工作室"
+          ],
+          [
+            "林安",
+            "lin.an@example.test",
+            "青禾设计"
+          ],
+          [
+            "Alex Lee",
+            "alex.lee@example.test",
+            "North Lab"
+          ]
+        ],
+        "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入联系人 选择或拖入一个 CSV 文件。表头需包含「姓名」和「邮箱」，「公司」可选。 支持 UTF-8（含 BOM）和 Excel 在中文 Windows 下默认的 GBK 编码。 已存在的邮箱（按邮箱判断）会自动跳过。 3 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab",
+        "visible_feedback": [],
+        "screenshot": "example-and-repeat-before.png"
+      }
+    },
+    {
+      "name": "missing-header-recovery",
+      "entry": "file:///<round>/trials/contacts/m4/index.html",
+      "launch_mode": "file://",
+      "external_requests": [],
+      "page_errors": [],
+      "steps": [
+        {
+          "name": "missing-header",
+          "file": "missing-required-header.csv",
+          "sha256": "11fb88fc8833f20639e957f29f875597bada532ecf75cb7fd916f7cc433de1da",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 3,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入联系人 选择或拖入一个 CSV 文件。表头需包含「姓名」和「邮箱」，「公司」可选。 支持 UTF-8（含 BOM）和 Excel 在中文 Windows 下默认的 GBK 编码。 已存在的邮箱（按邮箱判断）会自动跳过。 无法导入「missing-required-header.csv」：表头里找不到「邮箱」列。第一行需要是表头，可用：姓名、邮箱、公司（也接受 name、email、company）。 3 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab",
+            "visible_feedback": [
+              "无法导入「missing-required-header.csv」：表头里找不到「邮箱」列。第一行需要是表头，可用：姓名、邮箱、公司（也接受 name、email、company）。"
+            ],
+            "screenshot": "missing-header-recovery-1-missing-header.png"
+          }
+        },
+        {
+          "name": "valid-recovery",
+          "file": "example.csv",
+          "sha256": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 5,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ],
+              [
+                "张禾",
+                "zhang.he@example.test",
+                "星野制作"
+              ],
+              [
+                "Morgan, Taylor",
+                "morgan.taylor@example.test",
+                "Pine, Ltd"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入联系人 选择或拖入一个 CSV 文件。表头需包含「姓名」和「邮箱」，「公司」可选。 支持 UTF-8（含 BOM）和 Excel 在中文 Windows 下默认的 GBK 编码。 已存在的邮箱（按邮箱判断）会自动跳过。 已读取「example.csv」：导入 2 位联系人，跳过 1 位重复（邮箱已存在），编码 UTF-8。 5 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab 张禾 zhang.he@example.test 星野制作 Morgan, Taylor morgan.taylor@example.test Pine, Ltd",
+            "visible_feedback": [
+              "已读取「example.csv」：导入 2 位联系人，跳过 1 位重复（邮箱已存在），编码 UTF-8。"
+            ],
+            "screenshot": "missing-header-recovery-2-valid-recovery.png"
+          }
+        }
+      ],
+      "error": null,
+      "before": {
+        "visible_row_count": 3,
+        "visible_rows": [
+          [
+            "陈宁",
+            "chen.ning@example.test",
+            "山海工作室"
+          ],
+          [
+            "林安",
+            "lin.an@example.test",
+            "青禾设计"
+          ],
+          [
+            "Alex Lee",
+            "alex.lee@example.test",
+            "North Lab"
+          ]
+        ],
+        "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入联系人 选择或拖入一个 CSV 文件。表头需包含「姓名」和「邮箱」，「公司」可选。 支持 UTF-8（含 BOM）和 Excel 在中文 Windows 下默认的 GBK 编码。 已存在的邮箱（按邮箱判断）会自动跳过。 3 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab",
+        "visible_feedback": [],
+        "screenshot": "missing-header-recovery-before.png"
+      }
+    },
+    {
+      "name": "unterminated-quote",
+      "entry": "file:///<round>/trials/contacts/m4/index.html",
+      "launch_mode": "file://",
+      "external_requests": [],
+      "page_errors": [],
+      "steps": [
+        {
+          "name": "malformed-import",
+          "file": "unterminated-quote.csv",
+          "sha256": "3aac365e178564d692f7c4a5eed1510e9f7d0b80167c7dbf830040ae6acbd0cd",
+          "interaction": {
+            "entry": "visible import button and native file chooser",
+            "index": 0
+          },
+          "after": {
+            "visible_row_count": 4,
+            "visible_rows": [
+              [
+                "陈宁",
+                "chen.ning@example.test",
+                "山海工作室"
+              ],
+              [
+                "林安",
+                "lin.an@example.test",
+                "青禾设计"
+              ],
+              [
+                "Alex Lee",
+                "alex.lee@example.test",
+                "North Lab"
+              ],
+              [
+                "星野",
+                "malformed@example.test",
+                "unterminated, value"
+              ]
+            ],
+            "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入联系人 选择或拖入一个 CSV 文件。表头需包含「姓名」和「邮箱」，「公司」可选。 支持 UTF-8（含 BOM）和 Excel 在中文 Windows 下默认的 GBK 编码。 已存在的邮箱（按邮箱判断）会自动跳过。 已读取「unterminated-quote.csv」：导入 1 位联系人，编码 UTF-8。 4 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab 星野 malformed@example.test unterminated, value",
+            "visible_feedback": [
+              "已读取「unterminated-quote.csv」：导入 1 位联系人，编码 UTF-8。"
+            ],
+            "screenshot": "unterminated-quote-1-malformed-import.png"
+          }
+        }
+      ],
+      "error": null,
+      "before": {
+        "visible_row_count": 3,
+        "visible_rows": [
+          [
+            "陈宁",
+            "chen.ning@example.test",
+            "山海工作室"
+          ],
+          [
+            "林安",
+            "lin.an@example.test",
+            "青禾设计"
+          ],
+          [
+            "Alex Lee",
+            "alex.lee@example.test",
+            "North Lab"
+          ]
+        ],
+        "visible_main_text": "团队联系人 把常用联系信息放在一起，方便查找。 从 CSV 导入联系人 选择或拖入一个 CSV 文件。表头需包含「姓名」和「邮箱」，「公司」可选。 支持 UTF-8（含 BOM）和 Excel 在中文 Windows 下默认的 GBK 编码。 已存在的邮箱（按邮箱判断）会自动跳过。 3 位联系人 姓名 邮箱 公司 陈宁 chen.ning@example.test 山海工作室 林安 lin.an@example.test 青禾设计 Alex Lee alex.lee@example.test North Lab",
+        "visible_feedback": [],
+        "screenshot": "unterminated-quote-before.png"
+      }
+    }
+  ],
+  "browser_version": "154.0.4258.62",
+  "_archive": {
+    "path_substitutions": [
+      "<round>",
+      "<repo>",
+      "<user-home>"
+    ],
+    "raw_host_events_included": false,
+    "note": "Machine paths are substituted; observed functional values are preserved. Research judgments are archived separately."
+  }
+}

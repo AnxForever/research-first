@@ -96,13 +96,48 @@ preferences or general improvement across models.
   synthetic contacts and a representative CSV; no external service.
 - [Newcomer guide](fixtures/onboarding/README.md): standard-library Python CLI
   with synthetic receipts; judge instructions against actual behavior.
+- [Async search](fixtures/async-search/index.html): a local asynchronous API with
+  fixed delays and a recoverable failure; judge the last submitted query and
+  distinguish empty results from errors.
+- [Reading handoff](fixtures/reading-handoff/README.md): an offline Python reading
+  shelf with an existing Markdown-link helper; judge selected-item export,
+  inherited commands and the produced file independently of helper reuse.
 
 These are maintainer evaluation resources, not mandatory steps or examples to
 inject into ordinary user tasks. Keep output directories outside the repository
 or under the ignored `results/` directory.
 
+## Audit a Claude Code trace
+
+The maintainer-only [trace index](trace_index.py) pairs recorded tool calls with
+their results by ID before a reviewer opens selected evidence. This helps avoid
+accidentally showing a blinded reviewer skill contents while searching raw logs.
+It uses Python's standard library, reads the source without changing it, and
+requires a new output file in an existing directory:
+
+```bash
+python evals/discovery/trace_index.py --input ../private-run/events.jsonl --output ../private-run/index.json
+```
+
+The index retains line numbers, IDs, hashes and structural anomalies, including
+missing or duplicate results, permission denials and malformed records. It omits
+raw prompts, parameters, tool-result text and path fields. Keep it local and
+review it before sharing; identifiers and fingerprints are not an anonymization
+guarantee. Exit code 0 means the index was written, not that tools or tasks passed.
+It cannot establish source truth, semantic claim support, authorization or skill
+quality. Only the Claude Code event envelopes exercised by the tests and recorded
+runs are supported; other hosts need their own adapters.
+
 ## Executed Windows evaluation
 
+- [2026-10-07 decision-loop round](2026-10-07-decision-loop.md): two contact-import
+  pairs and a new reading-handoff pair, with observed entry-body reads and separate
+  functional, research and scope judgments. This round uses a shorter entry and
+  process-local memory controls; it is not comparable to earlier host profiles.
+- [2026-10-07 execution-evidence round](2026-10-07-execution-evidence.md): one
+  capability preflight and two fixed pairs, including a fresh async-search case.
+  It preserves the candidate's malformed-input failure, source and scope issues,
+  and the limits of the loading evidence and reviewer isolation.
 - [2026-10-03 paired quality round](2026-10-03-quality-round.md): three fixed-task
   pairs and one supplementary pair after detecting MCP inventory drift, covering
   workflow discovery, rejection premises and failure acceptance. It retains

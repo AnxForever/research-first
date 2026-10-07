@@ -1,0 +1,68 @@
+{
+  "app_dir": "<round>\\trials\\handoff\\x1",
+  "output_dir": "<round>\\acceptance\\handoff\\replay-x1",
+  "runtime": "Python 3.12.10",
+  "interpreter": "<user-home>\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "launcher_mode": "python -S (site initialization disabled; no third-party modules loaded)",
+  "per_invocation_timeout_seconds": 15,
+  "scope_note": "CLI flag and Markdown parsing adaptation covers the two handoff artifacts in this round; this is not a generic judge for every valid implementation.",
+  "discovered_options": {
+    "export_command": "export",
+    "output_flag": "--output",
+    "data_flag": "--data",
+    "data_position": "before subcommand",
+    "list_format_flag": "--format",
+    "stdout_export_advertised": true
+  },
+  "source_hash_before": "f605a975c98aad1875a974a10fe701b7d57d7b2adc73d5264a8997be541cef1b",
+  "source_hash_after": "f605a975c98aad1875a974a10fe701b7d57d7b2adc73d5264a8997be541cef1b",
+  "checks": {
+    "runtime_probe_exit_0": true,
+    "help_exit_codes": true,
+    "export_discovered_from_help": true,
+    "output_option_discovered_from_help": true,
+    "data_option_discovered_from_help": true,
+    "markdown_list_option_discovered_from_help": true,
+    "list_default_matches_baseline": true,
+    "list_default_exit": 0,
+    "list_markdown_matches_baseline": true,
+    "list_markdown_exit": 0,
+    "export_file_exit_0": true,
+    "file_is_utf8": true,
+    "selection_order_and_filter": true,
+    "markdown_title_url_and_note_integrity": true,
+    "empty_note_has_no_dangling_suffix": true,
+    "stdout_export_exit_0": true,
+    "stdout_semantically_equal_to_file": true,
+    "empty_selection_exit_0_no_traceback": true,
+    "empty_selection_replaces_stale_with_valid_document": true,
+    "empty_selection_has_clear_diagnostic": true,
+    "source_shelf_hash_unchanged": true,
+    "stdlib_only_app_runs_under_no_site": true
+  },
+  "criterion_results": {
+    "preserve-list-contract": true,
+    "selection-and-order": true,
+    "useful-markdown": true,
+    "file-and-stdout": true,
+    "empty-selection": true,
+    "local-inheritance": true
+  },
+  "diagnostics_not_part_of_frozen_criteria": {
+    "file_has_no_bom": true,
+    "file_uses_lf": true
+  },
+  "execution_errors": [],
+  "all_criteria_pass": true,
+  "selected_file_sha256": "bea6e52e9c21563409d3ec613422ea9365775aaa688fbc168d0aff1be6ecd871",
+  "empty_file_sha256": "9346ee547f140cf93fcab938b4ca953e0bca708e09a221ac13eea68743e3e11f",
+  "_archive": {
+    "path_substitutions": [
+      "<round>",
+      "<repo>",
+      "<user-home>"
+    ],
+    "raw_host_events_included": false,
+    "note": "Machine paths are substituted; observed functional values are preserved. Research judgments are archived separately."
+  }
+}

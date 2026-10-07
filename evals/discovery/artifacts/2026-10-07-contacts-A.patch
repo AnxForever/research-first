@@ -1,0 +1,184 @@
+--- a/index.html
++++ b/index.html
+@@ -15,10 +15,23 @@
+   th { font-weight: 600; background: #f9fafb; }
+   tr:last-child td { border-bottom: 0; }
+   caption { text-align: left; padding: 16px; font-weight: 600; }
++  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 20px 0 12px; }
++  .toolbar .hint { font-size: 14px; color: #586476; }
++  button { font: inherit; padding: 9px 16px; border: 1px solid #c9d2dd; border-radius: 8px; background: #fff; color: #182333; cursor: pointer; }
++  button:hover { background: #f2f5f8; }
++  button:focus-visible { outline: 2px solid #2f6fd0; outline-offset: 2px; }
++  #import-status { margin: 0 0 16px; font-size: 14px; min-height: 1.6em; }
++  #import-status.error { color: #b3261e; }
+ </style>
+ <main>
+   <h1>团队联系人</h1>
+   <p>把常用联系信息放在一起，方便查找。</p>
++  <div class="toolbar">
++    <button type="button" id="import-button">从 CSV 导入</button>
++    <input type="file" id="csv-file" accept=".csv,text/csv" hidden>
++    <span class="hint">CSV 首行需包含「姓名」和/或「邮箱」列，公司列可选</span>
++  </div>
++  <p id="import-status" role="status" aria-live="polite"></p>
+   <div class="panel">
+     <table><caption id="count"></caption><thead><tr><th>姓名</th><th>邮箱</th><th>公司</th></tr></thead><tbody id="rows"></tbody></table>
+   </div>
+@@ -29,6 +42,7 @@
+     { name: '林安', email: 'lin.an@example.test', company: '青禾设计' },
+     { name: 'Alex Lee', email: 'alex.lee@example.test', company: 'North Lab' },
+   ];
++
+   function renderContacts() {
+     document.getElementById('rows').replaceChildren();
+     for (const contact of contacts) {
+@@ -42,6 +56,149 @@
+     }
+     document.getElementById('count').textContent = `${contacts.length} 位联系人`;
+   }
++
++  // Minimal RFC 4180 reader: quoted fields, doubled quotes, embedded newlines,
++  // CRLF or LF, and a leading UTF-8 BOM.
++  function parseCsv(text) {
++    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
++    const rows = [];
++    let row = [];
++    let field = '';
++    let inQuotes = false;
++    let quoted = false;
++    let i = 0;
++
++    function endField() { row.push(field); field = ''; quoted = false; }
++    function endRow() { endField(); rows.push(row); row = []; }
++
++    while (i < text.length) {
++      const ch = text[i];
++
++      if (inQuotes) {
++        if (ch === '"') {
++          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
++          inQuotes = false; i += 1; continue;
++        }
++        field += ch; i += 1; continue;
++      }
++
++      if (ch === '"' && field === '' && !quoted) { inQuotes = true; quoted = true; i += 1; continue; }
++      if (ch === ',') { endField(); i += 1; continue; }
++      if (ch === '\r') { if (text[i + 1] === '\n') i += 1; endRow(); i += 1; continue; }
++      if (ch === '\n') { endRow(); i += 1; continue; }
++      field += ch; i += 1;
++    }
++
++    if (inQuotes) throw new Error('CSV 里有一个引号没有闭合');
++    if (field !== '' || row.length > 0) endRow();
++    if (rows.length && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === '') rows.pop();
++    return rows;
++  }
++
++  const FIELD_ALIASES = {
++    name: ['姓名', '名字', '名称', '联系人', 'name', 'fullname'],
++    email: ['邮箱', '电子邮箱', '电子邮件', '邮件', 'email', 'e-mail', 'mail'],
++    company: ['公司', '公司名称', '单位', '组织', '机构', 'company', 'organization', 'organisation', 'org'],
++  };
++
++  function normalizeHeader(value) {
++    return value.replace(/^﻿/, '').trim().toLowerCase().replace(/\s+/g, '');
++  }
++
++  // Map the header row onto our three fields. Unknown headers are ignored, but
++  // the caller reports them so nothing is dropped silently.
++  function mapColumns(headerRow) {
++    const normalized = headerRow.map(normalizeHeader);
++    const map = {};
++    const claimed = new Set();
++    for (const field of ['name', 'email', 'company']) {
++      const index = normalized.findIndex((header, i) => !claimed.has(i) && FIELD_ALIASES[field].includes(header));
++      if (index !== -1) { map[field] = index; claimed.add(index); }
++    }
++    return { map, claimed };
++  }
++
++  // Excel on a Chinese Windows system writes plain "CSV" as GB18030, so fall
++  // back to it when the bytes are not valid UTF-8.
++  async function decodeCsvFile(file) {
++    const buffer = await file.arrayBuffer();
++    const bytes = new Uint8Array(buffer);
++    if (bytes[0] === 0xff && bytes[1] === 0xfe) return new TextDecoder('utf-16le').decode(buffer);
++    if (bytes[0] === 0xfe && bytes[1] === 0xff) return new TextDecoder('utf-16be').decode(buffer);
++    try {
++      return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
++    } catch (error) {
++      try { return new TextDecoder('gb18030').decode(buffer); }
++      catch (unsupported) { return new TextDecoder('utf-8').decode(buffer); }
++    }
++  }
++
++  const status = document.getElementById('import-status');
++
++  function report(message, isError) {
++    status.textContent = message;
++    status.classList.toggle('error', Boolean(isError));
++  }
++
++  // Nothing is committed until the whole file parses and validates, so a
++  // rejected file leaves the existing list untouched.
++  async function importCsvFile(file) {
++    const rows = parseCsv(await decodeCsvFile(file));
++    if (rows.length === 0) throw new Error('文件里没有可读取的内容');
++
++    const { map, claimed } = mapColumns(rows[0]);
++    if (map.name === undefined && map.email === undefined) {
++      const seen = rows[0].join('、') || '（空行）';
++      throw new Error(`没有找到「姓名」或「邮箱」列，当前首行是：${seen}`);
++    }
++
++    const seenEmails = new Set(contacts.map((c) => c.email.trim().toLowerCase()).filter(Boolean));
++    const added = [];
++    const duplicateRows = [];
++    const incompleteRows = [];
++
++    for (let i = 1; i < rows.length; i += 1) {
++      const row = rows[i];
++      const pick = (field) => (map[field] === undefined ? '' : (row[map[field]] || '').trim());
++      const contact = { name: pick('name'), email: pick('email'), company: pick('company') };
++
++      if (!contact.name && !contact.email && !contact.company) continue;
++      if (!contact.name && !contact.email) { incompleteRows.push(i + 1); continue; }
++
++      const key = contact.email.toLowerCase();
++      if (key && seenEmails.has(key)) { duplicateRows.push(i + 1); continue; }
++      if (key) seenEmails.add(key);
++      added.push(contact);
++    }
++
++    for (const contact of added) contacts.push(contact);
++    renderContacts();
++
++    const ignored = rows[0].filter((header, i) => !claimed.has(i) && normalizeHeader(header));
++    const notes = [];
++    if (duplicateRows.length) notes.push(`跳过 ${duplicateRows.length} 行已有邮箱（第 ${duplicateRows.join('、')} 行）`);
++    if (incompleteRows.length) notes.push(`跳过 ${incompleteRows.length} 行缺少姓名和邮箱（第 ${incompleteRows.join('、')} 行）`);
++    if (ignored.length) notes.push(`忽略了 ${ignored.length} 个未识别的列：${ignored.join('、')}`);
++
++    const summary = added.length
++      ? `已从 ${file.name} 导入 ${added.length} 位联系人，共 ${contacts.length} 位。`
++      : `已读取 ${file.name}，但没有新增联系人。`;
++    report(notes.length ? `${summary}${notes.join('；')}。` : summary, false);
++  }
++
++  const fileInput = document.getElementById('csv-file');
++  document.getElementById('import-button').addEventListener('click', () => fileInput.click());
++  fileInput.addEventListener('change', async (event) => {
++    const file = event.target.files[0];
++    event.target.value = ''; // let the same file be picked again
++    if (!file) return;
++    try {
++      await importCsvFile(file);
++    } catch (error) {
++      report(`导入失败：${error.message}。现有联系人未改动。`, true);
++    }
++  });
++
+   renderContacts();
+ </script>
+ </html>

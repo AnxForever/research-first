@@ -1,0 +1,233 @@
+--- a/index.html
++++ b/index.html
+@@ -15,10 +15,30 @@
+   th { font-weight: 600; background: #f9fafb; }
+   tr:last-child td { border-bottom: 0; }
+   caption { text-align: left; padding: 16px; font-weight: 600; }
++  .import { background: white; border: 1px solid #dde2e8; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
++  .import.dragging { border-color: #4a6cf7; background: #f2f5ff; }
++  .import label { font-weight: 600; display: block; margin-bottom: 4px; }
++  .import .hint { margin: 0 0 12px; font-size: 14px; }
++  .import input[type="file"] { font: inherit; }
++  .status { margin: 12px 0 0; font-size: 14px; min-height: 1.6em; }
++  .status[data-tone="error"] { color: #b4232a; }
++  .status[data-tone="ok"] { color: #1d6b3f; }
+ </style>
+ <main>
+   <h1>团队联系人</h1>
+   <p>把常用联系信息放在一起，方便查找。</p>
++
++  <div class="import" id="dropzone">
++    <label for="csv-file">从 CSV 导入联系人</label>
++    <p class="hint" id="csv-hint">
++      选择或拖入一个 CSV 文件。表头需包含「姓名」和「邮箱」，「公司」可选。
++      支持 UTF-8（含 BOM）和 Excel 在中文 Windows 下默认的 GBK 编码。
++      已存在的邮箱（按邮箱判断）会自动跳过。
++    </p>
++    <input type="file" id="csv-file" accept=".csv,text/csv" aria-describedby="csv-hint">
++    <p class="status" id="csv-status" role="status"></p>
++  </div>
++
+   <div class="panel">
+     <table><caption id="count"></caption><thead><tr><th>姓名</th><th>邮箱</th><th>公司</th></tr></thead><tbody id="rows"></tbody></table>
+   </div>
+@@ -29,6 +49,15 @@
+     { name: '林安', email: 'lin.an@example.test', company: '青禾设计' },
+     { name: 'Alex Lee', email: 'alex.lee@example.test', company: 'North Lab' },
+   ];
++
++  // CSV 表头可以用的名字，按字段分组。匹配时不区分大小写和首尾空格。
++  const HEADER_ALIASES = {
++    name: ['姓名', '名字', 'name', 'full name', 'fullname'],
++    email: ['邮箱', '电子邮箱', '邮件', 'email', 'e-mail', 'mail'],
++    company: ['公司', '单位', '组织', 'company', 'organization', 'organisation', 'org'],
++  };
++  const REQUIRED_FIELDS = ['name', 'email'];
++
+   function renderContacts() {
+     document.getElementById('rows').replaceChildren();
+     for (const contact of contacts) {
+@@ -42,6 +71,183 @@
+     }
+     document.getElementById('count').textContent = `${contacts.length} 位联系人`;
+   }
++
++  // 按 RFC 4180 拆行：引号内的逗号和换行都属于同一个字段，两个连续引号表示一个引号。
++  function parseCsv(text) {
++    const rows = [];
++    let row = [];
++    let field = '';
++    let inQuotes = false;
++    let started = false;
++    for (let i = 0; i < text.length; i++) {
++      const char = text[i];
++      if (inQuotes) {
++        if (char === '"') {
++          if (text[i + 1] === '"') { field += '"'; i++; }
++          else inQuotes = false;
++        } else {
++          field += char;
++        }
++        continue;
++      }
++      if (char === '"') { inQuotes = true; started = true; }
++      else if (char === ',') { row.push(field); field = ''; started = true; }
++      else if (char === '\r') { /* 换行由 \n 处理，单独的 \r 忽略 */ }
++      else if (char === '\n') {
++        row.push(field); rows.push(row);
++        row = []; field = ''; started = false;
++      } else { field += char; started = true; }
++    }
++    if (started || field !== '' || row.length > 0) { row.push(field); rows.push(row); }
++    return rows;
++  }
++
++  // 严格按 UTF-8 解码；遇到非法字节说明不是 UTF-8（多为 Excel 存的 GBK），回退到 gb18030。
++  function decodeCsv(buffer) {
++    try {
++      return { text: new TextDecoder('utf-8', { fatal: true }).decode(buffer), encoding: 'UTF-8' };
++    } catch (utf8Error) {
++      try {
++        return { text: new TextDecoder('gb18030', { fatal: true }).decode(buffer), encoding: 'GBK/GB18030' };
++      } catch (gbkError) {
++        throw new Error('这个文件不是 UTF-8 也不是 GBK/GB18030 编码的文本，可能不是 CSV 文件。');
++      }
++    }
++  }
++
++  const normalizeHeader = (value) => value.trim().toLowerCase().replace(/\s+/g, ' ');
++
++  // 把表头映射到字段下标。返回 { name, email, company }，缺失的字段为 -1。
++  function mapHeaders(headerRow) {
++    const columns = { name: -1, email: -1, company: -1 };
++    const taken = new Set();
++    headerRow.forEach((cell, index) => {
++      const normalized = normalizeHeader(cell);
++      for (const field of ['name', 'email', 'company']) {
++        if (columns[field] === -1 && !taken.has(index) && HEADER_ALIASES[field].includes(normalized)) {
++          columns[field] = index;
++          taken.add(index);
++        }
++      }
++    });
++    return columns;
++  }
++
++  // 解析 + 校验，返回待写入的联系人，以及对用户的说明。不做任何写入。
++  function readCsv(text) {
++    const rows = parseCsv(text);
++    const headerRow = rows.find((row) => row.some((cell) => cell.trim() !== ''));
++    if (!headerRow) {
++      return { error: '文件是空的，没有找到表头。' };
++    }
++    const columns = mapHeaders(headerRow);
++    const missing = REQUIRED_FIELDS.filter((field) => columns[field] === -1);
++    if (missing.length > 0) {
++      const names = { name: '姓名', email: '邮箱' };
++      return {
++        error: `表头里找不到「${missing.map((field) => names[field]).join('、')}」列。`
++          + '第一行需要是表头，可用：姓名、邮箱、公司（也接受 name、email、company）。',
++      };
++    }
++
++    const headerIndex = rows.indexOf(headerRow);
++    const incoming = [];
++    const invalid = [];
++    for (let i = headerIndex + 1; i < rows.length; i++) {
++      const row = rows[i];
++      if (row.every((cell) => cell.trim() === '')) continue; // 空行直接忽略
++      const pick = (field) => (columns[field] === -1 ? '' : (row[columns[field]] || '').trim());
++      const contact = { name: pick('name'), email: pick('email'), company: pick('company') };
++      const missingFields = REQUIRED_FIELDS.filter((field) => contact[field] === '');
++      if (missingFields.length > 0) {
++        const names = { name: '姓名', email: '邮箱' };
++        invalid.push({ line: i + 1, reason: `缺少${missingFields.map((f) => names[f]).join('、')}` });
++        continue;
++      }
++      incoming.push(contact);
++    }
++    return { incoming, invalid };
++  }
++
++  function describeImport({ added, duplicates, invalid, encoding }) {
++    if (added === 0 && duplicates === 0 && invalid.length === 0) {
++      return '文件里没有可导入的联系人。';
++    }
++    const parts = [`导入 ${added} 位联系人`];
++    if (duplicates > 0) parts.push(`跳过 ${duplicates} 位重复（邮箱已存在）`);
++    if (invalid.length > 0) {
++      const detail = invalid.slice(0, 3)
++        .map((item) => `第 ${item.line} 行${item.reason}`).join('；');
++      parts.push(`忽略 ${invalid.length} 行无效数据（${detail}${invalid.length > 3 ? ' 等' : ''}）`);
++    }
++    parts.push(`编码 ${encoding}`);
++    return parts.join('，') + '。';
++  }
++
++  function showStatus(message, tone) {
++    const status = document.getElementById('csv-status');
++    status.textContent = message;
++    status.dataset.tone = tone;
++  }
++
++  // 导入一个文件。任何一步失败都不改动已有的联系人。
++  async function importFile(file, input) {
++    try {
++      const { text, encoding } = decodeCsv(await file.arrayBuffer());
++      const result = readCsv(text);
++      if (result.error) {
++        showStatus(`无法导入「${file.name}」：${result.error}`, 'error');
++        return;
++      }
++
++      // 先算完整结果，确认无误后再写入，避免中途留下半份数据。
++      const seen = new Set(contacts.map((contact) => contact.email.toLowerCase()));
++      const accepted = [];
++      let duplicates = 0;
++      for (const contact of result.incoming) {
++        const key = contact.email.toLowerCase();
++        if (seen.has(key)) { duplicates++; continue; }
++        seen.add(key);
++        accepted.push(contact);
++      }
++
++      contacts.push(...accepted);
++      if (accepted.length > 0) renderContacts();
++
++      // 文件本身解析成功就算 ok：全是重复或没有新数据只是「没有新内容」，不是错误。
++      const summary = describeImport({ added: accepted.length, duplicates, invalid: result.invalid, encoding });
++      showStatus(`已读取「${file.name}」：${summary}`, 'ok');
++    } catch (error) {
++      showStatus(`无法读取「${file.name}」：${error.message}`, 'error');
++    } finally {
++      // 清空选择，这样再次选同一个文件也能触发导入。
++      if (input) input.value = '';
++    }
++  }
++
++  const fileInput = document.getElementById('csv-file');
++  fileInput.addEventListener('change', () => {
++    const file = fileInput.files && fileInput.files[0];
++    if (file) importFile(file, fileInput);
++  });
++
++  // 拖放只是补充方式，键盘和屏幕阅读器仍走上面的原生文件选择框。
++  const dropzone = document.getElementById('dropzone');
++  dropzone.addEventListener('dragover', (event) => {
++    event.preventDefault();
++    dropzone.classList.add('dragging');
++  });
++  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragging'));
++  dropzone.addEventListener('drop', (event) => {
++    event.preventDefault();
++    dropzone.classList.remove('dragging');
++    const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
++    if (file) importFile(file, fileInput);
++  });
++  // 拖到页面其他地方时不要让浏览器直接打开文件。
++  window.addEventListener('dragover', (event) => event.preventDefault());
++  window.addEventListener('drop', (event) => event.preventDefault());
++
+   renderContacts();
+ </script>
+ </html>

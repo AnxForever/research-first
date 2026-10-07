@@ -1,0 +1,30 @@
+[
+  {
+    "id": "r-01",
+    "title": "Field notes: reading from evidence",
+    "url": "https://example.org/field-notes",
+    "note": "先看证据链，再看结论。",
+    "selected": true
+  },
+  {
+    "id": "r-02",
+    "title": "A small guide to review cycles",
+    "url": "https://example.org/review-cycle",
+    "note": "暂时不发给同事。",
+    "selected": false
+  },
+  {
+    "id": "r-03",
+    "title": "When titles use [brackets]",
+    "url": "https://example.org/guides/reading%20notes_(v2)",
+    "note": "保留 [原文中的标记]，下次讨论时检查。\n重点看第三节。",
+    "selected": true
+  },
+  {
+    "id": "r-04",
+    "title": "A short follow-up checklist",
+    "url": "https://example.org/follow-up",
+    "note": "",
+    "selected": true
+  }
+]

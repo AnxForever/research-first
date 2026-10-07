@@ -1,0 +1,277 @@
+--- a/README.md
++++ b/README.md
+@@ -7,3 +7,19 @@
+ Contacts currently live only in the page session. Preserve the existing list and
+ keep the result runnable locally; no external service is needed. A typical input
+ is in `example.csv`.
++
++## CSV import
++
++Click **导入 CSV** and pick a file. The first row must be a header containing
++`姓名` and `邮箱` (`名字` / `name` / `email` work too); `公司` is optional.
++Imported contacts are appended to the existing list, and duplicates are matched
++by email — so importing the same file twice adds nothing.
++
++Encoding is detected from the bytes, so UTF-8 (with or without BOM), UTF-16 with a
++BOM, and the GB18030 files saved by Chinese Excel are all read correctly. Quoted
++fields, doubled quotes (`""`) and line breaks inside quotes parse per RFC 4180.
++
++Unusable rows are skipped with a reason and their line number. A file with a
++missing required column, an unclosed quote, or no content is rejected outright and
++the list is left untouched. Imported contacts last for the page session only —
++reloading restores the built-in list.
+--- a/index.html
++++ b/index.html
+@@ -15,11 +15,33 @@
+   th { font-weight: 600; background: #f9fafb; }
+   tr:last-child td { border-bottom: 0; }
+   caption { text-align: left; padding: 16px; font-weight: 600; }
++  .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #e8ebef; }
++  .toolbar .title { font-weight: 600; }
++  .toolbar .hint { display: block; font-weight: 400; font-size: 14px; color: #586476; }
++  button { font: inherit; color: #fff; background: #2b6cb0; border: 0; border-radius: 8px; padding: 8px 16px; cursor: pointer; }
++  button:hover { background: #24598f; }
++  button:focus-visible { outline: 2px solid #2b6cb0; outline-offset: 2px; }
++  .status { margin: 0; padding: 12px 16px 0; }
++  .status:empty { display: none; }
++  .status .bad { color: #b42318; }
++  .report { margin: 8px 16px 16px; font-size: 14px; color: #586476; }
++  .report:empty { display: none; }
++  .report ul { margin: 8px 0 0; padding-left: 20px; }
+ </style>
+ <main>
+   <h1>团队联系人</h1>
+   <p>把常用联系信息放在一起，方便查找。</p>
+   <div class="panel">
++    <div class="toolbar">
++      <div class="title">
++        从 CSV 导入
++        <span class="hint">表头需含「姓名」「邮箱」，可选「公司」；重复邮箱不会重复导入。</span>
++      </div>
++      <button type="button" id="import-btn">导入 CSV</button>
++      <input type="file" id="file-input" accept=".csv,text/csv" hidden>
++    </div>
++    <p class="status" id="status" role="status"></p>
++    <div class="report" id="report"></div>
+     <table><caption id="count"></caption><thead><tr><th>姓名</th><th>邮箱</th><th>公司</th></tr></thead><tbody id="rows"></tbody></table>
+   </div>
+ </main>
+@@ -29,6 +51,202 @@
+     { name: '林安', email: 'lin.an@example.test', company: '青禾设计' },
+     { name: 'Alex Lee', email: 'alex.lee@example.test', company: 'North Lab' },
+   ];
++
++  const HEADER_ALIASES = {
++    name: ['姓名', '名字', 'name'],
++    email: ['邮箱', '电子邮件', '邮件', 'email', 'e-mail'],
++    company: ['公司', '单位', 'company', 'organization', 'org'],
++  };
++  const MAX_LISTED_SKIPS = 20;
++
++  // RFC 4180 tokenizer: quoted fields, doubled quotes, and line breaks inside quotes.
++  // Returns { records: [{ fields, line }] } or { error } for a structurally broken file.
++  function parseCsv(text) {
++    const records = [];
++    let fields = [];
++    let field = '';
++    let inQuotes = false;
++    let line = 1;
++    let recordLine = 1;
++    for (let i = 0; i < text.length; i++) {
++      const ch = text[i];
++      if (inQuotes) {
++        if (ch === '"') {
++          if (text[i + 1] === '"') { field += '"'; i++; }
++          else inQuotes = false;
++        } else if (ch === '\r' && text[i + 1] === '\n') {
++          field += '\n'; line++; i++;
++        } else if (ch === '\n') {
++          field += '\n'; line++;
++        } else {
++          field += ch;
++        }
++        continue;
++      }
++      if (ch === '"' && field === '') { inQuotes = true; continue; }
++      if (ch === ',') { fields.push(field); field = ''; continue; }
++      if (ch === '\n' || ch === '\r') {
++        fields.push(field);
++        records.push({ fields, line: recordLine });
++        fields = [];
++        field = '';
++        if (ch === '\r' && text[i + 1] === '\n') i++;
++        line++;
++        recordLine = line;
++        continue;
++      }
++      field += ch;
++    }
++    if (inQuotes) return { error: `第 ${recordLine} 行开始的引号没有闭合，无法解析该文件。` };
++    if (field !== '' || fields.length > 0) {
++      fields.push(field);
++      records.push({ fields, line: recordLine });
++    }
++    return { records };
++  }
++
++  const BOMS = [
++    { bytes: [0xEF, 0xBB, 0xBF], encoding: 'utf-8' },
++    { bytes: [0xFF, 0xFE], encoding: 'utf-16le' },
++    { bytes: [0xFE, 0xFF], encoding: 'utf-16be' },
++  ];
++
++  // Read the raw bytes rather than file.text(): a GBK-exported CSV (Chinese Excel default)
++  // decodes to mojibake as UTF-8, so fall back to gb18030 when strict UTF-8 decoding fails.
++  async function readText(file) {
++    const bytes = new Uint8Array(await file.arrayBuffer());
++    for (const bom of BOMS) {
++      if (bom.bytes.every((b, i) => bytes[i] === b)) {
++        return { text: new TextDecoder(bom.encoding).decode(bytes), encoding: bom.encoding.toUpperCase() };
++      }
++    }
++    try {
++      return { text: new TextDecoder('utf-8', { fatal: true }).decode(bytes), encoding: 'UTF-8' };
++    } catch {
++      return { text: new TextDecoder('gb18030').decode(bytes), encoding: 'GB18030' };
++    }
++  }
++
++  function normalizeHeader(cell) {
++    return cell.replace(/^﻿/, '').trim().toLowerCase();
++  }
++
++  // Decide what a parsed file means for the current list, without mutating it.
++  function planImport(records) {
++    const headerAt = records.findIndex((r) => r.fields.some((f) => f.trim() !== ''));
++    if (headerAt < 0) return { error: '文件里没有可导入的内容。' };
++
++    const header = records[headerAt].fields;
++    const columns = {};
++    const ranks = {};
++    header.forEach((cell, index) => {
++      const normalized = normalizeHeader(cell);
++      for (const key of Object.keys(HEADER_ALIASES)) {
++        const rank = HEADER_ALIASES[key].indexOf(normalized);
++        // When a file carries several aliases of one field (e.g. 名字 + 姓名), keep the
++        // most canonical one instead of whichever happens to come first.
++        if (rank >= 0 && (columns[key] === undefined || rank < ranks[key])) {
++          columns[key] = index;
++          ranks[key] = rank;
++        }
++      }
++    });
++
++    const missing = ['name', 'email'].filter((key) => columns[key] === undefined)
++      .map((key) => (key === 'name' ? '姓名' : '邮箱'));
++    if (missing.length) {
++      const seen = header.map((f) => f.trim()).filter(Boolean).join('、') || '（空）';
++      return { error: `表头缺少必需的列：${missing.join('、')}；读到的表头是：${seen}。` };
++    }
++
++    const known = new Set(contacts.map((c) => c.email.trim().toLowerCase()));
++    const imported = [];
++    const skipped = [];
++    let blank = 0;
++
++    for (let i = headerAt + 1; i < records.length; i++) {
++      const { fields, line } = records[i];
++      if (fields.every((f) => f.trim() === '')) { blank++; continue; }
++      if (fields.length > header.length) { skipped.push({ line, reason: '列数多于表头' }); continue; }
++
++      const value = (key) => (columns[key] === undefined ? '' : (fields[columns[key]] ?? '').trim());
++      const name = value('name');
++      const email = value('email');
++      if (!name && !email) { skipped.push({ line, reason: '缺少姓名和邮箱' }); continue; }
++      if (!name) { skipped.push({ line, reason: '缺少姓名' }); continue; }
++      if (!email) { skipped.push({ line, reason: '缺少邮箱' }); continue; }
++
++      const key = email.toLowerCase();
++      if (known.has(key)) { skipped.push({ line, reason: '已存在（同邮箱）' }); continue; }
++      known.add(key);
++      imported.push({ name, email, company: value('company') });
++    }
++    return { imported, skipped, blank };
++  }
++
++  function renderReport(plan, encoding) {
++    const status = document.getElementById('status');
++    const report = document.getElementById('report');
++    status.replaceChildren();
++    report.replaceChildren();
++
++    if (plan.error) {
++      const span = document.createElement('span');
++      span.className = 'bad';
++      span.textContent = `导入失败：${plan.error}名单没有改动。`;
++      status.append(span);
++      return;
++    }
++
++    const skipped = plan.skipped.length + plan.blank;
++    const parts = [];
++    if (plan.imported.length && skipped) parts.push(`已导入 ${plan.imported.length} 位，跳过 ${skipped} 行。`);
++    else if (plan.imported.length) parts.push(`已导入 ${plan.imported.length} 位联系人。`);
++    else if (skipped) parts.push(`没有新增联系人，跳过 ${skipped} 行。`);
++    else parts.push('文件里没有数据行。');
++    if (plan.blank) parts.push(`其中空行 ${plan.blank} 行。`);
++    if (encoding !== 'UTF-8') parts.push(`按 ${encoding} 解码。`);
++    status.textContent = parts.join('');
++
++    if (!plan.skipped.length) return;
++    const details = document.createElement('details');
++    const summary = document.createElement('summary');
++    summary.textContent = `查看跳过的 ${plan.skipped.length} 行`;
++    details.append(summary);
++    const list = document.createElement('ul');
++    for (const row of plan.skipped.slice(0, MAX_LISTED_SKIPS)) {
++      const item = document.createElement('li');
++      item.textContent = `第 ${row.line} 行：${row.reason}`;
++      list.append(item);
++    }
++    details.append(list);
++    if (plan.skipped.length > MAX_LISTED_SKIPS) {
++      const more = document.createElement('p');
++      more.textContent = `另有 ${plan.skipped.length - MAX_LISTED_SKIPS} 行未列出。`;
++      details.append(more);
++    }
++    report.append(details);
++  }
++
++  async function handleFile(file) {
++    let decoded;
++    try {
++      decoded = await readText(file);
++    } catch {
++      renderReport({ error: '无法识别该文件的编码。' }, '');
++      return;
++    }
++    const parsed = parseCsv(decoded.text);
++    if (parsed.error) {
++      renderReport({ error: parsed.error }, '');
++      return;
++    }
++    const plan = planImport(parsed.records);
++    if (!plan.error) contacts.push(...plan.imported);
++    renderReport(plan, decoded.encoding);
++    if (!plan.error) renderContacts();
++  }
++
+   function renderContacts() {
+     document.getElementById('rows').replaceChildren();
+     for (const contact of contacts) {
+@@ -42,6 +260,15 @@
+     }
+     document.getElementById('count').textContent = `${contacts.length} 位联系人`;
+   }
++
++  const fileInput = document.getElementById('file-input');
++  document.getElementById('import-btn').addEventListener('click', () => fileInput.click());
++  fileInput.addEventListener('change', async () => {
++    const file = fileInput.files[0];
++    if (file) await handleFile(file);
++    fileInput.value = ''; // so picking the same file again still fires
++  });
++
+   renderContacts();
+ </script>
+ </html>

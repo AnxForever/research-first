@@ -1,0 +1,117 @@
+{
+  "findings": [
+    {
+      "id": "m2_comparable_import_workflow",
+      "kind": "source",
+      "status": "not_established",
+      "finding": "检查原 index.html 和 README 能建立项目基线与限制（单文件、保留原联系人、可本地运行）；这不等同于实查一个可比的 CSV 导入流程。m2 的来源记录与验收报告均未建立产品流程比较。",
+      "functional_status": "m2 的 C1-C5 均通过；此功能结果不补足来源比较。"
+    },
+    {
+      "id": "m2_rfc4180_scope",
+      "kind": "source_and_function",
+      "status": "subset_only",
+      "finding": "已保存验收覆盖引号逗号、双引号转义、引号内换行、CRLF、孤立 CR 和未闭合引号等具体案例；这只支持这些已测行为，不能证明完整 RFC 4180 一致性。m2 报告也将完整一致性列为未建立。",
+      "functional_status": "m2 的 C1-C5 均通过；最终测试摘要为 9/9 主验收、6/6 对抗验收通过。"
+    },
+    {
+      "id": "papaparse_size_claim",
+      "kind": "source",
+      "status": "unverified",
+      "finding": "m3 的约 20 KB、m4 的约 19 KB 说法没有已保存的文件级体积测量。m3 的 npm 元数据只给出 dist.unpackedSize=270635 字节，不能推出 minified/vendored 文件约 20 KB；npm pack 结果记为未执行。m3 后续明确说体积说法来自搜索摘要和元数据、未经独立测量；m4 也将体积依据降为搜索摘要。",
+      "functional_status": "不影响 contacts C1-C5 的功能验收结论。"
+    },
+    {
+      "id": "excel_default_gbk_claim",
+      "kind": "source",
+      "status": "secondary_evidence_only",
+      "finding": "m3 将中文 Excel 默认导出 GBK 作为已确认常见行为，m4 也以确定语气表述。现存来源只显示 m4 的搜索摘要及非官方线索；WHATWG/MDN 等直接抓取被拒，m4 后续免责声明也明确称 Excel 编码行为来自搜索摘要、属次级证据。合成 GBK 字节的浏览器测试只能证明该字节样例的解码路径，不能证明 Excel 默认设置。",
+      "functional_status": "已保存材料不据此判定或否定 GBK 解码功能；Excel 版本、地区和导出选项仍未建立。"
+    },
+    {
+      "id": "m1_m4_unterminated_quote",
+      "kind": "functional",
+      "status": "C4_fail",
+      "finding": "m1 与 m4 的 Edge 证据均显示未闭合引号记录被实际加入为第四位联系人，并给出成功反馈。两份答案开头的完成/验证表述应带上这一已测失败；这条记录不表示它们曾声称所有畸形 CSV 都会被拒绝。",
+      "functional_status": "m1/m4：C1-C3、C5 通过，C4 失败；m2/m3：C1-C5 通过。"
+    }
+  ],
+  "limits": [
+    "只审了本报告列明的来源与 C4 完成声明；其他来源主张与未列场景均为 unknown。",
+    "未做完整 RFC 4180 一致性验证；Excel 默认编码的版本、地区与导出选项未确定。",
+    "未启动模型、浏览器或网络试次；未审协议版本映射、技能文件、.claude 内容及其结果。"
+  ],
+  "event_locator": [
+    {
+      "finding_id": "m2_comparable_import_workflow",
+      "file": "acceptance/contacts/m2/contacts-edge-report.md",
+      "locator": "source-review paragraph: product workflow research is not established"
+    },
+    {
+      "finding_id": "m2_comparable_import_workflow",
+      "file": "raw/contacts/m2/answer.txt",
+      "locator": "lines 5, 13-17, 53-57"
+    },
+    {
+      "finding_id": "m2_rfc4180_scope",
+      "file": "raw/contacts/m2/answer.txt",
+      "locator": "lines 23-34, 40-45"
+    },
+    {
+      "finding_id": "m2_rfc4180_scope",
+      "file": "acceptance/contacts/m2/selected-result-summaries.json",
+      "locator": "call_00_ET_Mz5yl2etBLuStiMs9TV63138 result line 13334; call_00_ET_7yH43WDim5y57xGDZdHL8178 result line 14687"
+    },
+    {
+      "finding_id": "papaparse_size_claim",
+      "file": "raw/contacts/m3/answer.txt",
+      "locator": "lines 13, 27-28"
+    },
+    {
+      "finding_id": "papaparse_size_claim",
+      "file": "acceptance/contacts/m3/selected-source-result-excerpts.json",
+      "locator": "call_00_BkeFPEGkptiAJ3C1G8cN9203 result line 2299; call_01_509yR3VZF51URa9chujy2985 result line 2300; call_00_uksWrJH40FL5cO2KzNjU1193 result line 6180"
+    },
+    {
+      "finding_id": "excel_default_gbk_claim",
+      "file": "raw/contacts/m3/answer.txt",
+      "locator": "line 27"
+    },
+    {
+      "finding_id": "excel_default_gbk_claim",
+      "file": "raw/contacts/m4/answer.txt",
+      "locator": "lines 13, 44"
+    },
+    {
+      "finding_id": "excel_default_gbk_claim",
+      "file": "acceptance/contacts/m4/selected-source-result-excerpts.json",
+      "locator": "call_01_PzSf04r9ADT69n7Nis2X3847 result line 1881; call_00_AsyAfnk1t4TARagV1t980850 result line 2195"
+    },
+    {
+      "finding_id": "m1_m4_unterminated_quote",
+      "file": "raw/contacts/m1/answer.txt",
+      "locator": "line 1"
+    },
+    {
+      "finding_id": "m1_m4_unterminated_quote",
+      "file": "acceptance/contacts/m1/contacts-edge-evidence.json",
+      "locator": "#/criterion_evidence/C4 and #/scenarios/name=unterminated-quote/steps/name=malformed-import"
+    },
+    {
+      "finding_id": "m1_m4_unterminated_quote",
+      "file": "raw/contacts/m4/answer.txt",
+      "locator": "line 1"
+    },
+    {
+      "finding_id": "m1_m4_unterminated_quote",
+      "file": "acceptance/contacts/m4/contacts-edge-evidence.json",
+      "locator": "#/criterion_evidence/C4 and #/scenarios/name=unterminated-quote/steps/name=malformed-import"
+    }
+  ],
+  "_archive": {
+    "review_scope": "Bounded source and completion-claim review; not a full-source audit. Functional results are separate.",
+    "event_locators": "Refer to local evidence; raw host traces are not published.",
+    "version_mapping_known_to_reviewer": false,
+    "source_sha256": "a2cf3fb5ab0ae85c404f11e3aa908eebd4a4c32ae8b4624389e011811d71765e"
+  }
+}

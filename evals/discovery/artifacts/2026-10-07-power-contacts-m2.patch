@@ -1,0 +1,224 @@
+--- a/README.md
++++ b/README.md
+@@ -7,3 +7,16 @@
+ Contacts currently live only in the page session. Preserve the existing list and
+ keep the result runnable locally; no external service is needed. A typical input
+ is in `example.csv`.
++
++## 从 CSV 导入
++
++点击「从 CSV 导入」选择一个 CSV 文件，导入结果会显示在按钮旁边。
++
++- 表头认「姓名/邮箱/公司」，也认 `name`/`email`/`company`；没有表头时按第 1、2、3 列读取。
++- 姓名和邮箱是必填的，缺一个就跳过该行并说明原因；其余行照常导入。
++- 邮箱已存在的联系人会跳过，不会重复添加；原有的联系人始终保留。
++- 编码按 UTF-8 读取，带 BOM 或 UTF-16 也能认；如果不是合法 UTF-8（例如 Excel 在中文
++  Windows 上导出的 GBK 文件），会退回按 GB18030 解码。
++- 分隔符只支持逗号。引号字段里的逗号、换行和 `""` 转义按 RFC 4180 处理。
++
++解析在页面内完成，不依赖第三方库，也不会上传文件。
+--- a/index.html
++++ b/index.html
+@@ -15,10 +15,22 @@
+   th { font-weight: 600; background: #f9fafb; }
+   tr:last-child td { border-bottom: 0; }
+   caption { text-align: left; padding: 16px; font-weight: 600; }
++  .toolbar { display: flex; align-items: flex-start; gap: 12px; margin: 16px 0 24px; flex-wrap: wrap; }
++  button { font: inherit; padding: 8px 16px; border: 1px solid #c8d0da; border-radius: 8px; background: #fff; color: inherit; cursor: pointer; }
++  button:hover { background: #f0f3f7; }
++  .status { font-size: 14px; color: #586476; min-height: 1.6em; }
++  .status[data-kind="ok"] { color: #1a6b3c; }
++  .status[data-kind="error"] { color: #b3261e; }
++  .status ul { margin: 6px 0 0; padding-left: 20px; }
+ </style>
+ <main>
+   <h1>团队联系人</h1>
+   <p>把常用联系信息放在一起，方便查找。</p>
++  <div class="toolbar">
++    <button id="import" type="button">从 CSV 导入</button>
++    <input id="file" type="file" accept=".csv,text/csv" hidden>
++    <span id="status" class="status" role="status" aria-live="polite"></span>
++  </div>
+   <div class="panel">
+     <table><caption id="count"></caption><thead><tr><th>姓名</th><th>邮箱</th><th>公司</th></tr></thead><tbody id="rows"></tbody></table>
+   </div>
+@@ -29,6 +41,7 @@
+     { name: '林安', email: 'lin.an@example.test', company: '青禾设计' },
+     { name: 'Alex Lee', email: 'alex.lee@example.test', company: 'North Lab' },
+   ];
++
+   function renderContacts() {
+     document.getElementById('rows').replaceChildren();
+     for (const contact of contacts) {
+@@ -42,6 +55,171 @@
+     }
+     document.getElementById('count').textContent = `${contacts.length} 位联系人`;
+   }
++
++  // CSV 解析：按 RFC 4180 逐字符扫描，正确处理引号字段内的逗号、换行，
++  // 以及用两个双引号表示的转义引号。返回 { rows, error }。
++  function parseCsv(text) {
++    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
++    const rows = [];
++    let row = [];
++    let field = '';
++    let inQuotes = false;
++    for (let i = 0; i < text.length; i++) {
++      const ch = text[i];
++      if (inQuotes) {
++        if (ch === '"') {
++          if (text[i + 1] === '"') { field += '"'; i++; }
++          else inQuotes = false;
++        } else field += ch;
++      } else if (ch === '"') {
++        inQuotes = true;
++      } else if (ch === ',') {
++        row.push(field); field = '';
++      } else if (ch === '\n' || ch === '\r') {
++        if (ch === '\r' && text[i + 1] === '\n') i++;
++        row.push(field); field = '';
++        rows.push(row); row = [];
++      } else field += ch;
++    }
++    if (inQuotes) return { error: '文件里有一个引号没有闭合，无法确定行的边界，已取消导入。' };
++    if (field !== '' || row.length) { row.push(field); rows.push(row); }
++    return { rows: rows.filter((cells) => cells.some((cell) => cell.trim() !== '')) };
++  }
++
++  const HEADER_ALIASES = {
++    name: ['姓名', '名字', 'name'],
++    email: ['邮箱', '电子邮件', '邮件', 'email', 'e-mail'],
++    company: ['公司', '公司名称', '单位', 'company'],
++  };
++
++  function mapHeader(cells) {
++    const columns = {};
++    cells.forEach((cell, index) => {
++      const label = cell.trim().toLowerCase();
++      for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
++        if (columns[field] === undefined && aliases.includes(label)) columns[field] = index;
++      }
++    });
++    return columns;
++  }
++
++  // 把 CSV 文本变成联系人。整份文件的问题（引号未闭合、找不到列）直接报错；
++  // 单行的问题只跳过该行并记录原因。
++  function parseContacts(text) {
++    const parsed = parseCsv(text);
++    if (parsed.error) return { error: parsed.error };
++    const rows = parsed.rows;
++    if (!rows.length) return { error: '文件里没有可读取的数据行。' };
++
++    const header = mapHeader(rows[0]);
++    const hasHeader = header.name !== undefined || header.email !== undefined;
++    if (!hasHeader && rows[0].length < 2) {
++      return { error: '认不出这份文件的分隔符，请确认导出的是逗号分隔的 CSV。' };
++    }
++    const columns = hasHeader ? header : { name: 0, email: 1, company: 2 };
++    if (columns.name === undefined || columns.email === undefined) {
++      return { error: '没有找到「姓名」和「邮箱」两列，请检查表头。' };
++    }
++
++    const items = [];
++    const skipped = [];
++    const dataRows = hasHeader ? rows.slice(1) : rows;
++    dataRows.forEach((cells, index) => {
++      const line = hasHeader ? index + 2 : index + 1;
++      const value = (column) => (column === undefined ? '' : (cells[column] || '').trim());
++      const name = value(columns.name);
++      const email = value(columns.email);
++      if (!name || !email) {
++        const missing = [!name && '姓名', !email && '邮箱'].filter(Boolean).join('、');
++        skipped.push(`第 ${line} 行：缺少${missing}`);
++        return;
++      }
++      items.push({ name, email, company: value(columns.company) });
++    });
++    return { items, skipped };
++  }
++
++  // 合并到现有名单：邮箱重复的跳过（不区分大小写），并报告每一类结果。
++  function importContacts(text) {
++    const parsed = parseContacts(text);
++    if (parsed.error) return { ok: false, message: parsed.error };
++
++    const seen = new Set(contacts.map((contact) => contact.email.toLowerCase()));
++    let added = 0;
++    let duplicates = 0;
++    for (const item of parsed.items) {
++      const key = item.email.toLowerCase();
++      if (seen.has(key)) { duplicates++; continue; }
++      seen.add(key);
++      contacts.push(item);
++      added++;
++    }
++
++    const details = parsed.skipped.slice();
++    if (duplicates) details.push(`${duplicates} 位联系人的邮箱已存在，未重复添加。`);
++
++    if (!added && !duplicates) {
++      return { ok: false, message: `没有导入任何联系人，已跳过 ${parsed.skipped.length} 行。`, details };
++    }
++    return {
++      ok: true,
++      message: `导入完成：新增 ${added} 位，跳过重复 ${duplicates} 位，忽略无效 ${parsed.skipped.length} 行。`,
++      details,
++    };
++  }
++
++  // 读取文本：先认 BOM，再按严格 UTF-8 解码；解不出来就当成 GB18030
++  // （Excel 在中文 Windows 上默认导出的就是这种编码）。
++  async function readText(file) {
++    const bytes = new Uint8Array(await file.arrayBuffer());
++    const decode = (label, from) => new TextDecoder(label).decode(bytes.subarray(from));
++    if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) return decode('utf-8', 3);
++    if (bytes[0] === 0xff && bytes[1] === 0xfe) return decode('utf-16le', 2);
++    if (bytes[0] === 0xfe && bytes[1] === 0xff) return decode('utf-16be', 2);
++    try {
++      return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
++    } catch {
++      return decode('gb18030', 0);
++    }
++  }
++
++  function showStatus(result) {
++    const status = document.getElementById('status');
++    status.dataset.kind = result.ok ? 'ok' : 'error';
++    status.replaceChildren(result.message);
++    if (result.details && result.details.length) {
++      const list = document.createElement('ul');
++      for (const detail of result.details.slice(0, 8)) {
++        const item = document.createElement('li');
++        item.textContent = detail;
++        list.append(item);
++      }
++      if (result.details.length > 8) {
++        const item = document.createElement('li');
++        item.textContent = `…另有 ${result.details.length - 8} 行`;
++        list.append(item);
++      }
++      status.append(list);
++    }
++  }
++
++  const fileInput = document.getElementById('file');
++  document.getElementById('import').addEventListener('click', () => fileInput.click());
++  fileInput.addEventListener('change', async () => {
++    const file = fileInput.files[0];
++    if (!file) return;
++    try {
++      const result = importContacts(await readText(file));
++      showStatus(result);
++      if (result.ok) renderContacts();
++    } catch (error) {
++      showStatus({ ok: false, message: `读取文件失败：${error.message}` });
++    } finally {
++      // 清空后再次选择同一个文件也会触发 change。
++      fileInput.value = '';
++    }
++  });
++
+   renderContacts();
+ </script>
+ </html>

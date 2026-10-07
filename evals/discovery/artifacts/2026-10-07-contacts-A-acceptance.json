@@ -1,0 +1,481 @@
+{
+  "label": "A",
+  "entry": "trials/contacts/A/index.html",
+  "browser": "154.0.4258.62",
+  "launch_mode": "file://",
+  "external_requests": [],
+  "console_errors": [],
+  "page_errors": [],
+  "interaction_methods": {
+    "example": {
+      "file": "example.csv",
+      "entry_method": "visible-import-button+native-file-chooser",
+      "confirm_action": null,
+      "ui_changed": true
+    },
+    "repeat": {
+      "file": "example.csv",
+      "entry_method": "visible-import-button+native-file-chooser",
+      "confirm_action": null,
+      "ui_changed": true
+    },
+    "missing_required_header": {
+      "file": "missing-required-header.csv",
+      "entry_method": "visible-import-button+native-file-chooser",
+      "confirm_action": null,
+      "ui_changed": true
+    },
+    "recovery": {
+      "file": "recovery.csv",
+      "entry_method": "visible-import-button+native-file-chooser",
+      "confirm_action": null,
+      "ui_changed": true
+    },
+    "unterminated_quote": {
+      "file": "unterminated-quote.csv",
+      "entry_method": "visible-import-button+native-file-chooser",
+      "confirm_action": null,
+      "ui_changed": true
+    },
+    "gb18030_claim_probe": {
+      "file": "gb18030.csv",
+      "entry_method": "visible-import-button+native-file-chooser",
+      "confirm_action": null,
+      "ui_changed": true
+    }
+  },
+  "checkpoints": {
+    "initial": {
+      "rows": [
+        [
+          "陈宁",
+          "chen.ning@example.test",
+          "山海工作室"
+        ],
+        [
+          "林安",
+          "lin.an@example.test",
+          "青禾设计"
+        ],
+        [
+          "Alex Lee",
+          "alex.lee@example.test",
+          "North Lab"
+        ]
+      ],
+      "row_count": 3,
+      "count_caption": "3 位联系人",
+      "email_occurrences": {
+        "chen.ning@example.test": 1,
+        "lin.an@example.test": 1,
+        "alex.lee@example.test": 1,
+        "zhang.he@example.test": 0,
+        "morgan.taylor@example.test": 0,
+        "recovered@example.test": 0,
+        "malformed@example.test": 0,
+        "zhou.qin@example.test": 0
+      },
+      "body_text": "团队联系人\n\n把常用联系信息放在一起，方便查找。\n\n从 CSV 导入\nCSV 首行需包含「姓名」和/或「邮箱」列，公司列可选\n\n3 位联系人\n姓名\t邮箱\t公司\n陈宁\tchen.ning@example.test\t山海工作室\n林安\tlin.an@example.test\t青禾设计\nAlex Lee\talex.lee@example.test\tNorth Lab",
+      "feedback": "",
+      "dialogs": []
+    },
+    "example_import": {
+      "rows": [
+        [
+          "陈宁",
+          "chen.ning@example.test",
+          "山海工作室"
+        ],
+        [
+          "林安",
+          "lin.an@example.test",
+          "青禾设计"
+        ],
+        [
+          "Alex Lee",
+          "alex.lee@example.test",
+          "North Lab"
+        ],
+        [
+          "张禾",
+          "zhang.he@example.test",
+          "星野制作"
+        ],
+        [
+          "Morgan, Taylor",
+          "morgan.taylor@example.test",
+          "Pine, Ltd"
+        ]
+      ],
+      "row_count": 5,
+      "count_caption": "5 位联系人",
+      "email_occurrences": {
+        "chen.ning@example.test": 1,
+        "lin.an@example.test": 1,
+        "alex.lee@example.test": 1,
+        "zhang.he@example.test": 1,
+        "morgan.taylor@example.test": 1,
+        "recovered@example.test": 0,
+        "malformed@example.test": 0,
+        "zhou.qin@example.test": 0
+      },
+      "body_text": "团队联系人\n\n把常用联系信息放在一起，方便查找。\n\n从 CSV 导入\nCSV 首行需包含「姓名」和/或「邮箱」列，公司列可选\n\n已从 example.csv 导入 2 位联系人，共 5 位。跳过 1 行已有邮箱（第 4 行）。\n\n5 位联系人\n姓名\t邮箱\t公司\n陈宁\tchen.ning@example.test\t山海工作室\n林安\tlin.an@example.test\t青禾设计\nAlex Lee\talex.lee@example.test\tNorth Lab\n张禾\tzhang.he@example.test\t星野制作\nMorgan, Taylor\tmorgan.taylor@example.test\tPine, Ltd",
+      "feedback": "已从 example.csv 导入 2 位联系人，共 5 位。跳过 1 行已有邮箱（第 4 行）。",
+      "dialogs": []
+    },
+    "repeat_import": {
+      "rows": [
+        [
+          "陈宁",
+          "chen.ning@example.test",
+          "山海工作室"
+        ],
+        [
+          "林安",
+          "lin.an@example.test",
+          "青禾设计"
+        ],
+        [
+          "Alex Lee",
+          "alex.lee@example.test",
+          "North Lab"
+        ],
+        [
+          "张禾",
+          "zhang.he@example.test",
+          "星野制作"
+        ],
+        [
+          "Morgan, Taylor",
+          "morgan.taylor@example.test",
+          "Pine, Ltd"
+        ]
+      ],
+      "row_count": 5,
+      "count_caption": "5 位联系人",
+      "email_occurrences": {
+        "chen.ning@example.test": 1,
+        "lin.an@example.test": 1,
+        "alex.lee@example.test": 1,
+        "zhang.he@example.test": 1,
+        "morgan.taylor@example.test": 1,
+        "recovered@example.test": 0,
+        "malformed@example.test": 0,
+        "zhou.qin@example.test": 0
+      },
+      "body_text": "团队联系人\n\n把常用联系信息放在一起，方便查找。\n\n从 CSV 导入\nCSV 首行需包含「姓名」和/或「邮箱」列，公司列可选\n\n已读取 example.csv，但没有新增联系人。跳过 3 行已有邮箱（第 2、3、4 行）。\n\n5 位联系人\n姓名\t邮箱\t公司\n陈宁\tchen.ning@example.test\t山海工作室\n林安\tlin.an@example.test\t青禾设计\nAlex Lee\talex.lee@example.test\tNorth Lab\n张禾\tzhang.he@example.test\t星野制作\nMorgan, Taylor\tmorgan.taylor@example.test\tPine, Ltd",
+      "feedback": "已读取 example.csv，但没有新增联系人。跳过 3 行已有邮箱（第 2、3、4 行）。",
+      "dialogs": []
+    },
+    "missing_required_header": {
+      "rows": [
+        [
+          "陈宁",
+          "chen.ning@example.test",
+          "山海工作室"
+        ],
+        [
+          "林安",
+          "lin.an@example.test",
+          "青禾设计"
+        ],
+        [
+          "Alex Lee",
+          "alex.lee@example.test",
+          "North Lab"
+        ],
+        [
+          "张禾",
+          "zhang.he@example.test",
+          "星野制作"
+        ],
+        [
+          "Morgan, Taylor",
+          "morgan.taylor@example.test",
+          "Pine, Ltd"
+        ]
+      ],
+      "row_count": 5,
+      "count_caption": "5 位联系人",
+      "email_occurrences": {
+        "chen.ning@example.test": 1,
+        "lin.an@example.test": 1,
+        "alex.lee@example.test": 1,
+        "zhang.he@example.test": 1,
+        "morgan.taylor@example.test": 1,
+        "recovered@example.test": 0,
+        "malformed@example.test": 0,
+        "zhou.qin@example.test": 0
+      },
+      "body_text": "团队联系人\n\n把常用联系信息放在一起，方便查找。\n\n从 CSV 导入\nCSV 首行需包含「姓名」和/或「邮箱」列，公司列可选\n\n导入失败：没有找到「姓名」或「邮箱」列，当前首行是：客户编号、错误列。现有联系人未改动。\n\n5 位联系人\n姓名\t邮箱\t公司\n陈宁\tchen.ning@example.test\t山海工作室\n林安\tlin.an@example.test\t青禾设计\nAlex Lee\talex.lee@example.test\tNorth Lab\n张禾\tzhang.he@example.test\t星野制作\nMorgan, Taylor\tmorgan.taylor@example.test\tPine, Ltd",
+      "feedback": "导入失败：没有找到「姓名」或「邮箱」列，当前首行是：客户编号、错误列。现有联系人未改动。",
+      "dialogs": []
+    },
+    "valid_recovery": {
+      "rows": [
+        [
+          "陈宁",
+          "chen.ning@example.test",
+          "山海工作室"
+        ],
+        [
+          "林安",
+          "lin.an@example.test",
+          "青禾设计"
+        ],
+        [
+          "Alex Lee",
+          "alex.lee@example.test",
+          "North Lab"
+        ],
+        [
+          "张禾",
+          "zhang.he@example.test",
+          "星野制作"
+        ],
+        [
+          "Morgan, Taylor",
+          "morgan.taylor@example.test",
+          "Pine, Ltd"
+        ],
+        [
+          "恢复联系人",
+          "recovered@example.test",
+          "恢复公司"
+        ]
+      ],
+      "row_count": 6,
+      "count_caption": "6 位联系人",
+      "email_occurrences": {
+        "chen.ning@example.test": 1,
+        "lin.an@example.test": 1,
+        "alex.lee@example.test": 1,
+        "zhang.he@example.test": 1,
+        "morgan.taylor@example.test": 1,
+        "recovered@example.test": 1,
+        "malformed@example.test": 0,
+        "zhou.qin@example.test": 0
+      },
+      "body_text": "团队联系人\n\n把常用联系信息放在一起，方便查找。\n\n从 CSV 导入\nCSV 首行需包含「姓名」和/或「邮箱」列，公司列可选\n\n已从 recovery.csv 导入 1 位联系人，共 6 位。\n\n6 位联系人\n姓名\t邮箱\t公司\n陈宁\tchen.ning@example.test\t山海工作室\n林安\tlin.an@example.test\t青禾设计\nAlex Lee\talex.lee@example.test\tNorth Lab\n张禾\tzhang.he@example.test\t星野制作\nMorgan, Taylor\tmorgan.taylor@example.test\tPine, Ltd\n恢复联系人\trecovered@example.test\t恢复公司",
+      "feedback": "已从 recovery.csv 导入 1 位联系人，共 6 位。",
+      "dialogs": []
+    },
+    "unterminated_quote": {
+      "rows": [
+        [
+          "陈宁",
+          "chen.ning@example.test",
+          "山海工作室"
+        ],
+        [
+          "林安",
+          "lin.an@example.test",
+          "青禾设计"
+        ],
+        [
+          "Alex Lee",
+          "alex.lee@example.test",
+          "North Lab"
+        ],
+        [
+          "张禾",
+          "zhang.he@example.test",
+          "星野制作"
+        ],
+        [
+          "Morgan, Taylor",
+          "morgan.taylor@example.test",
+          "Pine, Ltd"
+        ],
+        [
+          "恢复联系人",
+          "recovered@example.test",
+          "恢复公司"
+        ]
+      ],
+      "row_count": 6,
+      "count_caption": "6 位联系人",
+      "email_occurrences": {
+        "chen.ning@example.test": 1,
+        "lin.an@example.test": 1,
+        "alex.lee@example.test": 1,
+        "zhang.he@example.test": 1,
+        "morgan.taylor@example.test": 1,
+        "recovered@example.test": 1,
+        "malformed@example.test": 0,
+        "zhou.qin@example.test": 0
+      },
+      "body_text": "团队联系人\n\n把常用联系信息放在一起，方便查找。\n\n从 CSV 导入\nCSV 首行需包含「姓名」和/或「邮箱」列，公司列可选\n\n导入失败：CSV 里有一个引号没有闭合。现有联系人未改动。\n\n6 位联系人\n姓名\t邮箱\t公司\n陈宁\tchen.ning@example.test\t山海工作室\n林安\tlin.an@example.test\t青禾设计\nAlex Lee\talex.lee@example.test\tNorth Lab\n张禾\tzhang.he@example.test\t星野制作\nMorgan, Taylor\tmorgan.taylor@example.test\tPine, Ltd\n恢复联系人\trecovered@example.test\t恢复公司",
+      "feedback": "导入失败：CSV 里有一个引号没有闭合。现有联系人未改动。",
+      "dialogs": []
+    },
+    "gb18030_import": {
+      "rows": [
+        [
+          "陈宁",
+          "chen.ning@example.test",
+          "山海工作室"
+        ],
+        [
+          "林安",
+          "lin.an@example.test",
+          "青禾设计"
+        ],
+        [
+          "Alex Lee",
+          "alex.lee@example.test",
+          "North Lab"
+        ],
+        [
+          "张禾",
+          "zhang.he@example.test",
+          "星野制作"
+        ],
+        [
+          "Morgan, Taylor",
+          "morgan.taylor@example.test",
+          "Pine, Ltd"
+        ],
+        [
+          "恢复联系人",
+          "recovered@example.test",
+          "恢复公司"
+        ],
+        [
+          "周沁",
+          "zhou.qin@example.test",
+          "桂花研究"
+        ]
+      ],
+      "row_count": 7,
+      "count_caption": "7 位联系人",
+      "email_occurrences": {
+        "chen.ning@example.test": 1,
+        "lin.an@example.test": 1,
+        "alex.lee@example.test": 1,
+        "zhang.he@example.test": 1,
+        "morgan.taylor@example.test": 1,
+        "recovered@example.test": 1,
+        "malformed@example.test": 0,
+        "zhou.qin@example.test": 1
+      },
+      "body_text": "团队联系人\n\n把常用联系信息放在一起，方便查找。\n\n从 CSV 导入\nCSV 首行需包含「姓名」和/或「邮箱」列，公司列可选\n\n已从 gb18030.csv 导入 1 位联系人，共 7 位。\n\n7 位联系人\n姓名\t邮箱\t公司\n陈宁\tchen.ning@example.test\t山海工作室\n林安\tlin.an@example.test\t青禾设计\nAlex Lee\talex.lee@example.test\tNorth Lab\n张禾\tzhang.he@example.test\t星野制作\nMorgan, Taylor\tmorgan.taylor@example.test\tPine, Ltd\n恢复联系人\trecovered@example.test\t恢复公司\n周沁\tzhou.qin@example.test\t桂花研究",
+      "feedback": "已从 gb18030.csv 导入 1 位联系人，共 7 位。",
+      "dialogs": []
+    }
+  },
+  "checks": {
+    "entry_and_existing_contacts": {
+      "status": "pass",
+      "evidence": {
+        "visible_import_entry": true,
+        "initial_row_count": 3,
+        "seed_emails_once": true
+      }
+    },
+    "example_unicode_quoted_comma_and_existing_data": {
+      "status": "pass",
+      "evidence": {
+        "row_count": 5,
+        "row_by_email": {
+          "chen.ning@example.test": [
+            "陈宁",
+            "chen.ning@example.test",
+            "山海工作室"
+          ],
+          "lin.an@example.test": [
+            "林安",
+            "lin.an@example.test",
+            "青禾设计"
+          ],
+          "alex.lee@example.test": [
+            "Alex Lee",
+            "alex.lee@example.test",
+            "North Lab"
+          ],
+          "zhang.he@example.test": [
+            "张禾",
+            "zhang.he@example.test",
+            "星野制作"
+          ],
+          "morgan.taylor@example.test": [
+            "Morgan, Taylor",
+            "morgan.taylor@example.test",
+            "Pine, Ltd"
+          ]
+        },
+        "email_occurrences": {
+          "chen.ning@example.test": 1,
+          "lin.an@example.test": 1,
+          "alex.lee@example.test": 1,
+          "zhang.he@example.test": 1,
+          "morgan.taylor@example.test": 1,
+          "recovered@example.test": 0,
+          "malformed@example.test": 0,
+          "zhou.qin@example.test": 0
+        }
+      }
+    },
+    "repeat_duplicate_handling": {
+      "status": "pass",
+      "evidence": {
+        "data_unchanged": true,
+        "understandable_feedback": true,
+        "feedback": "已读取 example.csv，但没有新增联系人。跳过 3 行已有邮箱（第 2、3、4 行）。",
+        "row_count": 5
+      }
+    },
+    "missing_required_header_preserves_data_and_explains": {
+      "status": "pass",
+      "evidence": {
+        "data_unchanged": true,
+        "useful_feedback": true,
+        "feedback": "导入失败：没有找到「姓名」或「邮箱」列，当前首行是：客户编号、错误列。现有联系人未改动。",
+        "row_count": 5
+      }
+    },
+    "valid_import_recovers_after_header_error": {
+      "status": "pass",
+      "evidence": {
+        "row_count_before": 5,
+        "row_count_after": 6,
+        "recovered_email_once": true,
+        "feedback": "已从 recovery.csv 导入 1 位联系人，共 6 位。"
+      }
+    },
+    "unterminated_quote_rejected_or_explicitly_skipped": {
+      "status": "pass",
+      "evidence": {
+        "data_unchanged": true,
+        "malformed_contact_present": false,
+        "visible_rejection_or_skip_feedback": true,
+        "feedback": "导入失败：CSV 里有一个引号没有闭合。现有联系人未改动。",
+        "row_count": 6
+      }
+    },
+    "claimed_gb18030_compatibility": {
+      "status": "pass",
+      "evidence": {
+        "decoded_row": [
+          "周沁",
+          "zhou.qin@example.test",
+          "桂花研究"
+        ],
+        "feedback": "已从 gb18030.csv 导入 1 位联系人，共 7 位。"
+      }
+    },
+    "no_external_runtime_dependency_observed": {
+      "status": "pass",
+      "evidence": {
+        "launch_mode": "file://",
+        "external_requests": []
+      }
+    }
+  },
+  "scope": {
+    "trial_only": true,
+    "external_runtime_observed": false
+  },
+  "dialogs": [],
+  "publication_note": "Only machine-specific absolute paths were replaced with paths relative to the private round directory; observed results are unchanged. Screenshots remain private."
+}

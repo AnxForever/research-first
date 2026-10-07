@@ -43,7 +43,7 @@ Reference A says X. Reference B says Y.
 
 ## Document the Conflict
 
-In the Step 8 report, always note the disagreement:
+In the decision update, note consequential disagreements:
 
 ```
 ### Conflicts Resolved
@@ -56,7 +56,7 @@ B's approach is better for: [scenario]. We may adopt it later if [condition].
 
 If two references agree on an approach that feels wrong for your project:
 
-1. Recheck Step 1 evidence for the project's constraints; do not elevate intuition above evidence
+1. Recheck evidence for the project's constraints; do not elevate intuition above evidence
 2. Search specifically for `"{approach} problems"` or `"{approach} limitations"`
 3. Look for a third reference that takes a different approach entirely
 4. If only two approaches exist and both feel wrong, the problem might need reframing

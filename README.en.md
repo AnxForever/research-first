@@ -193,6 +193,7 @@ cases, and raw results. The core workflow remains usable without Jev.
 | [Search quality](references/search-quality.md) · [Research depth](references/adapting-depth.md) | Select evidence, scale investigation, and decide when to stop searching |
 | [Problem expansion](references/problem-expansion.md) · [Contradictions](references/contradictions.md) | Uncover material questions and resolve conflicting evidence |
 | [Feature evidence ledger](references/feature-evidence-ledger.md) | Track each feature's evidence, decisions, and historical gaps |
+| [Execution evidence and acceptance](references/execution-evidence.md) | Diagnose access failures, define support boundaries, and check completed outcomes with counterexamples |
 | [Research examples](references/research-examples.md) · [Case studies](references/case-studies.md) · [Evaluation scenarios](references/intent-interpretation-evaluation.md) | Understand the workflow and examine common reasoning failures |
 | [Research report template](assets/research-report-template.md) · [Project identity card](assets/project-identity-card.md) | Capture findings and long-term project context when useful |
 | [agents/openai.yaml](agents/openai.yaml) | Skill display metadata and default invocation prompt |
@@ -239,3 +240,16 @@ stronger workflow discovery, option-rejection evidence and failure acceptance.
 Invalid-input handling and source verification still have gaps; these results do
 not establish reliable uplift. Inspect the actual artifact and evidence when
 trying the skill.
+
+The [2026-10-07 execution-evidence trials](evals/discovery/2026-10-07-execution-evidence.md)
+record a capability preflight, the import regression and a fresh async-search case.
+That round's candidate failed malformed-input acceptance and showed source-calibration
+and task-scope issues. Its preserved snapshot is not a proven improvement
+over the published revision.
+
+The subsequent [decision-loop trials](evals/discovery/2026-10-07-decision-loop.md)
+test a shorter, rewritten entry. In both contact-import pairs, the new candidate
+passed 5/5 requirements; the published revision passed 4/5, silently accepting a
+malformed record. Both revisions passed 6/6 on the new reading-handoff task.
+This is a bounded failure-handling improvement, not proof of sufficient research
+evidence or reliable uplift across tasks, hosts and model configurations.

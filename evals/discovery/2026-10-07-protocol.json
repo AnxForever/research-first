@@ -1,0 +1,546 @@
+{
+  "date": "2026-10-07",
+  "round_id": "native-windows-claude-code-research-first-improvement",
+  "base_commit": "8a52431897628b636c413c51ea1d40af4a3fe290",
+  "conditions": {
+    "A": "published at base commit 8a52431897628b636c413c51ea1d40af4a3fe290",
+    "B": "frozen candidate snapshot"
+  },
+  "purpose": "Compare a frozen published skill snapshot with a candidate in one native Windows Claude Code tool profile; one paired trial per case, so results do not establish reliable general uplift.",
+  "snapshots": {
+    "published": {
+      "file_count": 18,
+      "sha256_by_repository_path": {
+        "agents/openai.yaml": "85b87d197beb39c41d178e0d44c4a0897a85e9844c2d5c99a280fcccf0fb376c",
+        "assets/project-identity-card.md": "e17b60e74d5496efb240e281289105d23200fa3e884edab4fda22ea6521d805a",
+        "assets/research-report-template.md": "ec76cf19313bdd9dcd3e97a293ca2aefd6f708a28e4a1bf920eb429f52d7ecf9",
+        "references/adapting-depth.md": "2eda3806604f192bc363d8084bc432341583859b8bbcbc1f696409955713d6ae",
+        "references/case-studies.md": "0a71a1be338a7ba026da778b7d29af8ca9c02c0e54147abaabd195cd37651847",
+        "references/contradictions.md": "92de2e349ee3facddc6ac7b07aa7195502864d29a1e3b8b7cb31f2e499517cde",
+        "references/feature-evidence-ledger.md": "8992b1b450c115c99a45988c247e23cfe3944cac79a0210c7c294a4bc5ad1ea4",
+        "references/intent-interpretation-evaluation.md": "299473a335d99f51b8254f57ea4a90b5ff58b9723dbbd85945e424442d3f222b",
+        "references/jev-checkpoints.md": "614b659679074efb986760fdd1c91f6a587eeda93046363e29bc54f58712a449",
+        "references/problem-expansion.md": "f5cc894c58e3e924f41fbb7d064cd70b6b70543ab4a5bb23ae6624f8167b9195",
+        "references/research-examples.md": "34f274bba017965425d31f4f63a5b39f188d3611cb12287713019518aa665084",
+        "references/reuse-and-alternatives.md": "4bdb6f6e861de076e35f827a7e79b03063e5f8002607f3820e7aea0ffc46079f",
+        "references/search-quality.md": "907e36c674db865eea768b2c8ab4b1229a984f75e374f47e371a1bd0897db1a2",
+        "scripts/jev_check.py": "442f2c105db6f7ba66cbd48198cfdfd1c21f930cf4b571558576d40287c06a00",
+        "scripts/requirements-dev.txt": "b5bc3730819d623299910c567b3492f909be9d7b46caefab341af14fe882a8ab",
+        "scripts/requirements-jev.txt": "51efe61d857f58462e3ef080662baf62bca09a0eca367df6210ab745c8a09e4c",
+        "scripts/validate_package.py": "f0d0b7a9fc711c37faf9538e2d90f9876f6d7ec8667927a81a434d7be3acd61f",
+        "SKILL.md": "0aa792370c5564a1026b3a534b717a15570c74113f6d4acb48f41bfbcdaf20eb"
+      },
+      "raw_bytes_match_manifest": true
+    },
+    "candidate": {
+      "file_count": 19,
+      "sha256_by_repository_path": {
+        "agents/openai.yaml": "85b87d197beb39c41d178e0d44c4a0897a85e9844c2d5c99a280fcccf0fb376c",
+        "assets/project-identity-card.md": "e17b60e74d5496efb240e281289105d23200fa3e884edab4fda22ea6521d805a",
+        "assets/research-report-template.md": "ec76cf19313bdd9dcd3e97a293ca2aefd6f708a28e4a1bf920eb429f52d7ecf9",
+        "references/adapting-depth.md": "2eda3806604f192bc363d8084bc432341583859b8bbcbc1f696409955713d6ae",
+        "references/case-studies.md": "0a71a1be338a7ba026da778b7d29af8ca9c02c0e54147abaabd195cd37651847",
+        "references/contradictions.md": "92de2e349ee3facddc6ac7b07aa7195502864d29a1e3b8b7cb31f2e499517cde",
+        "references/execution-evidence.md": "15ad7d4ea09a05f8495398cd65fdf348b5d547965bbb77a1a25617dd14ea52e1",
+        "references/feature-evidence-ledger.md": "8992b1b450c115c99a45988c247e23cfe3944cac79a0210c7c294a4bc5ad1ea4",
+        "references/intent-interpretation-evaluation.md": "299473a335d99f51b8254f57ea4a90b5ff58b9723dbbd85945e424442d3f222b",
+        "references/jev-checkpoints.md": "614b659679074efb986760fdd1c91f6a587eeda93046363e29bc54f58712a449",
+        "references/problem-expansion.md": "f5cc894c58e3e924f41fbb7d064cd70b6b70543ab4a5bb23ae6624f8167b9195",
+        "references/research-examples.md": "34f274bba017965425d31f4f63a5b39f188d3611cb12287713019518aa665084",
+        "references/reuse-and-alternatives.md": "4bdb6f6e861de076e35f827a7e79b03063e5f8002607f3820e7aea0ffc46079f",
+        "references/search-quality.md": "907e36c674db865eea768b2c8ab4b1229a984f75e374f47e371a1bd0897db1a2",
+        "scripts/jev_check.py": "442f2c105db6f7ba66cbd48198cfdfd1c21f930cf4b571558576d40287c06a00",
+        "scripts/requirements-dev.txt": "b5bc3730819d623299910c567b3492f909be9d7b46caefab341af14fe882a8ab",
+        "scripts/requirements-jev.txt": "51efe61d857f58462e3ef080662baf62bca09a0eca367df6210ab745c8a09e4c",
+        "scripts/validate_package.py": "f0d0b7a9fc711c37faf9538e2d90f9876f6d7ec8667927a81a434d7be3acd61f",
+        "SKILL.md": "419bfb102e14ee3c5475f399ee2968bd1956844c2b92e43fb69a8fc6d5eecf21"
+      },
+      "raw_bytes_match_manifest": true
+    }
+  },
+  "prompt_fingerprints": {
+    "contacts": {
+      "task_text": "这些联系人名单每次复制很麻烦，帮我做个从 CSV 导入的功能。",
+      "task_text_sha256": "fccc87b266709554e30f2cac7b790651fcf305bfcbbfec76d63e5fcfd5418d59",
+      "invocation_text": "/research-first 这些联系人名单每次复制很麻烦，帮我做个从 CSV 导入的功能。",
+      "invocation_text_sha256": "3a0a384a7c0c25b686590793dcd06e2cfc7e668a7bc7088e06f8373e332f0ece",
+      "encoding": "UTF-8; hashes cover exact bytes without a trailing newline"
+    },
+    "search": {
+      "task_text": "我经常用这个小页面找资料，希望搜索时更顺手些。连续换关键词后，结果要跟最后一次搜索一致，别让前一次慢查询把它盖回来。没搜到东西和本地查询暂时失败时，我也想一眼分清；出错后还能继续查。请基于现有页面完成调整，保持它轻量、打开就能用。",
+      "task_text_sha256": "77f2f5ed1e9b24ed11206786541924e7f24315ea2c93c7b555e247c820ab9c96",
+      "invocation_text": "/research-first 我经常用这个小页面找资料，希望搜索时更顺手些。连续换关键词后，结果要跟最后一次搜索一致，别让前一次慢查询把它盖回来。没搜到东西和本地查询暂时失败时，我也想一眼分清；出错后还能继续查。请基于现有页面完成调整，保持它轻量、打开就能用。",
+      "invocation_text_sha256": "7f71ae03ea3290de21d56e4bb6aae68b75c4422a4bad8ca93d168a1e99b4f21a",
+      "encoding": "UTF-8; hashes cover exact bytes without a trailing newline"
+    }
+  },
+  "fixtures": {
+    "contacts": {
+      "source": "evals/discovery/fixtures/contacts",
+      "sha256_by_file": {
+        "example.csv": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+        "index.html": "4f0ea9d695bbcd50f97d0c4e4bf703d9a76bd6aa40da8589698392806c9faed0",
+        "README.md": "dca9500e70d8f935ac9252fb0c302ddb3195997757952fc2e834db7916771301"
+      }
+    },
+    "async_search": {
+      "archived_path": "evals/discovery/fixtures/async-search/index.html",
+      "sha256": "78b023ff35c88089df1cdcfc444ebf5838bba5e773f041846c5ffe2a2a54e980",
+      "frozen_source_sha256": "78b023ff35c88089df1cdcfc444ebf5838bba5e773f041846c5ffe2a2a54e980"
+    }
+  },
+  "frozen_acceptance": {
+    "contacts": {
+      "prompt_source": "evals/discovery/cases.json#contacts-import",
+      "required": [
+        "Visible CSV import of provided example preserves real Unicode and quoted-comma field values and existing contacts.",
+        "Repeat import has understandable duplicate handling, without accidental destruction or unexplained list growth.",
+        "A missing-required-header input gives useful feedback, preserves existing data and permits a later valid import.",
+        "An unterminated quoted field is not silently accepted as a successful, corrupted contact; reject it or explicitly skip the invalid row with feedback.",
+        "The local feature does not require an external runtime service."
+      ],
+      "no_prescribed_solution": "No mandatory preview, mapping, parser dependency or exact UI text. Adapt selectors to actual artifact."
+    },
+    "research_review": {
+      "product_workflow": "Actual inspected comparable product/example flow, meaningful local adaptation or supported decision to omit; library capability lists alone do not qualify.",
+      "rejection_premise": "Any material factual reason used to reject a credible alternative is supported by inspected primary material or a probe. An explicit local preference is valid without inventing a limitation.",
+      "failure_expectation": "Evidence the worker derived a relevant state invariant and falsifying case, then executed it against the result rather than relying only on own happy-path test count.",
+      "claim_accuracy": "Inspect material compatibility, recovery and completion statements in artifact and answer. Do not equate source listing or self-reported test totals with evidence."
+    },
+    "search": {
+      "version": 1,
+      "visibility": "reviewer-only",
+      "purpose": "判断异步搜索结果是否始终对应用户最近一次提交，并区分无匹配与暂时失败且支持恢复。",
+      "baseline": {
+        "entry": "worker-visible/fixture/index.html",
+        "api": {
+          "name": "localSearch(rawQuery)",
+          "input": "字符串；执行前 trim",
+          "output": "Promise<string[]>",
+          "local_only": true,
+          "catalog": [
+            "快速指南",
+            "慢速连接说明",
+            "异步搜索说明",
+            "连接恢复手册"
+          ],
+          "cases": [
+            {
+              "query": "慢",
+              "delay_ms": 900,
+              "outcome": [
+                "慢速连接说明"
+              ]
+            },
+            {
+              "query": "快",
+              "delay_ms": 100,
+              "outcome": [
+                "快速指南"
+              ]
+            },
+            {
+              "query": "空",
+              "delay_ms": 180,
+              "outcome": []
+            },
+            {
+              "query": "暂时失败",
+              "delay_ms": 220,
+              "first_call": "reject",
+              "later_call": [
+                "连接恢复手册"
+              ]
+            },
+            {
+              "query": "其他",
+              "delay_ms": 250,
+              "outcome": "catalog entries containing the trimmed query"
+            }
+          ]
+        },
+        "existing_behavior": [
+          "搜索通过表单提交，可用搜索按钮或 Enter。",
+          "每次提交各自等待 localSearch 完成并直接写回结果，因此先提交的慢请求可能晚于后提交的快请求覆盖页面。",
+          "空数组和 Promise reject 当前都显示‘没有找到结果’，无法区分无匹配和服务不可用。"
+        ]
+      },
+      "review_checks": [
+        {
+          "id": "latest-submission-wins",
+          "sequence": [
+            "提交‘慢’。",
+            "在该请求仍未完成时，将关键词改为‘快’并再次提交。",
+            "先确认快查询的结果可见，再等到慢查询也已完成。"
+          ],
+          "expected": [
+            "快查询完成后，当前结果对应‘快’并显示‘快速指南’。",
+            "慢查询完成后，当前结果仍对应最后提交的‘快’；‘慢速连接说明’不能作为当前结果出现。",
+            "界面给出的完成状态与当前可见结果一致。"
+          ]
+        },
+        {
+          "id": "empty-is-not-failure",
+          "sequence": [
+            "提交‘空’，等待查询完成。"
+          ],
+          "expected": [
+            "界面明确表达当前查询没有匹配内容。",
+            "界面不把此状态表达成暂时不可用或查询失败。",
+            "当前查询的结果集合为空；若保留历史条目，必须清楚标明它们不属于当前查询。"
+          ]
+        },
+        {
+          "id": "temporary-failure-and-recovery",
+          "sequence": [
+            "首次提交‘暂时失败’，等待本地 API reject。",
+            "再次提交同一关键词，等待本地 API resolve。"
+          ],
+          "expected": [
+            "首次请求后，界面表达查询暂时不可用或失败，不能把它说成没有匹配内容。",
+            "同一关键词再次提交后，界面从错误状态恢复，显示‘连接恢复手册’作为当前结果。",
+            "恢复后的完成状态与可见结果一致，不再保留会误导用户的失败状态。"
+          ]
+        },
+        {
+          "id": "basic-use",
+          "sequence": [
+            "用 Enter 和搜索按钮分别提交可匹配的关键词。"
+          ],
+          "expected": [
+            "两种现有提交方式都能完成本地搜索并呈现匹配项。",
+            "页面保持无需账号、依赖安装或外网访问即可使用。"
+          ]
+        }
+      ],
+      "scope": {
+        "must_preserve": [
+          "本地模拟 API 的输入输出语义、样例数据及不同延时/失败行为",
+          "表单提交搜索的基本能力"
+        ],
+        "must_not_constrain": [
+          "具体 debounce 时长",
+          "实现库或并发控制方案",
+          "页面布局或视觉样式",
+          "超出上述场景的搜索功能"
+        ],
+        "out_of_scope": [
+          "外部服务接入",
+          "账号认证",
+          "研究结论或来源数量"
+        ]
+      }
+    }
+  },
+  "host_profile": {
+    "host": "Claude Code native Windows CLI",
+    "version": "2.1.281",
+    "runtime_observed": {
+      "node": "v24.14.0",
+      "python": "3.12.10",
+      "microsoft_edge": "154.0.4258.62"
+    },
+    "reported_model": "deepseek-v4-flash[1m]",
+    "model_or_provider_override": false,
+    "provider_identity_independently_verified": false,
+    "tools": [
+      "Bash",
+      "PowerShell",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "Skill"
+    ],
+    "allowed_tool_patterns": [
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "Skill",
+      "Bash(node *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(pnpm *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git ls-files*)",
+      "Bash(rg *)",
+      "PowerShell(node *)",
+      "PowerShell(python *)",
+      "PowerShell(python3 *)",
+      "PowerShell(npm *)",
+      "PowerShell(npx *)",
+      "PowerShell(pnpm *)",
+      "PowerShell(git status*)",
+      "PowerShell(git diff*)",
+      "PowerShell(git ls-files*)",
+      "PowerShell(rg *)"
+    ],
+    "mcp": "explicit empty MCP configuration",
+    "common_environment": "This is an isolated synthetic evaluation project on native Windows.\nWork only on the supplied task in this directory. Do not change global settings,\ncredentials, installations or model routing; do not publish or contact other people.\nPublic research is permitted. Native Node and Python are on PATH. Python Playwright\nand Microsoft Edge are installed; use a fresh isolated browser context if needed.\nBoth Bash and PowerShell are exposed. Automatic shell permissions match commands\nstarting with node, python, python3, npm, npx, pnpm, rg, or the listed git read commands.\nIssue permitted commands separately in this working directory. A compound command\ncan require different permissions. Do not bypass a permission or path restriction.\n",
+    "limits": {
+      "timeout_seconds": 600,
+      "max_concurrent_trials": 2,
+      "policy": "One capability preflight plus four implementation trials; no automatic retry of a failed or timed-out trial."
+    },
+    "cli_flags_overview": [
+      "-p",
+      "--output-format stream-json",
+      "--verbose",
+      "--no-session-persistence",
+      "--permission-prompts none",
+      "--permission-mode acceptEdits",
+      "--strict-mcp-config",
+      "--mcp-config {\"mcpServers\":{}}",
+      "--tools with the exact exposed tools listed above",
+      "--allowedTools with the exact Bash and PowerShell prefixes listed above",
+      "--append-system-prompt with the shared isolated-project environment instructions"
+    ]
+  },
+  "preflight": {
+    "execution": {
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 11.72,
+      "result_subtype": "success",
+      "permission_denied_events": 0,
+      "malformed_event_lines": 0
+    },
+    "observations": [
+      "Standalone Node version commands succeeded in Bash and PowerShell.",
+      "Python Playwright launched a fresh headless Microsoft Edge browser.",
+      "A WebFetch attempt for python.org/about returned a domain safety verification failure; no page content was retrieved.",
+      "This preflight establishes the listed local runtime/browser capabilities and the observed WebFetch outcome only."
+    ],
+    "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+    "skill_inventory_sha256": "e1358aadc7def029d7cf0d18ae44b5215b52007341fbbb41c080fce72c49eafe"
+  },
+  "trials": {
+    "contacts/A": {
+      "execution": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 184.61,
+        "result_subtype": "success",
+        "is_error": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 4,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "output_sha256": "79e621774577a438f2dee6c664fbd4e091dfd7f9cd31497e4b1d5f848a4182e1",
+      "loading_evidence": {
+        "prompt_begins_with_explicit_research_first_invocation": true,
+        "init_mentions_research_first": true,
+        "same_project_skill_inventory_hash_across_all_four_trials": true,
+        "native_skill_tool_use_observed": false,
+        "launching_acknowledgement_observed": false,
+        "entrypoint_skill_md_read_observed": false,
+        "entrypoint_body_directly_visible_in_stream": false,
+        "actual_entrypoint_body_injection_confirmed_from_trace": false,
+        "conditional_reference_reads": []
+      }
+    },
+    "contacts/B": {
+      "execution": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 171.14,
+        "result_subtype": "success",
+        "is_error": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 2,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "output_sha256": "d26a54c88f5374d3d0292f9430824f587433bf5f557e84012fd268678a8b9139",
+      "loading_evidence": {
+        "prompt_begins_with_explicit_research_first_invocation": true,
+        "init_mentions_research_first": true,
+        "same_project_skill_inventory_hash_across_all_four_trials": true,
+        "native_skill_tool_use_observed": false,
+        "launching_acknowledgement_observed": false,
+        "entrypoint_skill_md_read_observed": false,
+        "entrypoint_body_directly_visible_in_stream": false,
+        "actual_entrypoint_body_injection_confirmed_from_trace": false,
+        "conditional_reference_reads": [
+          {
+            "tool": "Read",
+            "target": "project-copy/.claude/skills/research-first/references/execution-evidence.md",
+            "result_present": true,
+            "is_error": false,
+            "reference_identified": true,
+            "full_reference_text_returned": true
+          }
+        ]
+      }
+    },
+    "search/A": {
+      "execution": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 243.36,
+        "result_subtype": "success",
+        "is_error": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 1,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "output_sha256": "7ce4c58e75006b02f563d601c8c2a1e22bc64140feee55f079c2cfb092eb9fbb",
+      "loading_evidence": {
+        "prompt_begins_with_explicit_research_first_invocation": true,
+        "init_mentions_research_first": true,
+        "same_project_skill_inventory_hash_across_all_four_trials": true,
+        "native_skill_tool_use_observed": false,
+        "launching_acknowledgement_observed": false,
+        "entrypoint_skill_md_read_observed": false,
+        "entrypoint_body_directly_visible_in_stream": false,
+        "actual_entrypoint_body_injection_confirmed_from_trace": false,
+        "conditional_reference_reads": []
+      }
+    },
+    "search/B": {
+      "execution": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 226.24,
+        "result_subtype": "success",
+        "is_error": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 1,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "output_sha256": "eae7303e00b96a20a4332b0296bec455b2e898b95d6f173cf4f41bb7012f5bc8",
+      "loading_evidence": {
+        "prompt_begins_with_explicit_research_first_invocation": true,
+        "init_mentions_research_first": true,
+        "same_project_skill_inventory_hash_across_all_four_trials": true,
+        "native_skill_tool_use_observed": false,
+        "launching_acknowledgement_observed": false,
+        "entrypoint_skill_md_read_observed": false,
+        "entrypoint_body_directly_visible_in_stream": false,
+        "actual_entrypoint_body_injection_confirmed_from_trace": false,
+        "conditional_reference_reads": [
+          {
+            "tool": "Read",
+            "target": "project-copy/.claude/skills/research-first/references/execution-evidence.md",
+            "result_present": true,
+            "is_error": false,
+            "reference_identified": true,
+            "full_reference_text_returned": true
+          }
+        ]
+      }
+    }
+  },
+  "side_effects_and_cleanup": {
+    "summary": "Contacts/B wrote one external project-memory note; search/B wrote a note and a memory index. The coordinator verified ownership, backed up exact bytes with matching SHA-256, then removed only those three files. No unrelated user memory was changed. Private paths and note contents are intentionally omitted.",
+    "observed_external_memory_writes": {
+      "contacts/A": 0,
+      "contacts/B": 1,
+      "search/A": 0,
+      "search/B": 2
+    },
+    "other_external_artifacts": {
+      "contacts/A": "Five successful script Write calls targeted a system Temp probe directory. Sixteen current files (scripts, CSVs, screenshots) were backed up with verified hashes. The original directory was retained because no pre-trial inventory of that shared Temp path exists. External-memory counts are not a total of all out-of-directory writes."
+    }
+  },
+  "artifacts": {
+    "patches_are_evaluation_outputs_not_recommended_implementations": true,
+    "candidate_patch_base": "published snapshot at the stated base commit",
+    "application_patches_base": "the corresponding frozen contacts or async-search fixture",
+    "sha256_by_artifact": {
+      "2026-10-07-candidate.patch": "28b68b236a63748d3b30156956e1285dffb85e8b6fcdc1e089e4903e72f05a9f",
+      "2026-10-07-contacts-A.patch": "0035437802b32d7bee332609beb157b25bf1025231a169c0344d952468c958a8",
+      "2026-10-07-contacts-B.patch": "071fb3d2d65ac50d3501bfd2557719e945e776e7a4f51d7cbb97d88ac7bb677b",
+      "2026-10-07-search-A.patch": "9f5941cc4d07e99adc877988490931bda702e3ef5dcf4139c4e56cc01d569b80",
+      "2026-10-07-search-B.patch": "2cfb92610d3da592f628eb29a1c5eabfb1aedad73dfaca6579209b3fb09a697b",
+      "2026-10-07-contacts-A-acceptance.json": "ce702cd975d2e4d0f97ba291a304f212c105f743774f23d5056d4a9b8462bc0f",
+      "2026-10-07-contacts-B-acceptance.json": "98fed8aa86c15fdbe3218f7760e9d7b7f012bc97b71f1882c0dbc622b644baba",
+      "2026-10-07-contacts-source-review.json": "102a125830fd0e479650bac05c4f1dacb3ba86a4fdb1edbc44a7c87ed01602c5",
+      "2026-10-07-search-A-acceptance.json": "ea0befcf2d8a6eed7e1a5f1687512db6ee4c1bc0c06eb5240dce5f1361625990",
+      "2026-10-07-search-B-acceptance.json": "3c3e95035bdba9f6e1594c7899377f113e25f5dccfe5ea5ceee26426417a2987",
+      "2026-10-07-search-source-review.json": "3e2bfa886e9a6aba502457ea6eee606e15b2ef1a210ebdf131f9ec63a5bb7a97"
+    },
+    "trial_application_sha256": {
+      "contacts/A": "79e621774577a438f2dee6c664fbd4e091dfd7f9cd31497e4b1d5f848a4182e1",
+      "contacts/B": "d26a54c88f5374d3d0292f9430824f587433bf5f557e84012fd268678a8b9139",
+      "search/A": "7ce4c58e75006b02f563d601c8c2a1e22bc64140feee55f079c2cfb092eb9fbb",
+      "search/B": "eae7303e00b96a20a4332b0296bec455b2e898b95d6f173cf4f41bb7012f5bc8"
+    },
+    "patch_verification": {
+      "candidate": "Applied to the frozen published snapshot; all 19 reconstructed runtime files match the candidate snapshot raw SHA-256 manifest.",
+      "contacts/A": "Patch applied to the frozen contacts fixture; reconstructed index.html raw SHA-256 matches trial output.",
+      "contacts/B": "Patch applied to the frozen contacts fixture; reconstructed index.html raw SHA-256 matches trial output, including the acceptance failure.",
+      "search/A": "Patch applied to the frozen async-search fixture; reconstructed index.html raw SHA-256 matches trial output.",
+      "search/B": "Patch applied to the frozen async-search fixture; reconstructed index.html raw SHA-256 matches trial output."
+    },
+    "byte_preservation": "Snapshot manifests and fixture hashes were checked against raw file bytes before normalization. The archived fixture matches its frozen hash; the git attributes preserve fixtures and patches without line-ending conversion. Search patches preserve the original no-final-newline marker."
+  },
+  "limitations": [
+    "One pair per case; no reliable-uplift claim.",
+    "New tool profile; compare only within this round.",
+    "Live sources and model outputs may vary."
+  ],
+  "independent_acceptance": {
+    "contacts": {
+      "frozen_logical_checks": {
+        "A": "5/5 pass",
+        "B": "4/5 pass; unterminated quoted field was written as an erroneous contact"
+      },
+      "gb18030_special_case": {
+        "A": "pass",
+        "B": "pass"
+      }
+    },
+    "async_search": {
+      "frozen_behavior_checks": {
+        "A": "4/4 pass",
+        "B": "4/4 pass"
+      },
+      "local_api_contract_checks": "passed for both"
+    },
+    "reviewer_visibility_limit": {
+      "contacts": "Reviewer accidentally read part of the B skill copy; contacts review was not fully blinded.",
+      "async_search": "Reviewer did not read either skill version before acceptance."
+    },
+    "status": "Final frozen-requirement acceptance. Artifact JSON retains sub-checks; the companion report distinguishes additional compatibility probes.",
+    "artifacts": {
+      "contacts/A": "artifacts/2026-10-07-contacts-A-acceptance.json",
+      "contacts/B": "artifacts/2026-10-07-contacts-B-acceptance.json",
+      "search/A": "artifacts/2026-10-07-search-A-acceptance.json",
+      "search/B": "artifacts/2026-10-07-search-B-acceptance.json"
+    }
+  },
+  "acceptance_tools": {
+    "requirements": "Python Playwright 1.57.0 and an installed Microsoft Edge channel were used; these are evaluation-only dependencies.",
+    "scripts": {
+      "verify-async-search.py": "eec4f217b1e5fc54fd50b2a93f92989ac47fefb3e98815bdb656d96f6c51def2",
+      "verify-contact-import.py": "0d39b2d6dee0e6bbe957cff85e45a059e272c3e1752d9241e778d93b31d8db80"
+    },
+    "verification": {
+      "search_original_fixture": "exit 1; latest-submission and failure/recovery requirements failed, while API contract checks passed",
+      "search_A": "exit 0",
+      "search_B": "exit 0",
+      "contacts_A_malformed_input": "exit 0; preserved initial rows and displayed explicit rejection",
+      "contacts_B_malformed_input": "exit 1; inserted erroneous contact and displayed success without rejection",
+      "search_error_reporting": "API sub-check failures enter the aggregate result; an invalid browser channel is an execution error; an existing output remains unchanged"
+    },
+    "model_trial_count_unchanged": true
+  }
+}

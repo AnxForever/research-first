@@ -1,0 +1,206 @@
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -77,16 +77,14 @@
+ Start with local constraints and installed resources, then investigate applicable
+ products or prior implementations, reusable resources, and primary guidance.
+ When shaping a user workflow, inspect a comparable product flow or established
+-exemplar, separately from its implementation mechanism. Follow the user's action
+-through feedback and recovery; explain which documented or observed behavior
+-fits the local need, its cost, and what to adapt or leave out. An API survey alone
+-does not establish product-workflow discovery. If no suitable exemplar can be
+-inspected, disclose that gap and continue a contained, reversible approach.
+-
+-For each serious candidate inspect enough official APIs, relevant source, tests,
+-or examples to support adoption claims. Check target versions, fit, maintenance,
+-license and integration cost where relevant. Package names or marketing alone
+-do not verify behavior.
++exemplar: action, feedback, and recovery. Identify what fits the local need, what
++to adapt or omit, and its cost. Keep documented behavior distinct from behavior
++you exercised. An API survey does not establish a product workflow; if none can
++be inspected, disclose that gap and proceed within contained, reversible scope.
++
++For serious candidates, inspect relevant official contracts, implementation,
++tests or examples. Check version fit, maintenance, license and integration cost
++where they change the choice. Package names or marketing do not verify behavior.
+ 
+ Trace the chosen capability through the project's actual wrappers and call path.
+ Separate what the reusable resource supplies from what the application still owns,
+@@ -108,7 +106,10 @@
+ 
+ ## Step 5: Evaluate Evidence and Stop Sensibly
+ 
+-- Support material claims with applicable primary evidence, or label them as inference.
++- Link each decision-changing claim to what you actually inspected or observed,
++  its source locator, and the local consequence. Mark a search-only lead, unread
++  citation or failed fetch as unverified; it cannot support a definite adoption
++  or rejection premise. Label inference and preference separately from facts.
+ - Independently corroborate high-risk claims or consequential disagreements.
+   Two pages repeating the same source are not independent streams.
+ - Match evidence to the target version and environment. Distinguish documented
+@@ -124,11 +125,12 @@
+ For source selection and corroboration, use
+ [references/search-quality.md](references/search-quality.md).
+ 
+-In an offline or restricted environment, inspect available documentation, installed
+-source, metadata, fixtures and experiments. Disclose unavailable external research
+-and provisional technical claims. Continue an authorized, reversible path when
+-its uncertainty is contained; wait only when a missing answer or authority makes
+-the dependent action inappropriate. Do not fabricate sources or claim verification.
++When source access or execution fails, identify the failed operation and boundary
++before concluding that a capability is unavailable. Use the permitted recovery
++procedure in [references/execution-evidence.md](references/execution-evidence.md).
++Inspect available documentation, installed source or local experiments; disclose
++what remains provisional. Continue authorized reversible work with contained
++uncertainty; defer only actions dependent on missing evidence or authority.
+ 
+ ## Step 6: Show Options Before Implementation
+ 
+@@ -141,11 +143,10 @@
+ user preference that justifies custom work; do not invent weak alternatives to
+ fill a table. Keep independent choices separate, such as table state and animation.
+ 
+-Before rejecting a credible option, verify the decisive premise: the exact missing
+-behavior, incompatibility, or material cost. Check primary material or run a
+-bounded probe. If that premise remains unknown, keep the option conditional;
+-do not turn an assumption into a factual reason it cannot work. A supported local
+-preference may still justify the choice. Use the comparison procedure in
++Before rejecting a credible option, verify the decisive missing behavior,
++incompatibility or cost using Step 5 evidence. If unknown, keep the option
++conditional; a local preference can justify a choice without inventing a
++technical limitation. Use the comparison procedure in
+ [references/reuse-and-alternatives.md](references/reuse-and-alternatives.md).
+ 
+ A request to implement a feature normally includes choosing routine, reversible
+@@ -165,15 +166,16 @@
+ can be that record; **no separate ledger file is required**. Include:
+ 
+ ```text
+-Outcome and constraints -> material question -> inspected evidence and limits
+--> options and selected approach -> acceptance checks and their execution status
++Decision: outcome/constraints -> question -> inspected evidence/limits -> choice
++Acceptance: important promise -> falsifying case -> expected final state -> observed result
+ ```
+ 
+-Before implementing, name the observable successful outcome and the consequential
+-failure that could invalidate the choice. For a state-changing operation, record
+-what must remain unchanged if input is rejected, the user cancels, or a relevant
+-write fails. Derive these expectations from the request and inspected contracts,
+-not from the implementation's own tests; select applicable cases only.
++Before implementing, identify the relevant support boundary when an important
++promise depends on input or state, including how other relevant cases are handled.
++Derive a consequential counterexample from the request and inspected contract,
++independently of the implementation's tests. For state changes,
++specify what must survive rejection, cancellation or relevant write failure.
++Select applicable cases; leave results pending until actually checked.
+ 
+ Update it after execution with actual results and what remains unverified.
+ A label-only or other mechanical edit needs only its targeted verification.
+@@ -206,28 +208,20 @@
+ 
+ ## Step 9: Verify and Update the Record
+ 
+-Exercise the Step 7 expectations at the promised user boundary, checking the
+-request, inspected contracts and actual data flow independently of the existing tests.
+-Use a concrete input or state that could falsify each consequential guarantee;
+-inspect resulting data and visible feedback, not only a return value or test count.
+-If an invariant fails, fix the authorized behavior and rerun the affected check
+-before calling it complete. Keep unavailable checks explicitly unverified.
+-When a separate reviewer is available and the consequences justify it, provide
+-the request, contracts and artifact for an independent check, without supplying
+-the implementer's proposed verdict. Otherwise perform a separate acceptance pass.
+-
+-Follow the whole relevant journey: interaction entry, action, exit and return;
+-saved state after reload; actual exported file contents. A modal check includes
+-focus after cancel or navigation. A getting-started guide must carry the reader's
+-chosen platform commands through the subsequent recovery step. A build, stubbed
+-DOM or mocked service does not establish the corresponding real user journey.
+-
+-Audit promises in both the artifact and the final response against these results.
+-For a compatibility or recovery claim, name the supported inputs, environment and
+-failure stage. Narrow or remove a claim that its evidence does not support;
+-neither a passing example nor a large test count warrants "everything verified."
+-Update the Step 7 record with executed outcomes and remaining limits. Tests prove
+-covered behavior, not user preference or the merit of a product decision.
++Run the Step 7 cases at the promised user boundary and fill in observed results.
++Check final data or artifacts and visible feedback after the operation completes;
++canceling before a write cannot prove that invalid input is rejected on submission.
++For changed state, compatibility or recovery behavior, follow the bounded
++acceptance procedure in [references/execution-evidence.md](references/execution-evidence.md).
++Fix failed authorized behavior and rerun the affected case before calling it complete.
++
++Review acceptance independently of the implementation's existing tests. Use a
++separate reviewer when available and warranted, supplying request, contracts and
++artifact without the implementer's proposed verdict; otherwise make a separate pass.
++Audit artifact and final-response promises against the resulting record. Distinguish
++implemented, executed-and-passed, failed, and unverified; narrow unsupported claims.
++A test count, build or stub cannot establish an unexercised user journey, and tests
++do not establish user preference or the merit of a product decision.
+ 
+ ## Optional Jev Checks and Examples
+ 
+--- /dev/null
++++ b/references/execution-evidence.md
+@@ -0,0 +1,63 @@
++# From Evidence to Executed Acceptance
++
++Use the access procedure when source retrieval or a required execution route is
++uncertain. Use the acceptance procedure for changed state, compatibility or
++recovery promises. Keep the record in the Step 7 summary or existing ledger;
++this guide does not require another document or extra checks for mechanical edits.
++
++## Resolve the Actual Access Failure
++
++Try a harmless representative operation when the plan depends on an unfamiliar
++tool or uncertain capability. Record the tool, operation, result and what that
++result establishes. Tool listings show availability, not a successful invocation.
++
++- **Command composition or tool mismatch:** a refused compound command does not
++  prove its runtime is absent. If a smaller operation is already permitted, run it
++  on its own in the intended working directory. Do not wrap a denied action in a
++  different interpreter or use another route to evade a permission or path boundary.
++- **Missing executable, dependency or connection:** separate this from application
++  failure. Use an existing permitted alternative when it answers the same question.
++  Do not modify global configuration or add services outside the user's scope.
++- **Unread source:** distinguish a transport/format failure from an access denial.
++  Use another authorized source or local copy for the claim, without bypassing a
++  restriction. Search summaries remain leads; record exactly what was inspected.
++
++Retry only when the next attempt tests a materially different, permitted cause.
++Repeated denial is a limit to record, not a reason to probe more routes. Continue
++contained authorized work and narrow its claims; defer only dependent actions
++whose missing evidence or authority matters.
++
++## Turn a Contract Into a Counterexample
++
++Before implementing, connect each important promise to an observable result and
++a case that would falsify it. Derive cases from the request, actual input contract,
++chosen reusable component and local integration boundary, not just existing tests.
++For example, a response can contain usable data and diagnostics simultaneously;
++inspect its acceptance policy before treating a returned value as successful work.
++
++State the relevant support boundary: accepted structure or states, applicable
++versions/environment, and what rejection or recovery preserves. Exercise a case
++across that boundary when the promise depends on it. If compatibility is based on
++structure rather than a version field, explain and check that policy. Partial
++success can be valid when the contract permits it; disclose what was applied,
++skipped and preserved rather than silently choosing a loss policy.
++
++## Observe the Promised Outcome
++
++Execute the chosen counterexample through the entry point the user will use and
++observe the completed result, including failures. Distinguish these checks:
++
++| Promise | Evidence needed |
++|---|---|
++| Rejected work preserves data | Submit the invalid operation; inspect final data and feedback. Cancellation tests a different path. |
++| Changes survive a return | Complete the change, leave/reload/reopen as relevant, and inspect restored values. |
++| Recovery restores usable interaction | Trigger the failure, attempt the supported next action, and inspect state and focus/feedback where relevant. |
++| An exported artifact is usable | Inspect the produced artifact and exercise the relevant consumer or round-trip boundary. |
++| A guide works on a named platform | Carry that platform's commands through first success and relevant recovery. |
++
++Choose applicable rows only. Library tests or DOM substitutes establish their
++tested boundary; they do not establish the assembled browser, service or reader
++journey. If the boundary cannot be exercised, keep acceptance unverified even when
++static inspection looks correct. Record the actual reason, not an unattempted
++tool's supposed failure. Preserve the concrete failed case, fix within authorized
++scope and rerun it; update the record rather than replacing failure with a test total.

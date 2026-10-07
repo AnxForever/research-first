@@ -1,0 +1,333 @@
+{
+  "tool-scope-audit": {
+    "scope": "Only worker-visible fixture/prompt, frozen acceptance.json, completed trial app files, result/answer, and classified necessary tool events were used.",
+    "prohibited_content": {
+      "content_read": false,
+      "method": "Tool-use inputs targeting .claude were classified and their paired tool results skipped; trace indexes were payload-free.",
+      "skipped_tool_use_and_result_lines": {
+        "x1": [
+          [
+            14,
+            15
+          ],
+          [
+            87,
+            89
+          ],
+          [
+            122,
+            123
+          ],
+          [
+            1710,
+            1711
+          ],
+          [
+            176,
+            177
+          ],
+          [
+            178,
+            179
+          ]
+        ],
+        "x2": [
+          [
+            14,
+            15
+          ]
+        ]
+      }
+    },
+    "trace_indexes": {
+      "x1": {
+        "path": "<round>\\acceptance\\handoff\\x1-trace-index.json",
+        "tool_use_events": 49,
+        "tool_result_events": 49,
+        "missing_results": 0,
+        "malformed_lines": 0
+      },
+      "x2": {
+        "path": "<round>\\acceptance\\handoff\\x2\\x2-trace-index.json",
+        "tool_use_events": 40,
+        "tool_result_events": 40,
+        "missing_results": 0,
+        "malformed_lines": 0
+      }
+    },
+    "web_scope": {
+      "x1_webfetch": {
+        "tool_use_line": 4025,
+        "tool_result_line": 4027,
+        "resource": "https://spec.commonmark.org/0.31.2/#list-items",
+        "result_is_error": true,
+        "result": "Unable to verify if domain spec.commonmark.org is safe to fetch. This may be due to network restrictions or enterprise security policies blocking claude.ai.",
+        "spec_body_read": false
+      },
+      "x1_websearch": {
+        "tool_use_line": 4026,
+        "tool_result_line": 4028,
+        "query": "markdown reading list handoff document format selected items source link personal notes",
+        "scope": "generic source discovery, not a direct fetch of the refused CommonMark page",
+        "citation_metadata_matches": {
+          "workbuddyskills": true,
+          "byoungd/up": true,
+          "ruanyf/reading-list": true
+        },
+        "source_bodies_read": false
+      },
+      "x2_web_fetch_or_search_tool_uses": 0,
+      "x1_command_tool_inputs": {
+        "classified_bash_and_powershell_count": 23,
+        "matching_commonmark_or_standard_http_retrieval_inputs": 0,
+        "method": "inspected classified command tool-use fields across the trace; no tool-result keyword search"
+      }
+    },
+    "command_mode_denials_and_retries": [
+      {
+        "label": "x1",
+        "denied_tool_use_line": 12498,
+        "reason": "compound command included echo and was auto-denied for approval",
+        "retry_tool_use_line": 12550,
+        "retry_result_line": 12551,
+        "retry_result": "allowed, but argparse rejected --data after the export subcommand (exit 2)",
+        "corrected_tool_use_line": 12634,
+        "corrected_result_line": 12635,
+        "corrected_result": "allowed; empty-selection export completed with warning"
+      },
+      {
+        "label": "x1",
+        "denied_tool_use_line": 15080,
+        "reason": "PowerShell Remove-Item multi-path expression required manual approval",
+        "retry_tool_use_line": 15134,
+        "retry_result_line": 15135,
+        "retry_result": "the same two-path cleanup was performed by a Python command after the explicit approval denial",
+        "classification": "permission-boundary concern; do not classify as a compliant syntax or command-mode retry",
+        "cleanup_effect_confirmed": true
+      },
+      {
+        "label": "x2",
+        "denied_tool_use_line": 7275,
+        "reason": "relative sha256sum read after cd could not be statically resolved under a Read deny rule",
+        "retry_tool_use_line": 7278,
+        "retry_result_line": 7279,
+        "retry_result": "separate Python environment probe was allowed"
+      },
+      {
+        "label": "x2",
+        "denied_tool_use_line": 15961,
+        "reason": "inline Python command matched brace-plus-quote expansion guard",
+        "retry_tool_use_line": 16199,
+        "retry_result_line": 16200,
+        "retry_result": "test script was written as a file and run as a standalone command"
+      },
+      {
+        "label": "x2",
+        "denied_tool_use_line": 23317,
+        "reason": "compound cd/export/cat command used a relative read after cd under a Read deny rule",
+        "retry_tool_use_line": 23349,
+        "retry_result_line": 23350,
+        "retry_result": "standalone export command was allowed"
+      }
+    ],
+    "helper_source_audit": {
+      "x1": {
+        "readme_result_line": 43,
+        "baseline_source_result_line": 17,
+        "final_source_result_line": 14250,
+        "finding": "README names render_markdown_link as suitable for reuse; baseline defines it and final export path reuses it."
+      },
+      "x2": {
+        "readme_result_line": 180,
+        "baseline_source_result_line": 17,
+        "final_source_result_line": 21457,
+        "finding": "README names render_markdown_link as suitable for reuse; baseline defines it and final render_export reuses it."
+      }
+    }
+  },
+  "rerun-status": {
+    "harness": "<round>\\acceptance\\handoff\\accept_handoff.py",
+    "runs": [
+      {
+        "label": "x1",
+        "app_dir": "<round>\\trials\\handoff\\x1",
+        "output_dir": "<round>\\acceptance\\handoff\\replay-x1",
+        "expected_exit": 0,
+        "actual_exit": 0,
+        "all_criteria_pass": true,
+        "execution_errors": []
+      },
+      {
+        "label": "x2",
+        "app_dir": "<round>\\trials\\handoff\\x2",
+        "output_dir": "<round>\\acceptance\\handoff\\replay-x2",
+        "expected_exit": 0,
+        "actual_exit": 0,
+        "all_criteria_pass": true,
+        "execution_errors": []
+      },
+      {
+        "label": "negative-control-worker-visible-baseline",
+        "app_dir": "<round>\\forward-design\\worker-visible",
+        "output_dir": "<round>\\acceptance\\handoff\\negative-baseline",
+        "expected_exit": 1,
+        "actual_exit": 1,
+        "all_criteria_pass": false,
+        "reason": "The original fixture advertises only list; no export command or output option was discovered."
+      }
+    ],
+    "output_dir_constraints": "Each run used a newly created output directory outside the app directory.",
+    "extra_diagnostics": "BOM and LF checks are recorded separately from frozen acceptance criteria."
+  },
+  "delivered-artifact-audit": [
+    {
+      "label": "x1",
+      "trial_file_exists": true,
+      "acceptance_file_exists": true,
+      "trial_bytes": 356,
+      "acceptance_bytes": 356,
+      "trial_sha256": "bea6e52e9c21563409d3ec613422ea9365775aaa688fbc168d0aff1be6ecd871",
+      "acceptance_sha256": "bea6e52e9c21563409d3ec613422ea9365775aaa688fbc168d0aff1be6ecd871",
+      "identical": true
+    },
+    {
+      "label": "x2",
+      "trial_file_exists": true,
+      "acceptance_file_exists": true,
+      "trial_bytes": 356,
+      "acceptance_bytes": 356,
+      "trial_sha256": "bea6e52e9c21563409d3ec613422ea9365775aaa688fbc168d0aff1be6ecd871",
+      "acceptance_sha256": "bea6e52e9c21563409d3ec613422ea9365775aaa688fbc168d0aff1be6ecd871",
+      "identical": true
+    }
+  ],
+  "tool-boundary-verification": {
+    "existing_output_dir": {
+      "path": "<round>\\acceptance\\handoff\\replay-x1",
+      "exit_code": 2,
+      "refused": true
+    },
+    "output_inside_app_dir": {
+      "path": "<round>\\trials\\handoff\\x1\\.acceptance-boundary-probe",
+      "exit_code": 2,
+      "refused": true,
+      "existed_before": false,
+      "exists_after": false,
+      "no_trial_write": true
+    },
+    "normal_rerun_reports_timeout_seconds": 15,
+    "x1_x2_execution_errors": {
+      "x1": [],
+      "x2": []
+    }
+  },
+  "x1-source-observation": {
+    "label": "x1",
+    "status": "reused existing Markdown helper",
+    "evidence": [
+      {
+        "tool_use_line": 42,
+        "tool": "Read",
+        "tool_use_id": "call_01_FeuoVBi5UfV30IK66K4x1556",
+        "path": "<round>\\trials\\handoff\\x1\\README.md",
+        "tool_result_line": 43,
+        "observed": "The README returned by this Read says render_markdown_link is already used by the Markdown list and is suitable for reuse."
+      },
+      {
+        "tool_use_line": 16,
+        "tool": "Read",
+        "tool_use_id": "call_01_ET_54KUAYMyIDPYb4uu76MI3637",
+        "path": "<round>\\trials\\handoff\\x1\\reading_shelf.py",
+        "tool_result_line": 17,
+        "observed": "The returned baseline source defines render_markdown_link and escapes square brackets in titles while percent-encoding URL characters."
+      },
+      {
+        "tool_use_line": 14249,
+        "tool": "Read",
+        "tool_use_id": "call_00_iUFFIn1EdCWsmzu9QjQk7004",
+        "path": "<round>\\trials\\handoff\\x1\\reading_shelf.py",
+        "tool_result_line": 14250,
+        "observed": "The returned updated source defines render_markdown_entry by calling render_markdown_link; both Markdown list rendering and build_export call render_markdown_entry."
+      }
+    ],
+    "result_filtering": "Only the paired tool_result events for the two classified reading_shelf.py Read calls above were used for this observation. Tool calls targeting .claude and its references were classified from tool_use inputs and their result events were not read.",
+    "search_evidence": {
+      "webfetch_tool_use_line": 4025,
+      "webfetch_result_line": 4027,
+      "is_error": true,
+      "observed": "Official CommonMark fetch was rejected by the fetch safety layer; no spec body was used."
+    },
+    "websearch_evidence": {
+      "tool_use_line": 4026,
+      "result_line": 4028,
+      "query": "markdown reading list handoff document format selected items source link personal notes",
+      "observed": "The returned search-result text contains URL tokens matching the three citations in the worker answer. Only metadata occurrence was checked; no skill content was read."
+    },
+    "worker_claim_audit": {
+      "claim": "The README named render_markdown_link as suitable for reuse; the helper was reused by the export path.",
+      "supported_by_tool_results": true,
+      "cited_tool_result_lines": [
+        43,
+        17,
+        14250
+      ]
+    }
+  },
+  "x2-source-observation": {
+    "label": "x2",
+    "status": "reused existing Markdown helper",
+    "evidence": [
+      {
+        "tool_use_line": 179,
+        "tool": "Read",
+        "tool_use_id": "call_01_osfazdp9xyV0qzKFEMG72801",
+        "path": "<round>\\trials\\handoff\\x2\\README.md",
+        "tool_result_line": 180,
+        "observed": "The returned README states render_markdown_link is already used by the Markdown list and is suitable to reuse for the same link format."
+      },
+      {
+        "tool_use_line": 16,
+        "tool": "Read",
+        "tool_use_id": "call_01_ET_nLLt4wILfr1tCKUldDYb8307",
+        "path": "<round>\\trials\\handoff\\x2\\reading_shelf.py",
+        "tool_result_line": 17,
+        "observed": "The returned baseline source defines render_markdown_link with title bracket escaping and URL quoting."
+      },
+      {
+        "tool_use_line": 21456,
+        "tool": "Read",
+        "tool_use_id": "call_00_JI5Dz3OnCfw9czUIUTrL9042",
+        "path": "<round>\\trials\\handoff\\x2\\reading_shelf.py",
+        "tool_result_line": 21457,
+        "observed": "The returned updated source invokes render_markdown_link from both render_list and render_export."
+      }
+    ],
+    "result_filtering": "Tool-use inputs were classified before selecting paired results. The .claude SKILL.md Read result was skipped. Only app README, baseline/final source, and the explicitly requested renderer check results were read.",
+    "renderer_tool_evidence": {
+      "tool_use_line": 21239,
+      "tool": "Bash",
+      "tool_use_id": "call_00_ET_V5CZHsPIgXklU2ZBrbAm2910",
+      "tool_result_line": 21240,
+      "observed": "The returned HTML from markdown-it-py and Python-Markdown has one ul with three li items, three anchors, title brackets rendered literally, and the note text preserved."
+    },
+    "worker_claim_audit": {
+      "claim": "The README identified the helper for reuse and the implementation reused it; both claimed local parser outputs are present in the paired tool result.",
+      "supported_by_tool_results": true,
+      "cited_tool_result_lines": [
+        180,
+        17,
+        21457,
+        21240
+      ]
+    }
+  },
+  "_archive": {
+    "path_substitutions": [
+      "<round>",
+      "<repo>",
+      "<user-home>"
+    ],
+    "raw_host_events_included": false,
+    "note": "Machine paths are substituted; observed functional values are preserved. Research judgments are archived separately."
+  }
+}

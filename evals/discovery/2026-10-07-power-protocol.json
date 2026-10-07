@@ -1,0 +1,754 @@
+{
+  "date": "2026-10-07",
+  "round_id": "power-round-native-windows-claude-code",
+  "base_commit": "8a52431897628b636c413c51ea1d40af4a3fe290",
+  "comparison": {
+    "published_snapshot": "8a52431897628b636c413c51ea1d40af4a3fe290",
+    "candidate_snapshot": "frozen 19-file runtime snapshot",
+    "interpretation": "Two contacts pairs and one reading-handoff pair; no overall-superiority or cross-model-generalization claim is encoded here."
+  },
+  "condition_map": {
+    "m1": {
+      "case": "contacts",
+      "snapshot": "published"
+    },
+    "m2": {
+      "case": "contacts",
+      "snapshot": "candidate"
+    },
+    "m3": {
+      "case": "contacts",
+      "snapshot": "candidate"
+    },
+    "m4": {
+      "case": "contacts",
+      "snapshot": "published"
+    },
+    "x1": {
+      "case": "handoff",
+      "snapshot": "published"
+    },
+    "x2": {
+      "case": "handoff",
+      "snapshot": "candidate"
+    }
+  },
+  "snapshots": {
+    "published": {
+      "file_count": 18,
+      "sha256_by_repository_relative_path": {
+        "agents/openai.yaml": "85b87d197beb39c41d178e0d44c4a0897a85e9844c2d5c99a280fcccf0fb376c",
+        "assets/project-identity-card.md": "e17b60e74d5496efb240e281289105d23200fa3e884edab4fda22ea6521d805a",
+        "assets/research-report-template.md": "ec76cf19313bdd9dcd3e97a293ca2aefd6f708a28e4a1bf920eb429f52d7ecf9",
+        "references/adapting-depth.md": "2eda3806604f192bc363d8084bc432341583859b8bbcbc1f696409955713d6ae",
+        "references/case-studies.md": "0a71a1be338a7ba026da778b7d29af8ca9c02c0e54147abaabd195cd37651847",
+        "references/contradictions.md": "92de2e349ee3facddc6ac7b07aa7195502864d29a1e3b8b7cb31f2e499517cde",
+        "references/feature-evidence-ledger.md": "8992b1b450c115c99a45988c247e23cfe3944cac79a0210c7c294a4bc5ad1ea4",
+        "references/intent-interpretation-evaluation.md": "299473a335d99f51b8254f57ea4a90b5ff58b9723dbbd85945e424442d3f222b",
+        "references/jev-checkpoints.md": "614b659679074efb986760fdd1c91f6a587eeda93046363e29bc54f58712a449",
+        "references/problem-expansion.md": "f5cc894c58e3e924f41fbb7d064cd70b6b70543ab4a5bb23ae6624f8167b9195",
+        "references/research-examples.md": "34f274bba017965425d31f4f63a5b39f188d3611cb12287713019518aa665084",
+        "references/reuse-and-alternatives.md": "4bdb6f6e861de076e35f827a7e79b03063e5f8002607f3820e7aea0ffc46079f",
+        "references/search-quality.md": "907e36c674db865eea768b2c8ab4b1229a984f75e374f47e371a1bd0897db1a2",
+        "scripts/jev_check.py": "442f2c105db6f7ba66cbd48198cfdfd1c21f930cf4b571558576d40287c06a00",
+        "scripts/requirements-dev.txt": "b5bc3730819d623299910c567b3492f909be9d7b46caefab341af14fe882a8ab",
+        "scripts/requirements-jev.txt": "51efe61d857f58462e3ef080662baf62bca09a0eca367df6210ab745c8a09e4c",
+        "scripts/validate_package.py": "f0d0b7a9fc711c37faf9538e2d90f9876f6d7ec8667927a81a434d7be3acd61f",
+        "SKILL.md": "0aa792370c5564a1026b3a534b717a15570c74113f6d4acb48f41bfbcdaf20eb"
+      },
+      "raw_bytes_match_frozen_manifest": true
+    },
+    "candidate": {
+      "file_count": 19,
+      "sha256_by_repository_relative_path": {
+        "agents/openai.yaml": "85b87d197beb39c41d178e0d44c4a0897a85e9844c2d5c99a280fcccf0fb376c",
+        "assets/project-identity-card.md": "e17b60e74d5496efb240e281289105d23200fa3e884edab4fda22ea6521d805a",
+        "assets/research-report-template.md": "ec76cf19313bdd9dcd3e97a293ca2aefd6f708a28e4a1bf920eb429f52d7ecf9",
+        "references/adapting-depth.md": "2eda3806604f192bc363d8084bc432341583859b8bbcbc1f696409955713d6ae",
+        "references/case-studies.md": "0a71a1be338a7ba026da778b7d29af8ca9c02c0e54147abaabd195cd37651847",
+        "references/contradictions.md": "3fd8a0c863eb0d8b7baec282e65dbfd95b2cc613c1bc95fd583b26b19005501a",
+        "references/execution-evidence.md": "bf172fdaa76b4b172a18340f316bc60f7cc1e9b14c0e8d06c05328b27cffc1bc",
+        "references/feature-evidence-ledger.md": "8992b1b450c115c99a45988c247e23cfe3944cac79a0210c7c294a4bc5ad1ea4",
+        "references/intent-interpretation-evaluation.md": "299473a335d99f51b8254f57ea4a90b5ff58b9723dbbd85945e424442d3f222b",
+        "references/jev-checkpoints.md": "614b659679074efb986760fdd1c91f6a587eeda93046363e29bc54f58712a449",
+        "references/problem-expansion.md": "f5cc894c58e3e924f41fbb7d064cd70b6b70543ab4a5bb23ae6624f8167b9195",
+        "references/research-examples.md": "34f274bba017965425d31f4f63a5b39f188d3611cb12287713019518aa665084",
+        "references/reuse-and-alternatives.md": "4bdb6f6e861de076e35f827a7e79b03063e5f8002607f3820e7aea0ffc46079f",
+        "references/search-quality.md": "907e36c674db865eea768b2c8ab4b1229a984f75e374f47e371a1bd0897db1a2",
+        "scripts/jev_check.py": "442f2c105db6f7ba66cbd48198cfdfd1c21f930cf4b571558576d40287c06a00",
+        "scripts/requirements-dev.txt": "b5bc3730819d623299910c567b3492f909be9d7b46caefab341af14fe882a8ab",
+        "scripts/requirements-jev.txt": "51efe61d857f58462e3ef080662baf62bca09a0eca367df6210ab745c8a09e4c",
+        "scripts/validate_package.py": "f0d0b7a9fc711c37faf9538e2d90f9876f6d7ec8667927a81a434d7be3acd61f",
+        "SKILL.md": "68f9655fe702ee9f2f194fcfd27f7185a63e3fabff67849deb7b1685f6af1c95"
+      },
+      "raw_bytes_match_frozen_manifest": true
+    }
+  },
+  "prompt_fingerprints": {
+    "contacts": {
+      "task_text": "这些联系人名单每次复制很麻烦，帮我做个从 CSV 导入的功能。",
+      "task_text_sha256_utf8_without_trailing_newline": "fccc87b266709554e30f2cac7b790651fcf305bfcbbfec76d63e5fcfd5418d59",
+      "captured_invocation_prompt_sha256": "c2fa85a59f3d368076a8e3331cd99523930d671ca1f6783716e7ad76612d5e6f",
+      "captured_invocation_prompt_bytes": 331,
+      "captured_prompt_copy_count": 4,
+      "captured_invocation_line_endings": "SHA-256 covers the captured UTF-8 prompt bytes; the loading-prefix separator is CRLF in captured files."
+    },
+    "handoff": {
+      "task_text": "我准备把勾选的几条资料交给同事继续看，帮我给这个小工具加个导出，产出一份简洁的 Markdown 阅读清单，带着来源链接和我写的备注，保留列表里的先后顺序，最好能直接落成文件。本机离线使用即可。",
+      "task_text_sha256_utf8_without_trailing_newline": "081ed6030ecec425f4ae2c267bf946fbfd865e5cbc85992e5e1be3edc7e62b53",
+      "captured_invocation_prompt_sha256": "0c7de158a0fa8fb3b9baf4f44adddf732c7c74b1e6b7c1c56c30792df98b5d7e",
+      "captured_invocation_prompt_bytes": 519,
+      "captured_prompt_copy_count": 2,
+      "captured_invocation_line_endings": "SHA-256 covers the captured UTF-8 prompt bytes; the loading-prefix separator is CRLF in captured files.",
+      "worker_visible_prompt_md_sha256": "0a6227f707f09623f65643bf0ded817a99a0a518d54b5257afc52315b426c2ac"
+    }
+  },
+  "frozen_fixtures": {
+    "contacts": {
+      "archived_path": "evals/discovery/fixtures/contacts",
+      "sha256_by_file": {
+        "example.csv": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+        "index.html": "4f0ea9d695bbcd50f97d0c4e4bf703d9a76bd6aa40da8589698392806c9faed0",
+        "README.md": "dca9500e70d8f935ac9252fb0c302ddb3195997757952fc2e834db7916771301"
+      }
+    },
+    "handoff": {
+      "archived_path": "evals/discovery/fixtures/reading-handoff",
+      "sha256_by_archived_file": {
+        "evals/discovery/fixtures/reading-handoff/README.md": "572ba8faae014b0f66aeccddf047d1cd22e77b103900b426fee6ea786845b9bf",
+        "evals/discovery/fixtures/reading-handoff/reading_shelf.py": "e7ed500ccb8f1a5e8d0686dd366f78a72134effeb517d29d31a5e5615e9260cb",
+        "evals/discovery/fixtures/reading-handoff/shelf.json": "f605a975c98aad1875a974a10fe701b7d57d7b2adc73d5264a8997be541cef1b"
+      },
+      "prompt_md_excluded_from_fixture": true,
+      "prompt_md_source_sha256": "0a6227f707f09623f65643bf0ded817a99a0a518d54b5257afc52315b426c2ac"
+    }
+  },
+  "frozen_acceptance": {
+    "contacts": {
+      "prompt_source": "evals/discovery/cases.json#contacts-import",
+      "required": [
+        "Visible CSV import of provided example preserves real Unicode and quoted-comma field values and existing contacts.",
+        "Repeat import has understandable duplicate handling, without accidental destruction or unexplained list growth.",
+        "A missing-required-header input gives useful feedback, preserves existing data and permits a later valid import.",
+        "An unterminated quoted field is not silently accepted as a successful, corrupted contact; reject it or explicitly skip the invalid row with feedback.",
+        "The local feature does not require an external runtime service."
+      ],
+      "no_prescribed_solution": "No mandatory preview, mapping, parser dependency or exact UI text. Adapt selectors to actual artifact."
+    },
+    "research_review": {
+      "product_workflow": "Actual inspected comparable product/example flow, meaningful local adaptation or supported decision to omit; library capability lists alone do not qualify.",
+      "rejection_premise": "Any material factual reason used to reject a credible alternative is supported by inspected primary material or a probe. An explicit local preference is valid without inventing a limitation.",
+      "failure_expectation": "Evidence the worker derived a relevant state invariant and falsifying case, then executed it against the result rather than relying only on own happy-path test count.",
+      "claim_accuracy": "Inspect material compatibility, recovery and completion statements in artifact and answer. Do not equate source listing or self-reported test totals with evidence."
+    },
+    "handoff": {
+      "task": "Add a small offline Markdown handoff export to the existing reading shelf.",
+      "acceptance": [
+        {
+          "id": "preserve-list-contract",
+          "criterion": "The existing `list` command remains usable with both its current default text output and `--format markdown`; records retain their JSON-array order."
+        },
+        {
+          "id": "selection-and-order",
+          "criterion": "The new handoff contains only records whose `selected` value is true, in their existing list order."
+        },
+        {
+          "id": "useful-markdown",
+          "criterion": "Each exported record is a readable Markdown item with a title linked to its original URL and its note when present; Markdown-sensitive title/URL characters and note line breaks do not corrupt the document."
+        },
+        {
+          "id": "file-and-stdout",
+          "criterion": "The export can be written as UTF-8 to a user-specified output file. Discover the command and options from the program's --help output; do not require a particular subcommand or flag. If stdout export is also supported, check that its document content is semantically equivalent to the file output, but stdout support is optional."
+        },
+        {
+          "id": "empty-selection",
+          "criterion": "An empty selected set produces a clear, valid empty handoff rather than a traceback or stale output."
+        },
+        {
+          "id": "local-inheritance",
+          "criterion": "Export leaves the shelf JSON unchanged and remains usable offline. The fixture's current baseline uses only the Python standard library; an offline dependency already available in the environment is acceptable, but the change must not require network installation or leave the fresh fixture unable to run because a dependency is unavailable. Keep existing basic commands runnable."
+        }
+      ],
+      "research_observation": {
+        "label": "Non-functional observation; not a pass/fail acceptance criterion.",
+        "criterion": "Record whether the implementation inspected the existing `render_markdown_link` helper and either reused it or gave an evidence-based reason for an equivalent alternative. Reuse is not mandatory."
+      }
+    }
+  },
+  "host_profile": {
+    "host": "Claude Code native Windows CLI",
+    "version": "2.1.281 (Claude Code)",
+    "reported_model": "deepseek-v4-flash[1m]",
+    "model_or_provider_override": false,
+    "provider_identity_independently_verified": false,
+    "tools": [
+      "Bash",
+      "PowerShell",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "Skill"
+    ],
+    "allowed_tool_patterns": [
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "Skill",
+      "Bash(node *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(pnpm *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git ls-files*)",
+      "Bash(rg *)",
+      "PowerShell(node *)",
+      "PowerShell(python *)",
+      "PowerShell(python3 *)",
+      "PowerShell(npm *)",
+      "PowerShell(npx *)",
+      "PowerShell(pnpm *)",
+      "PowerShell(git status*)",
+      "PowerShell(git diff*)",
+      "PowerShell(git ls-files*)",
+      "PowerShell(rg *)"
+    ],
+    "mcp": "explicit empty configuration",
+    "settings": {
+      "autoMemoryEnabled": false,
+      "permissions": {
+        "deny": [
+          "Edit(//<user-home>/**)",
+          "Read(//<user-home>/.claude/**)",
+          "Read(//<user-home>/.codex/**)"
+        ]
+      },
+      "path_placeholder_note": "<user-home> substitutes the actual host profile path. These tool-level rules are not a Windows process or filesystem sandbox."
+    },
+    "process_environment_overrides": {
+      "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+      "TEMP": "<project>/.eval-tmp",
+      "TMP": "<project>/.eval-tmp",
+      "TMPDIR": "<project>/.eval-tmp"
+    },
+    "shared_loading_prefix": "/research-first Use Read on .claude/skills/research-first/SKILL.md so the exact project instructions are visible in the execution record. Follow that skill to complete the task below. These loading instructions are not task acceptance criteria.\n\n",
+    "common_environment": "This is a contained synthetic task on native Windows.\nWork on this task only inside the current project. Keep probes and notes here.\nDo not change global settings, installations, host memory, credentials or routing;\ndo not publish, contact others or change another project. Auto memory is disabled.\nNode and Python are installed. Python Playwright and Edge are available. Use fresh\nbrowser contexts when needed. Bash and PowerShell shell permissions match commands\nstarting with node, python, python3, npm, npx, pnpm, rg, or the listed git read commands.\nRun permitted commands individually from the project. Do not bypass a permission\nor path restriction. If WebFetch refuses a resource or domain, do not fetch that\nrefused resource through shell code or another route; keep the gap explicit.\nPublic research with the available authorized tools is allowed. Do not expose\nprivate machine data in external queries. Keep research proportional to this task.\n",
+    "cli_flags_overview": [
+      "-p",
+      "--output-format stream-json",
+      "--verbose",
+      "--no-session-persistence",
+      "--permission-prompts none",
+      "--permission-mode acceptEdits",
+      "--strict-mcp-config",
+      "--mcp-config {\"mcpServers\":{}}",
+      "--settings with autoMemoryEnabled=false and the sanitized deny rules above",
+      "--tools with the exact tool list above",
+      "--allowedTools with the exact Bash and PowerShell command prefixes above",
+      "--append-system-prompt with the shared isolated-project instructions"
+    ],
+    "security_boundary": "This setup has no Windows process sandbox. Tool-level deny rules, environment redirection and prompts do not confine arbitrary shell or filesystem code."
+  },
+  "preflight": {
+    "completion": {
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 8.86,
+      "result_subtype": "success",
+      "is_error": false,
+      "reported_model": "deepseek-v4-flash[1m]",
+      "malformed_event_lines": 0,
+      "permission_denied_events": 0,
+      "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+      "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+    },
+    "loading_evidence": [
+      {
+        "kind": "entry_read",
+        "call_line": 207,
+        "result_line": 208,
+        "error": false,
+        "acknowledged": false,
+        "entry_title_visible": true
+      }
+    ],
+    "observation": "The CLI preflight completed successfully; raw event logs and answer text are not embedded here."
+  },
+  "trials": {
+    "contacts/m1": {
+      "assigned_snapshot": "published",
+      "completion": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 311.95,
+        "result_subtype": "success",
+        "is_error": false,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "model_or_provider_override": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 3,
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "loading_evidence": {
+        "prompt_uses_explicit_slash_invocation": true,
+        "entry_read_events": [
+          {
+            "kind": "entry_read",
+            "call_line": 14,
+            "result_line": 15,
+            "error": false,
+            "acknowledged": false,
+            "entry_title_visible": true,
+            "full_entry_matches_project_snapshot": true
+          }
+        ],
+        "interpretation": "Runner metadata records a successful project entry Read and full_entry_matches_project_snapshot=true. This round uses explicit slash invocation and is not an automatic-discovery test."
+      },
+      "archived_application_files": [
+        "README.md",
+        "index.html"
+      ],
+      "application_file_sha256": {
+        "README.md": "2942a74cd99da4520c60a3198ebaa4501155099b8a5754c2d7b12c1268faf75a",
+        "index.html": "c98b49c8cfc5bd178ae74bb88e92d0a652400b4f53ff062b15bc6f92463b73b0"
+      },
+      "explicit_Write_Edit_scope_observation": {
+        "outside_project_file_tool_writes": [],
+        "runtime_snapshot_unchanged_after_trial": true,
+        "scope_limit": "Only explicit Write/Edit tool calls; not a full filesystem or shell side-effect audit."
+      }
+    },
+    "contacts/m2": {
+      "assigned_snapshot": "candidate",
+      "completion": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 145.66,
+        "result_subtype": "success",
+        "is_error": false,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "model_or_provider_override": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 2,
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "loading_evidence": {
+        "prompt_uses_explicit_slash_invocation": true,
+        "entry_read_events": [
+          {
+            "kind": "entry_read",
+            "call_line": 14,
+            "result_line": 15,
+            "error": false,
+            "acknowledged": false,
+            "entry_title_visible": true,
+            "full_entry_matches_project_snapshot": true
+          }
+        ],
+        "interpretation": "Runner metadata records a successful project entry Read and full_entry_matches_project_snapshot=true. This round uses explicit slash invocation and is not an automatic-discovery test."
+      },
+      "archived_application_files": [
+        "README.md",
+        "index.html"
+      ],
+      "application_file_sha256": {
+        "README.md": "3157b2bfb39e7f2557f7179f51df6abce22c50237fa5e23d910260b4cb1ae4a2",
+        "index.html": "ba0fa7f8049ee929622f166443e98c172539123c00a3579825e022524e47facc"
+      },
+      "explicit_Write_Edit_scope_observation": {
+        "outside_project_file_tool_writes": [],
+        "runtime_snapshot_unchanged_after_trial": true,
+        "scope_limit": "Only explicit Write/Edit tool calls; not a full filesystem or shell side-effect audit."
+      }
+    },
+    "contacts/m3": {
+      "assigned_snapshot": "candidate",
+      "completion": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 199.34,
+        "result_subtype": "success",
+        "is_error": false,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "model_or_provider_override": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 4,
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "loading_evidence": {
+        "prompt_uses_explicit_slash_invocation": true,
+        "entry_read_events": [
+          {
+            "kind": "entry_read",
+            "call_line": 14,
+            "result_line": 15,
+            "error": false,
+            "acknowledged": false,
+            "entry_title_visible": true,
+            "full_entry_matches_project_snapshot": true
+          }
+        ],
+        "interpretation": "Runner metadata records a successful project entry Read and full_entry_matches_project_snapshot=true. This round uses explicit slash invocation and is not an automatic-discovery test."
+      },
+      "archived_application_files": [
+        "README.md",
+        "index.html"
+      ],
+      "application_file_sha256": {
+        "README.md": "ae2f87cdd751c23dd73d95c70f15414ba614617566f202aeeb93b18fbab7341a",
+        "index.html": "4b01b13df99d2d6c288959b547c6ccc9b4ebdd390e84f86047fc23ca0106f182"
+      },
+      "explicit_Write_Edit_scope_observation": {
+        "outside_project_file_tool_writes": [],
+        "runtime_snapshot_unchanged_after_trial": true,
+        "scope_limit": "Only explicit Write/Edit tool calls; not a full filesystem or shell side-effect audit."
+      }
+    },
+    "contacts/m4": {
+      "assigned_snapshot": "published",
+      "completion": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 223.91,
+        "result_subtype": "success",
+        "is_error": false,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "model_or_provider_override": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 3,
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "loading_evidence": {
+        "prompt_uses_explicit_slash_invocation": true,
+        "entry_read_events": [
+          {
+            "kind": "entry_read",
+            "call_line": 14,
+            "result_line": 15,
+            "error": false,
+            "acknowledged": false,
+            "entry_title_visible": true,
+            "full_entry_matches_project_snapshot": true
+          }
+        ],
+        "interpretation": "Runner metadata records a successful project entry Read and full_entry_matches_project_snapshot=true. This round uses explicit slash invocation and is not an automatic-discovery test."
+      },
+      "archived_application_files": [
+        "index.html"
+      ],
+      "application_file_sha256": {
+        "index.html": "e594370106e7bcce61aeba00110df63d15bc43af6181bc52b0a6d3cc4f4106bc"
+      },
+      "explicit_Write_Edit_scope_observation": {
+        "outside_project_file_tool_writes": [],
+        "runtime_snapshot_unchanged_after_trial": true,
+        "scope_limit": "Only explicit Write/Edit tool calls; not a full filesystem or shell side-effect audit."
+      }
+    },
+    "handoff/x1": {
+      "assigned_snapshot": "published",
+      "completion": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 162.58,
+        "result_subtype": "success",
+        "is_error": false,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "model_or_provider_override": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 3,
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "loading_evidence": {
+        "prompt_uses_explicit_slash_invocation": true,
+        "entry_read_events": [
+          {
+            "kind": "entry_read",
+            "call_line": 14,
+            "result_line": 15,
+            "error": false,
+            "acknowledged": false,
+            "entry_title_visible": true,
+            "full_entry_matches_project_snapshot": true
+          }
+        ],
+        "interpretation": "Runner metadata records a successful project entry Read and full_entry_matches_project_snapshot=true. This round uses explicit slash invocation and is not an automatic-discovery test."
+      },
+      "archived_application_files": [
+        "README.md",
+        "reading_shelf.py",
+        "reading-list.md"
+      ],
+      "application_file_sha256": {
+        "README.md": "4bfe44c84a6d856e5452db71210c05dfb82a7c886c415886d73322af11628b28",
+        "reading_shelf.py": "5acb31281da1fe17282a917dde7159743f9204148e52a4c4a98ed78d918a8738",
+        "reading-list.md": "bea6e52e9c21563409d3ec613422ea9365775aaa688fbc168d0aff1be6ecd871"
+      },
+      "explicit_Write_Edit_scope_observation": {
+        "outside_project_file_tool_writes": [],
+        "runtime_snapshot_unchanged_after_trial": true,
+        "scope_limit": "Only explicit Write/Edit tool calls; not a full filesystem or shell side-effect audit."
+      }
+    },
+    "handoff/x2": {
+      "assigned_snapshot": "candidate",
+      "completion": {
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_seconds": 176.89,
+        "result_subtype": "success",
+        "is_error": false,
+        "reported_model": "deepseek-v4-flash[1m]",
+        "model_or_provider_override": false,
+        "malformed_event_lines": 0,
+        "permission_denied_events": 3,
+        "tool_inventory_sha256": "a6f4a7780d17ee0ad3485f874fdd9dff14cdf1a4892610a2afe189c4019d6979",
+        "skill_inventory_sha256": "ddd4196b053fbeb61ec58ef61f0aa97356f3438be82653c2c524fade58651992"
+      },
+      "loading_evidence": {
+        "prompt_uses_explicit_slash_invocation": true,
+        "entry_read_events": [
+          {
+            "kind": "entry_read",
+            "call_line": 14,
+            "result_line": 15,
+            "error": false,
+            "acknowledged": false,
+            "entry_title_visible": true,
+            "full_entry_matches_project_snapshot": true
+          }
+        ],
+        "interpretation": "Runner metadata records a successful project entry Read and full_entry_matches_project_snapshot=true. This round uses explicit slash invocation and is not an automatic-discovery test."
+      },
+      "archived_application_files": [
+        "README.md",
+        "reading_shelf.py",
+        "reading-list.md"
+      ],
+      "application_file_sha256": {
+        "README.md": "8c32ea37abd9ed54913ac20c08b7463780997fe199f6bbc42274d3d8fdfeef34",
+        "reading_shelf.py": "8d7a9db399666131765432b7d91382350d7107303ec59ec24c1190d60fc897b4",
+        "reading-list.md": "bea6e52e9c21563409d3ec613422ea9365775aaa688fbc168d0aff1be6ecd871"
+      },
+      "explicit_Write_Edit_scope_observation": {
+        "outside_project_file_tool_writes": [],
+        "runtime_snapshot_unchanged_after_trial": true,
+        "scope_limit": "Only explicit Write/Edit tool calls; not a full filesystem or shell side-effect audit."
+      }
+    }
+  },
+  "scope_and_trace_summary": {
+    "explicit_Write_Edit_outside_project_paths": 0,
+    "runtime_skill_copy_unchanged_after_each_trial": true,
+    "audit_limit": "The Write/Edit path review is not a full shell or filesystem side-effect audit.",
+    "aggregated_trace_index": {
+      "calls": 266,
+      "results": 266,
+      "unique_pairs": 266,
+      "permission_denials": 18,
+      "tool_errors": 39,
+      "missing_duplicate_orphan_or_malformed_records": 0,
+      "raw_payloads_in_public_protocol": false
+    }
+  },
+  "artifact_scope": {
+    "candidate_patch_base": "frozen published snapshot raw bytes",
+    "application_patch_bases": {
+      "contacts": "frozen contacts fixture",
+      "handoff": "frozen reading-handoff fixture with prompt.md excluded"
+    },
+    "application_files_only": true,
+    "included_useful_generated_output": [
+      "handoff/reading-list.md"
+    ],
+    "excluded_trial_only_content": [
+      ".claude skill copies",
+      ".git metadata",
+      ".eval-tmp caches",
+      ".probe and research scratch code",
+      "screenshots",
+      "raw CLI logs"
+    ],
+    "sha256_by_artifact": {
+      "evals/discovery/artifacts/2026-10-07-power-candidate.patch": "cd146d7b57aa4cf123f862000c982d11d0e0f5bc6e3ca4d37abe23949c4fa4b1",
+      "evals/discovery/artifacts/2026-10-07-power-contacts-m1.patch": "9745453f824bc190d2b90d44a4383e2a90273bf5dc2764a48a72e8073fe10abb",
+      "evals/discovery/artifacts/2026-10-07-power-contacts-m2.patch": "37aef29e895431fb30a5d89fa9785fc1f13a21424a8b6f54f93878963559f6a4",
+      "evals/discovery/artifacts/2026-10-07-power-contacts-m3.patch": "8aac8dc483582c42b464d00c78c40bd015f7e48ffee5f6e5939996a7f404bdb0",
+      "evals/discovery/artifacts/2026-10-07-power-contacts-m4.patch": "a82e85fc5739106f50309ee8e5039a7b2ba0619534fcf65f9a09c7fbbd843afa",
+      "evals/discovery/artifacts/2026-10-07-power-handoff-x1.patch": "474e9ae4fa875e44927af9f55f4d6c1c25bdc01aa8be44e8ebe2d71f725bfa4f",
+      "evals/discovery/artifacts/2026-10-07-power-handoff-x2.patch": "366812034cabcf1ce999ac6119688abcae0fdedabe1f52eac80057f283da27d5",
+      "evals/discovery/fixtures/reading-handoff/README.md": "572ba8faae014b0f66aeccddf047d1cd22e77b103900b426fee6ea786845b9bf",
+      "evals/discovery/fixtures/reading-handoff/reading_shelf.py": "e7ed500ccb8f1a5e8d0686dd366f78a72134effeb517d29d31a5e5615e9260cb",
+      "evals/discovery/fixtures/reading-handoff/shelf.json": "f605a975c98aad1875a974a10fe701b7d57d7b2adc73d5264a8997be541cef1b",
+      "evals/discovery/artifacts/2026-10-07-power-candidate-git.patch": "dd774a95b71a70dacdd270c3c2e6d028b30debc4b0011f3d9b9712f241a99489"
+    },
+    "candidate_patch_variants": {
+      "frozen_snapshot_raw": {
+        "path": "evals/discovery/artifacts/2026-10-07-power-candidate.patch",
+        "base": "Frozen published runtime snapshot raw bytes under the round snapshots.",
+        "target": "Frozen candidate runtime snapshot exact raw bytes.",
+        "hash_semantics": "Use snapshots.published and snapshots.candidate SHA-256 maps as raw-byte hashes. This patch is for exact trial-snapshot reconstruction."
+      },
+      "published_git_blob_lf": {
+        "path": "evals/discovery/artifacts/2026-10-07-power-candidate-git.patch",
+        "base_commit": "8a52431897628b636c413c51ea1d40af4a3fe290",
+        "base": "Actual Git blob bytes from the published commit, not the frozen Windows runtime-copy bytes.",
+        "target": "All 19 candidate runtime files after CRLF-to-LF normalization; target files contain no CR bytes.",
+        "target_file_count": 19,
+        "target_sha256_by_repository_relative_path": {
+          "SKILL.md": "68f9655fe702ee9f2f194fcfd27f7185a63e3fabff67849deb7b1685f6af1c95",
+          "agents/openai.yaml": "d21105aa61dc9be924d23263e5a15a439564a2043ecd00b9a07ae0557d356972",
+          "assets/project-identity-card.md": "9cc32f32b5c7214062a851bac62d042bbe93b60361e847a5b8e5a22c68b15368",
+          "assets/research-report-template.md": "ec76cf19313bdd9dcd3e97a293ca2aefd6f708a28e4a1bf920eb429f52d7ecf9",
+          "references/adapting-depth.md": "c48c5abde993a7fc777ae77c7481f2d3f34b3aad67fe430501c46581e820b2ef",
+          "references/case-studies.md": "0a71a1be338a7ba026da778b7d29af8ca9c02c0e54147abaabd195cd37651847",
+          "references/contradictions.md": "c5226ff7b3db96210f7abac6cdf1b323f6b31425fdb37ab511369896f8be009a",
+          "references/execution-evidence.md": "bf172fdaa76b4b172a18340f316bc60f7cc1e9b14c0e8d06c05328b27cffc1bc",
+          "references/feature-evidence-ledger.md": "8992b1b450c115c99a45988c247e23cfe3944cac79a0210c7c294a4bc5ad1ea4",
+          "references/intent-interpretation-evaluation.md": "b9c14543a5783aa35e6d994740ac4644249aebfdb50d7d17c6a3cc44d378b8bd",
+          "references/jev-checkpoints.md": "614b659679074efb986760fdd1c91f6a587eeda93046363e29bc54f58712a449",
+          "references/problem-expansion.md": "a5b63c85aca6a09b499a5e1d17e98f46c04f615692410d03de06dfa74c6094b2",
+          "references/research-examples.md": "34f274bba017965425d31f4f63a5b39f188d3611cb12287713019518aa665084",
+          "references/reuse-and-alternatives.md": "4bdb6f6e861de076e35f827a7e79b03063e5f8002607f3820e7aea0ffc46079f",
+          "references/search-quality.md": "437ec6a6822a1a26d7d1e50249ad7fc9c391479a29a16a784acbef8c0d55c692",
+          "scripts/jev_check.py": "442f2c105db6f7ba66cbd48198cfdfd1c21f930cf4b571558576d40287c06a00",
+          "scripts/requirements-dev.txt": "b5bc3730819d623299910c567b3492f909be9d7b46caefab341af14fe882a8ab",
+          "scripts/requirements-jev.txt": "51efe61d857f58462e3ef080662baf62bca09a0eca367df6210ab745c8a09e4c",
+          "scripts/validate_package.py": "f0d0b7a9fc711c37faf9538e2d90f9876f6d7ec8667927a81a434d7be3acd61f"
+        },
+        "hash_semantics": "These hashes cover LF-normalized candidate bytes. Do not compare them with the raw-byte hashes in snapshots.candidate.",
+        "published_snapshot_raw_vs_git_blob": {
+          "file_count": 18,
+          "raw_byte_different_file_count": 7,
+          "raw_byte_different_paths": [
+            "agents/openai.yaml",
+            "assets/project-identity-card.md",
+            "references/adapting-depth.md",
+            "references/contradictions.md",
+            "references/intent-interpretation-evaluation.md",
+            "references/problem-expansion.md",
+            "references/search-quality.md"
+          ],
+          "all_differences_equal_after_crlf_to_lf_normalization": true,
+          "git_blob_sha256_by_repository_relative_path": {
+            "SKILL.md": "0aa792370c5564a1026b3a534b717a15570c74113f6d4acb48f41bfbcdaf20eb",
+            "agents/openai.yaml": "d21105aa61dc9be924d23263e5a15a439564a2043ecd00b9a07ae0557d356972",
+            "assets/project-identity-card.md": "9cc32f32b5c7214062a851bac62d042bbe93b60361e847a5b8e5a22c68b15368",
+            "assets/research-report-template.md": "ec76cf19313bdd9dcd3e97a293ca2aefd6f708a28e4a1bf920eb429f52d7ecf9",
+            "references/adapting-depth.md": "c48c5abde993a7fc777ae77c7481f2d3f34b3aad67fe430501c46581e820b2ef",
+            "references/case-studies.md": "0a71a1be338a7ba026da778b7d29af8ca9c02c0e54147abaabd195cd37651847",
+            "references/contradictions.md": "2591ed83c71040c3fdc8c5bac5223e847c8f4416871b9188bc8f51ffa502803c",
+            "references/feature-evidence-ledger.md": "8992b1b450c115c99a45988c247e23cfe3944cac79a0210c7c294a4bc5ad1ea4",
+            "references/intent-interpretation-evaluation.md": "b9c14543a5783aa35e6d994740ac4644249aebfdb50d7d17c6a3cc44d378b8bd",
+            "references/jev-checkpoints.md": "614b659679074efb986760fdd1c91f6a587eeda93046363e29bc54f58712a449",
+            "references/problem-expansion.md": "a5b63c85aca6a09b499a5e1d17e98f46c04f615692410d03de06dfa74c6094b2",
+            "references/research-examples.md": "34f274bba017965425d31f4f63a5b39f188d3611cb12287713019518aa665084",
+            "references/reuse-and-alternatives.md": "4bdb6f6e861de076e35f827a7e79b03063e5f8002607f3820e7aea0ffc46079f",
+            "references/search-quality.md": "437ec6a6822a1a26d7d1e50249ad7fc9c391479a29a16a784acbef8c0d55c692",
+            "scripts/jev_check.py": "442f2c105db6f7ba66cbd48198cfdfd1c21f930cf4b571558576d40287c06a00",
+            "scripts/requirements-dev.txt": "b5bc3730819d623299910c567b3492f909be9d7b46caefab341af14fe882a8ab",
+            "scripts/requirements-jev.txt": "51efe61d857f58462e3ef080662baf62bca09a0eca367df6210ab745c8a09e4c",
+            "scripts/validate_package.py": "f0d0b7a9fc711c37faf9538e2d90f9876f6d7ec8667927a81a434d7be3acd61f"
+          }
+        },
+        "reconstruction": "Passed git apply --check and git apply in a separate clean checkout at base_commit; all 19 reconstructed files match the LF-normalized target hashes."
+      }
+    }
+  },
+  "reconstruction_verification": {
+    "preserved_at": "verification/public-archive-validation",
+    "git_apply_check_and_apply": "The frozen-snapshot raw candidate patch and all six application patches passed with core.autocrlf=false; the separate Git-blob LF candidate patch passed independently as documented below.",
+    "candidate": "The frozen-snapshot raw candidate patch reconstructs all 19 files with exact raw SHA-256 matches to the frozen candidate snapshot.",
+    "applications": "Each patch reconstructs every explicitly archived app file byte-for-byte from its corresponding frozen fixture.",
+    "line_endings": "The original candidate patch uses frozen published/candidate snapshot raw bytes and their raw SHA-256 manifests. Seven published snapshot files differ byte-for-byte from their Git blobs only by CRLF/LF representation. The Git-blob candidate patch is a separate reproduction route: its base is the published commit’s actual Git blobs and its target is all 19 candidate runtime files normalized to LF. Keep raw snapshot hashes and normalized LF target hashes distinct.",
+    "candidate_git_blob_lf": {
+      "preserved_at": "verification/git-blob-candidate-validation",
+      "patch": "evals/discovery/artifacts/2026-10-07-power-candidate-git.patch",
+      "base_commit": "8a52431897628b636c413c51ea1d40af4a3fe290",
+      "base_is_actual_git_blobs": true,
+      "target_is_candidate_crlf_to_lf_normalized": true,
+      "target_file_count": 19,
+      "patch_sha256": "dd774a95b71a70dacdd270c3c2e6d028b30debc4b0011f3d9b9712f241a99489",
+      "patch_check_and_apply": "passed",
+      "all_reconstructed_lf_hashes_match": true,
+      "lf_hashes_by_repository_relative_path": {
+        "SKILL.md": "68f9655fe702ee9f2f194fcfd27f7185a63e3fabff67849deb7b1685f6af1c95",
+        "agents/openai.yaml": "d21105aa61dc9be924d23263e5a15a439564a2043ecd00b9a07ae0557d356972",
+        "assets/project-identity-card.md": "9cc32f32b5c7214062a851bac62d042bbe93b60361e847a5b8e5a22c68b15368",
+        "assets/research-report-template.md": "ec76cf19313bdd9dcd3e97a293ca2aefd6f708a28e4a1bf920eb429f52d7ecf9",
+        "references/adapting-depth.md": "c48c5abde993a7fc777ae77c7481f2d3f34b3aad67fe430501c46581e820b2ef",
+        "references/case-studies.md": "0a71a1be338a7ba026da778b7d29af8ca9c02c0e54147abaabd195cd37651847",
+        "references/contradictions.md": "c5226ff7b3db96210f7abac6cdf1b323f6b31425fdb37ab511369896f8be009a",
+        "references/execution-evidence.md": "bf172fdaa76b4b172a18340f316bc60f7cc1e9b14c0e8d06c05328b27cffc1bc",
+        "references/feature-evidence-ledger.md": "8992b1b450c115c99a45988c247e23cfe3944cac79a0210c7c294a4bc5ad1ea4",
+        "references/intent-interpretation-evaluation.md": "b9c14543a5783aa35e6d994740ac4644249aebfdb50d7d17c6a3cc44d378b8bd",
+        "references/jev-checkpoints.md": "614b659679074efb986760fdd1c91f6a587eeda93046363e29bc54f58712a449",
+        "references/problem-expansion.md": "a5b63c85aca6a09b499a5e1d17e98f46c04f615692410d03de06dfa74c6094b2",
+        "references/research-examples.md": "34f274bba017965425d31f4f63a5b39f188d3611cb12287713019518aa665084",
+        "references/reuse-and-alternatives.md": "4bdb6f6e861de076e35f827a7e79b03063e5f8002607f3820e7aea0ffc46079f",
+        "references/search-quality.md": "437ec6a6822a1a26d7d1e50249ad7fc9c391479a29a16a784acbef8c0d55c692",
+        "scripts/jev_check.py": "442f2c105db6f7ba66cbd48198cfdfd1c21f930cf4b571558576d40287c06a00",
+        "scripts/requirements-dev.txt": "b5bc3730819d623299910c567b3492f909be9d7b46caefab341af14fe882a8ab",
+        "scripts/requirements-jev.txt": "51efe61d857f58462e3ef080662baf62bca09a0eca367df6210ab745c8a09e4c",
+        "scripts/validate_package.py": "f0d0b7a9fc711c37faf9538e2d90f9876f6d7ec8667927a81a434d7be3acd61f"
+      }
+    }
+  },
+  "limitations": [
+    "No Windows process sandbox; shell rules and prompts do not confine arbitrary code.",
+    "Two pairs for contacts, one pair for handoff; no reliable cross-model generalization.",
+    "Changed common host instructions and settings; compare only inside this round.",
+    "Explicit slash invocation plus entry Read; not an automatic-discovery test or a required Skill-tool call.",
+    "Forward designer saw a memory summary of prior CSV tests, but no candidate or old artifacts."
+  ],
+  "independent_acceptance_archive": {
+    "functional_results_are_separate_from_research_judgments": true,
+    "path_substitutions": [
+      "<round>",
+      "<repo>",
+      "<user-home>"
+    ],
+    "raw_trace_or_screenshot_published": false,
+    "sha256_by_artifact": {
+      "evals/discovery/artifacts/2026-10-07-power-contacts-m1-acceptance.json": "b99503e6b2fe595eb4464d28ef92f57fe986e1508b82ce5039fd4214729913f3",
+      "evals/discovery/artifacts/2026-10-07-power-contacts-m2-acceptance.json": "305bae30f82dee0f0e0e9bd40e861776c2357bef342674be2cc774e5ffd3a8df",
+      "evals/discovery/artifacts/2026-10-07-power-contacts-m3-acceptance.json": "050af151e6c3d3b292651ad7295078ecd6193f30a0ebe349b792f389f99550c6",
+      "evals/discovery/artifacts/2026-10-07-power-contacts-m4-acceptance.json": "72982f7b272d19f2c12b2f983a206d534dd16483fb7e8a4deae669bd3f9ccf1a",
+      "evals/discovery/artifacts/2026-10-07-power-handoff-x1-acceptance.json": "d3f0a81735bca1287de3ae46e87a4c71b786f63779b7182da63511721311aa8a",
+      "evals/discovery/artifacts/2026-10-07-power-handoff-x2-acceptance.json": "965371bd760e7d2cc62b99bea15ef3179222196ea4e43bc15d2e8f58a82bd12c",
+      "evals/discovery/artifacts/2026-10-07-power-handoff-source-review.json": "c8f8384742baca0ee4bc042843ccba555c51a7929648cd1a50a6162a81bc4482",
+      "evals/discovery/trace_index.py": "2caf0f45fa42f3fec8b7eb756b3693d7efe81c4e22f45b8dfbbc5fd7a6f377be",
+      "tests/test_trace_index.py": "367e80624d438c34d436e70e9e6cce068595ff96869441c5b75ad8a207573293",
+      "evals/discovery/verify-reading-handoff.py": "4556cc850ea91315383821cf277fc225a0f738f100bc996cfc012b01b251b4be",
+      "evals/discovery/artifacts/2026-10-07-power-contacts-source-review.json": "a9a296737f8957ca20a964c92dfc36180f2d5cefbd7e94c9c41906bfc03d4b55"
+    },
+    "handoff_replay": {
+      "x1_exit": 0,
+      "x2_exit": 0,
+      "original_fixture_exit": 1,
+      "subprocess_timeout_seconds": 15,
+      "frozen_criteria_count": 6,
+      "bom_and_lf_are_extra_diagnostics": true
+    },
+    "maintenance_tests": {
+      "passed": 37,
+      "skipped": 0,
+      "live_sdk_calls": false
+    }
+  }
+}
