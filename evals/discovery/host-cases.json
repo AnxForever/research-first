@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "frozen_at_utc": "2026-10-02T08:35:09.633Z",
+  "scope": "Windows native Claude Code host activation cases",
+  "source_snapshot": {
+    "repository_commit": "c94db861ede29f3d718ea6be1dc1b0f1875cb88a",
+    "skill_snapshot_commit": "c94db861ede29f3d718ea6be1dc1b0f1875cb88a"
+  },
+  "fixture": {
+    "repository_path": "evals/discovery/fixtures/host",
+    "seed_provenance": "Copied from the pre-run host preparation seed host/positive-search/index.html; not from a post-run negative fixture.",
+    "files": [
+      {
+        "path": "index.html",
+        "bytes": 741,
+        "sha256": "9EC181D38670B94788D90D929E3C897C1D5B52B36DE41F1E84580611F2059376"
+      }
+    ],
+    "readme_present_in_seed": false,
+    "project_skill_included": false
+  },
+  "runtime": {
+    "host": "Windows native Claude Code 2.1.281",
+    "model": "default/current configuration; reported as deepseek-v4-flash[1m]",
+    "per_case_timeout_seconds": 40,
+    "prompt_transport": "UTF-8 bytes on stdin",
+    "output_format": "stream-json with verbose events",
+    "session_persistence": false,
+    "permission_prompts": "none",
+    "permission_mode": "acceptEdits, scoped to a fresh isolated fixture",
+    "allowed_tools_filter": "none; no --allowedTools flag was used, so the native tool set was not filtered",
+    "fixture_skill_path_during_runs": ".claude/skills/research-first/SKILL.md",
+    "skill_materialization": "A c94db86 snapshot was copied into each fresh run fixture; no user-level skill existed on the tested Windows host. The project skill is intentionally not bundled in this repository fixture."
+  },
+  "evidence_rules": {
+    "confirmed_invocation": "A Skill tool_use naming research-first plus its matching non-error tool_result containing the launch acknowledgement.",
+    "confirmed_target_file_read": "A Read tool_use resolving to the exact project fixture .claude/skills/research-first/SKILL.md path plus a matching non-error tool_result with returned content.",
+    "loaded": "Union of confirmed_invocation and confirmed_target_file_read.",
+    "skill_body_visible_in_trace": "Record separately; a launch acknowledgement alone does not establish that the body is visible in the trace or was followed.",
+    "positive_stop_rule": "Stop at the first valid load evidence or timeout. If stopped after load evidence, task completion is not evaluated.",
+    "negative_stop_rule": "Continue to normal CLI completion. No-load is confirmed only when completion is successful and no valid load evidence occurred; timeout, error, or missing terminal result is unknown.",
+    "explicit_control_stop_rule": "Stop at the first valid load evidence or timeout; task completion is not evaluated when stopped after evidence."
+  },
+  "skill_snapshot_hashes": {
+    "source_commit": "c94db861ede29f3d718ea6be1dc1b0f1875cb88a",
+    "file_count": 12,
+    "note": "The skill files are not included under evals/discovery/fixtures/host. Existing sha256 values preserve materialized Windows run-fixture hashes; git_blob_sha256 and normalized_lf_sha256 document raw c94 Git-object bytes and LF-normalized equivalence.",
+    "files": [
+      {
+        "path": "agents/openai.yaml",
+        "bytes": 391,
+        "sha256": "85B87D197BEB39C41D178E0D44C4A0897A85E9844C2D5C99A280FCCCF0FB376C",
+        "git_blob_sha256": "D21105AA61DC9BE924D23263E5A15A439564A2043ECD00B9A07AE0557D356972",
+        "normalized_lf_sha256": "D21105AA61DC9BE924D23263E5A15A439564A2043ECD00B9A07AE0557D356972",
+        "raw_bytes_equal_to_git_blob": false,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/adapting-depth.md",
+        "bytes": 5659,
+        "sha256": "2EDA3806604F192BC363D8084BC432341583859B8BBCBC1F696409955713D6AE",
+        "git_blob_sha256": "C48C5ABDE993A7FC777AE77C7481F2D3F34B3AAD67FE430501C46581E820B2EF",
+        "normalized_lf_sha256": "C48C5ABDE993A7FC777AE77C7481F2D3F34B3AAD67FE430501C46581E820B2EF",
+        "raw_bytes_equal_to_git_blob": false,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/case-studies.md",
+        "bytes": 6558,
+        "sha256": "0A71A1BE338A7BA026DA778B7D29AF8CA9C02C0E54147ABAABD195CD37651847",
+        "git_blob_sha256": "0A71A1BE338A7BA026DA778B7D29AF8CA9C02C0E54147ABAABD195CD37651847",
+        "normalized_lf_sha256": "0A71A1BE338A7BA026DA778B7D29AF8CA9C02C0E54147ABAABD195CD37651847",
+        "raw_bytes_equal_to_git_blob": true,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/contradictions.md",
+        "bytes": 3195,
+        "sha256": "92DE2E349EE3FACDDC6AC7B07AA7195502864D29A1E3B8B7CB31F2E499517CDE",
+        "git_blob_sha256": "2591ED83C71040C3FDC8C5BAC5223E847C8F4416871B9188BC8F51FFA502803C",
+        "normalized_lf_sha256": "2591ED83C71040C3FDC8C5BAC5223E847C8F4416871B9188BC8F51FFA502803C",
+        "raw_bytes_equal_to_git_blob": false,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/feature-evidence-ledger.md",
+        "bytes": 10721,
+        "sha256": "8992B1B450C115C99A45988C247E23CFE3944CAC79A0210C7C294A4BC5AD1EA4",
+        "git_blob_sha256": "8992B1B450C115C99A45988C247E23CFE3944CAC79A0210C7C294A4BC5AD1EA4",
+        "normalized_lf_sha256": "8992B1B450C115C99A45988C247E23CFE3944CAC79A0210C7C294A4BC5AD1EA4",
+        "raw_bytes_equal_to_git_blob": true,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/intent-interpretation-evaluation.md",
+        "bytes": 12707,
+        "sha256": "299473A335D99F51B8254F57EA4A90B5FF58B9723DBBD85945E424442D3F222B",
+        "git_blob_sha256": "B9C14543A5783AA35E6D994740AC4644249AEBFDB50D7D17C6A3CC44D378B8BD",
+        "normalized_lf_sha256": "B9C14543A5783AA35E6D994740AC4644249AEBFDB50D7D17C6A3CC44D378B8BD",
+        "raw_bytes_equal_to_git_blob": false,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/jev-checkpoints.md",
+        "bytes": 7447,
+        "sha256": "614B659679074EFB986760FDD1C91F6A587EEDA93046363E29BC54F58712A449",
+        "git_blob_sha256": "614B659679074EFB986760FDD1C91F6A587EEDA93046363E29BC54F58712A449",
+        "normalized_lf_sha256": "614B659679074EFB986760FDD1C91F6A587EEDA93046363E29BC54F58712A449",
+        "raw_bytes_equal_to_git_blob": true,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/problem-expansion.md",
+        "bytes": 6375,
+        "sha256": "F5CC894C58E3E924F41FBB7D064CD70B6B70543AB4A5BB23AE6624F8167B9195",
+        "git_blob_sha256": "A5B63C85ACA6A09B499A5E1D17E98F46C04F615692410D03DE06DFA74C6094B2",
+        "normalized_lf_sha256": "A5B63C85ACA6A09B499A5E1D17E98F46C04F615692410D03DE06DFA74C6094B2",
+        "raw_bytes_equal_to_git_blob": false,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/research-examples.md",
+        "bytes": 7244,
+        "sha256": "34F274BBA017965425D31F4F63A5B39F188D3611CB12287713019518AA665084",
+        "git_blob_sha256": "34F274BBA017965425D31F4F63A5B39F188D3611CB12287713019518AA665084",
+        "normalized_lf_sha256": "34F274BBA017965425D31F4F63A5B39F188D3611CB12287713019518AA665084",
+        "raw_bytes_equal_to_git_blob": true,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/reuse-and-alternatives.md",
+        "bytes": 9122,
+        "sha256": "4E0FECC08035EFCA9188052A9E928906F806AB211FA99F52166D5C7AEDA78774",
+        "git_blob_sha256": "4E0FECC08035EFCA9188052A9E928906F806AB211FA99F52166D5C7AEDA78774",
+        "normalized_lf_sha256": "4E0FECC08035EFCA9188052A9E928906F806AB211FA99F52166D5C7AEDA78774",
+        "raw_bytes_equal_to_git_blob": true,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "references/search-quality.md",
+        "bytes": 5517,
+        "sha256": "907E36C674DB865EEA768B2C8AB4B1229A984F75E374F47E371A1BD0897DB1A2",
+        "git_blob_sha256": "437EC6A6822A1A26D7D1E50249AD7FC9C391479A29A16A784ACBEF8C0D55C692",
+        "normalized_lf_sha256": "437EC6A6822A1A26D7D1E50249AD7FC9C391479A29A16A784ACBEF8C0D55C692",
+        "raw_bytes_equal_to_git_blob": false,
+        "normalized_lf_equal_to_git_blob": true
+      },
+      {
+        "path": "SKILL.md",
+        "bytes": 12757,
+        "sha256": "3CF8D0AC2D5616CD387773806FE94B564C0434C5DE5A71B417EFE1B1FAE6B50A",
+        "git_blob_sha256": "3CF8D0AC2D5616CD387773806FE94B564C0434C5DE5A71B417EFE1B1FAE6B50A",
+        "normalized_lf_sha256": "3CF8D0AC2D5616CD387773806FE94B564C0434C5DE5A71B417EFE1B1FAE6B50A",
+        "raw_bytes_equal_to_git_blob": true,
+        "normalized_lf_equal_to_git_blob": true
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "positive-search",
+      "class": "positive",
+      "prompt": "给任务列表加一个能快速找到条目的搜索功能",
+      "fixture_sha256": "9EC181D38670B94788D90D929E3C897C1D5B52B36DE41F1E84580611F2059376",
+      "stop_rule": "positive_stop_rule",
+      "expected_evidence": "confirmed_invocation OR confirmed_target_file_read"
+    },
+    {
+      "id": "positive-filter-repetition",
+      "class": "positive",
+      "prompt": "经常重复选筛选条件，帮我省点操作",
+      "fixture_sha256": "9EC181D38670B94788D90D929E3C897C1D5B52B36DE41F1E84580611F2059376",
+      "stop_rule": "positive_stop_rule",
+      "expected_evidence": "confirmed_invocation OR confirmed_target_file_read"
+    },
+    {
+      "id": "negative-button-label",
+      "class": "negative",
+      "prompt": "只把按钮“提交”改成“保存”，其他不动",
+      "fixture_sha256": "9EC181D38670B94788D90D929E3C897C1D5B52B36DE41F1E84580611F2059376",
+      "stop_rule": "negative_stop_rule",
+      "expected_evidence": "No valid load evidence before successful normal completion; otherwise unknown."
+    },
+    {
+      "id": "negative-explain-function",
+      "class": "negative",
+      "prompt": "解释一下这段函数返回什么，不改代码",
+      "fixture_sha256": "9EC181D38670B94788D90D929E3C897C1D5B52B36DE41F1E84580611F2059376",
+      "stop_rule": "negative_stop_rule",
+      "expected_evidence": "No valid load evidence before successful normal completion; otherwise unknown."
+    },
+    {
+      "id": "explicit-health-control",
+      "class": "explicit-control",
+      "prompt": "请明确使用 research-first 技能，先研究适合这个任务的实现方案并说明取舍。",
+      "fixture_sha256": "9EC181D38670B94788D90D929E3C897C1D5B52B36DE41F1E84580611F2059376",
+      "stop_rule": "explicit_control_stop_rule",
+      "expected_evidence": "confirmed_invocation OR confirmed_target_file_read"
+    }
+  ],
+  "hash_semantics": {
+    "skill_snapshot_sha256": "Existing sha256 fields are preserved as hashes of materialized Windows run-fixture bytes.",
+    "git_blob_sha256": "Raw bytes returned by git show <source_commit>:<path>.",
+    "normalization": "Replace CRLF with LF, then any remaining CR with LF; normalized_lf_sha256 hashes those normalized runtime bytes.",
+    "comparison_result": {
+      "runtime_copies_identical_across_five_cases": true,
+      "raw_git_blob_byte_matches": 6,
+      "normalized_git_blob_byte_matches": 12,
+      "file_count": 12,
+      "non_newline_content_differences": 0
+    }
+  }
+}

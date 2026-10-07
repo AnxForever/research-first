@@ -1,0 +1,199 @@
+--- a/app.js
++++ b/app.js
+@@ -5,9 +5,17 @@
+   { id: 'r-3', title: 'A tiny field guide', url: 'https://example.test/field-guide', note: '', status: 'read' },
+ ];
+ 
++const BACKUP_APP = 'reading-list';
++const BACKUP_VERSION = 1;
++const MAX_BACKUP_BYTES = 2 * 1024 * 1024;
++const KNOWN_STATUSES = ['unread', 'reading', 'read'];
++
+ const status = document.querySelector('#status');
+ const itemsNode = document.querySelector('#items');
++const restoreDialog = document.querySelector('#restore-dialog');
++const restoreSummary = document.querySelector('#restore-summary');
+ let items = loadItems();
++let pendingRestore = null;
+ 
+ function loadItems() {
+   const raw = localStorage.getItem(STORAGE_KEY);
+@@ -64,4 +72,136 @@
+   status.textContent = '列表已清空。';
+ });
+ 
++// 备份导出：一个可拷到别的电脑的 JSON 文件。
++document.querySelector('#export-backup').addEventListener('click', () => {
++  const backup = {
++    app: BACKUP_APP,
++    version: BACKUP_VERSION,
++    exportedAt: new Date().toISOString(),
++    items,
++  };
++  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
++  const url = URL.createObjectURL(blob);
++  const link = document.createElement('a');
++  link.href = url;
++  link.download = `reading-list-backup-${new Date().toISOString().slice(0, 10)}.json`;
++  document.body.append(link);
++  link.click();
++  link.remove();
++  setTimeout(() => URL.revokeObjectURL(url), 0);
++  status.textContent = `已导出 ${items.length} 条到下载文件夹。`;
++});
++
++// 只接受 http/https，避免导入的备份把 javascript: 之类的地址塞进链接。
++function safeUrl(value) {
++  if (typeof value !== 'string') return null;
++  try {
++    const parsed = new URL(value.trim());
++    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.href : null;
++  } catch {
++    return null;
++  }
++}
++
++function normalizeItem(raw, usedIds) {
++  if (!raw || typeof raw !== 'object') return null;
++  const title = typeof raw.title === 'string' ? raw.title.trim() : '';
++  const url = safeUrl(raw.url);
++  if (!title || url === null) return null;
++  let id = typeof raw.id === 'string' && raw.id.trim() ? raw.id.trim() : crypto.randomUUID();
++  if (usedIds.has(id)) id = crypto.randomUUID();
++  usedIds.add(id);
++  return {
++    id,
++    title,
++    url,
++    note: typeof raw.note === 'string' ? raw.note : '',
++    status: KNOWN_STATUSES.includes(raw.status) ? raw.status : 'unread',
++  };
++}
++
++// 同时接受导出的信封格式和直接存储的条目数组。
++function parseBackup(text) {
++  let data;
++  try {
++    data = JSON.parse(text);
++  } catch {
++    throw new Error('这个文件不是有效的 JSON。');
++  }
++  const list = Array.isArray(data) ? data : data && Array.isArray(data.items) ? data.items : null;
++  if (list === null) throw new Error('这个文件不是「稍后阅读」的备份。');
++  const usedIds = new Set();
++  const restored = [];
++  for (const raw of list) {
++    const item = normalizeItem(raw, usedIds);
++    if (item) restored.push(item);
++  }
++  if (restored.length === 0 && list.length > 0) throw new Error('备份里没有可用的条目。');
++  return { items: restored, skipped: list.length - restored.length };
++}
++
++function applyRestore(incoming, mode) {
++  if (mode !== 'merge') {
++    items = incoming.slice();
++    return items.length;
++  }
++  const existing = new Set(items.map(item => item.id));
++  const added = incoming.filter(item => !existing.has(item.id));
++  items = items.concat(added);
++  return added.length;
++}
++
++document.querySelector('#restore-backup').addEventListener('click', () => {
++  document.querySelector('#restore-file').click();
++});
++
++document.querySelector('#restore-file').addEventListener('change', async event => {
++  const file = event.currentTarget.files[0];
++  event.currentTarget.value = '';
++  if (!file) return;
++  if (file.size > MAX_BACKUP_BYTES) {
++    status.textContent = '恢复失败：文件太大，不像是备份文件。列表未改动。';
++    return;
++  }
++  let parsed;
++  try {
++    parsed = parseBackup(await file.text());
++  } catch (error) {
++    status.textContent = `恢复失败：${error.message}列表未改动。`;
++    return;
++  }
++  if (parsed.items.length === 0) {
++    status.textContent = '备份里没有可恢复的条目，列表未改动。';
++    return;
++  }
++  const skipped = parsed.skipped > 0 ? `，跳过 ${parsed.skipped} 条无效条目` : '';
++  // 当前列表是空的就没有可损坏的内容，直接恢复；否则先让用户确认。
++  if (items.length === 0) {
++    const count = applyRestore(parsed.items, 'replace');
++    saveItems();
++    renderItems();
++    status.textContent = `已恢复 ${count} 条${skipped}。`;
++    return;
++  }
++  pendingRestore = parsed.items;
++  restoreSummary.textContent = `备份里 ${parsed.items.length} 条${skipped}；当前列表 ${items.length} 条。`;
++  restoreDialog.returnValue = '';
++  restoreDialog.showModal();
++});
++
++restoreDialog.addEventListener('close', () => {
++  const incoming = pendingRestore;
++  const choice = restoreDialog.returnValue;
++  pendingRestore = null;
++  document.querySelector('#restore-backup').focus();
++  if (!incoming || (choice !== 'merge' && choice !== 'replace')) {
++    status.textContent = '已取消，列表未改动。';
++    return;
++  }
++  const count = applyRestore(incoming, choice);
++  saveItems();
++  renderItems();
++  status.textContent = choice === 'merge' ? `已合并，新增 ${count} 条。` : `已替换为备份内容，共 ${count} 条。`;
++});
++
+ renderItems();
+--- a/index.html
++++ b/index.html
+@@ -19,6 +19,10 @@
+     li p { margin: .4rem 0 0; white-space: pre-wrap; }
+     .actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+     #status { min-height: 1.5em; }
++    dialog { max-width: 46rem; border: 1px solid #d9dee6; border-radius: .75rem; }
++    dialog::backdrop { background: rgb(29 41 57 / .4); }
++    dialog form { margin: 0; padding: 0; border: 0; background: none; }
++    dialog h2 { margin: 0 0 .5rem; font-size: 1.15rem; }
+   </style>
+ </head>
+ <body>
+@@ -31,9 +35,27 @@
+       <label>备注 <input name="note"></label>
+       <button type="submit">添加链接</button>
+     </form>
+-    <div class="actions"><button id="clear-list" type="button">清空列表</button></div>
++    <div class="actions">
++      <button id="clear-list" type="button">清空列表</button>
++      <button id="export-backup" type="button">导出备份</button>
++      <button id="restore-backup" type="button">恢复备份</button>
++      <input id="restore-file" type="file" accept="application/json,.json" hidden>
++    </div>
+     <p id="status" role="status" aria-live="polite"></p>
+     <ul id="items"></ul>
++
++    <dialog id="restore-dialog" aria-labelledby="restore-title">
++      <form method="dialog">
++        <h2 id="restore-title">恢复备份</h2>
++        <p id="restore-summary"></p>
++        <p>恢复会改动当前列表，请选择处理方式：</p>
++        <div class="actions">
++          <button type="submit" value="cancel" autofocus>取消</button>
++          <button type="submit" value="merge">合并（保留当前，加入备份）</button>
++          <button type="submit" value="replace">替换（清空当前，只用备份）</button>
++        </div>
++      </form>
++    </dialog>
+   </main>
+   <script src="./app.js"></script>
+ </body>

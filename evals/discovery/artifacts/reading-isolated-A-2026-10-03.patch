@@ -1,0 +1,266 @@
+--- a/app.js
++++ b/app.js
+@@ -1,4 +1,5 @@
+ const STORAGE_KEY = 'reading-list';
++const SNAPSHOT_KEY = 'reading-list:previous';
+ const STARTER_ITEMS = [
+   { id: 'r-1', title: 'Keyboard-friendly forms', url: 'https://example.test/forms', note: 'Review the keyboard flow', status: 'unread' },
+   { id: 'r-2', title: '给新同事的设计笔记', url: 'https://example.test/design', note: '含有逗号，和引号“引用内容”\n第二行备注。', status: 'reading' },
+@@ -7,7 +8,18 @@
+ 
+ const status = document.querySelector('#status');
+ const itemsNode = document.querySelector('#items');
++const undoButton = document.querySelector('#undo-restore');
++const backupDialog = document.querySelector('#backup-dialog');
++const backupText = document.querySelector('#backup-text');
++const backupDownload = document.querySelector('#backup-download');
++const fileInput = document.querySelector('#import-file');
++const restoreDialog = document.querySelector('#restore-dialog');
++const restoreDesc = document.querySelector('#restore-desc');
++const exportButton = document.querySelector('#export-list');
++const importButton = document.querySelector('#import-list');
++
+ let items = loadItems();
++let pendingRestore = null;
+ 
+ function loadItems() {
+   const raw = localStorage.getItem(STORAGE_KEY);
+@@ -41,6 +53,71 @@
+   }
+ }
+ 
++// A single "previous list" slot. Written just before anything replaces the list,
++// so an accidental 清空 or 恢复 can be walked back.
++function readSnapshot() {
++  const raw = localStorage.getItem(SNAPSHOT_KEY);
++  if (raw === null) return null;
++  try {
++    const saved = JSON.parse(raw);
++    return saved && Array.isArray(saved.items) ? saved : null;
++  } catch {
++    return null;
++  }
++}
++
++function writeSnapshot(reason) {
++  localStorage.setItem(SNAPSHOT_KEY, JSON.stringify({ reason, at: new Date().toISOString(), items }));
++  updateUndoButton();
++}
++
++function clearSnapshot() {
++  localStorage.removeItem(SNAPSHOT_KEY);
++  updateUndoButton();
++}
++
++function updateUndoButton() {
++  const snapshot = readSnapshot();
++  undoButton.hidden = snapshot === null;
++  undoButton.textContent = snapshot ? `撤销上次${snapshot.reason}` : '撤销';
++}
++
++function backupPayload() {
++  return JSON.stringify({ app: 'reading-list', version: 1, exportedAt: new Date().toISOString(), items }, null, 2);
++}
++
++// Turns parsed backup data into a clean item list. Throws before anything is
++// written, so a bad file can never leave the current list half-replaced.
++function itemsFromBackup(parsed) {
++  const list = Array.isArray(parsed) ? parsed : parsed && Array.isArray(parsed.items) ? parsed.items : null;
++  if (list === null) {
++    throw new Error('文件里没有列表数据，可能不是这个应用的备份');
++  }
++  return list.map(entry => {
++    if (!entry || typeof entry !== 'object' || typeof entry.url !== 'string' || entry.url.trim() === '') {
++      throw new Error('备份里有条目缺少网址，已停止恢复');
++    }
++    return {
++      id: typeof entry.id === 'string' && entry.id ? entry.id : crypto.randomUUID(),
++      title: typeof entry.title === 'string' && entry.title.trim() ? entry.title : entry.url,
++      url: entry.url,
++      note: typeof entry.note === 'string' ? entry.note : '',
++      status: typeof entry.status === 'string' && entry.status ? entry.status : 'unread',
++    };
++  });
++}
++
++function finishRestore() {
++  const next = pendingRestore;
++  pendingRestore = null;
++  if (next === null) return;
++  writeSnapshot('恢复');
++  items = next;
++  saveItems();
++  renderItems();
++  status.textContent = `已从备份恢复 ${items.length} 条。恢复前的列表可以用“撤销上次恢复”找回。`;
++}
++
+ document.querySelector('#add-form').addEventListener('submit', event => {
+   event.preventDefault();
+   const form = new FormData(event.currentTarget);
+@@ -58,10 +135,101 @@
+ });
+ 
+ document.querySelector('#clear-list').addEventListener('click', () => {
++  writeSnapshot('清空');
+   items = [];
+   saveItems();
+   renderItems();
+-  status.textContent = '列表已清空。';
+-});
+-
++  status.textContent = '列表已清空。可以用“撤销上次清空”找回。';
++});
++
++exportButton.addEventListener('click', () => {
++  const payload = backupPayload();
++  backupText.value = payload;
++  backupDownload.href = `data:application/json;charset=utf-8,${encodeURIComponent(payload)}`;
++  backupDownload.download = `reading-list-${new Date().toISOString().slice(0, 10)}.json`;
++  backupDialog.showModal();
++  backupText.focus();
++  backupText.select();
++  status.textContent = `已生成 ${items.length} 条备份。`;
++});
++
++document.querySelector('#backup-close').addEventListener('click', () => {
++  backupDialog.close();
++});
++
++backupDialog.addEventListener('close', () => {
++  exportButton.focus();
++});
++
++importButton.addEventListener('click', () => {
++  fileInput.click();
++});
++
++fileInput.addEventListener('change', async () => {
++  const file = fileInput.files[0];
++  fileInput.value = '';
++  if (!file) return;
++
++  let next;
++  try {
++    const raw = await file.text();
++    // Notepad and Excel on Windows prepend a BOM; JSON.parse chokes on it.
++    const text = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
++    let parsed;
++    try {
++      parsed = JSON.parse(text);
++    } catch {
++      throw new Error('文件内容不是有效的 JSON');
++    }
++    next = itemsFromBackup(parsed);
++  } catch (error) {
++    const reason = error instanceof Error ? error.message : '这个文件读不出来';
++    status.textContent = `恢复失败：${reason}。当前列表没有改动。`;
++    return;
++  }
++
++  pendingRestore = next;
++  if (items.length === 0) {
++    finishRestore();
++    return;
++  }
++  restoreDesc.textContent =
++    `备份里有 ${next.length} 条，当前列表有 ${items.length} 条。` +
++    `继续会用备份替换当前列表；恢复前的列表会留一份快照，之后可以撤销。`;
++  restoreDialog.showModal();
++});
++
++// finishRestore() clears pendingRestore before close() so the dialog's close
++// handler stays quiet, whichever order the browser fires things in.
++document.querySelector('#restore-confirm').addEventListener('click', () => {
++  finishRestore();
++  restoreDialog.close();
++});
++
++document.querySelector('#restore-cancel').addEventListener('click', () => {
++  restoreDialog.close();
++});
++
++// Esc (native cancel) and the 取消 button both land here, so backing out never
++// leaves a half-applied restore waiting. Clicking the backdrop does not close.
++// Focus goes to the visible trigger rather than the offscreen file input.
++restoreDialog.addEventListener('close', () => {
++  if (pendingRestore !== null) {
++    pendingRestore = null;
++    status.textContent = '已取消恢复，当前列表没有改动。';
++  }
++  importButton.focus();
++});
++
++undoButton.addEventListener('click', () => {
++  const snapshot = readSnapshot();
++  if (snapshot === null) return;
++  items = snapshot.items;
++  saveItems();
++  renderItems();
++  clearSnapshot();
++  status.textContent = `已撤销上次${snapshot.reason}，找回 ${items.length} 条。`;
++});
++
++updateUndoButton();
+ renderItems();
+--- a/index.html
++++ b/index.html
+@@ -17,8 +17,19 @@
+     button { width: fit-content; padding: .55rem .9rem; font: inherit; cursor: pointer; }
+     ul { display: grid; gap: .75rem; padding: 0; list-style: none; }
+     li p { margin: .4rem 0 0; white-space: pre-wrap; }
+-    .actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
++    .actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; align-items: center; }
+     #status { min-height: 1.5em; }
++    #items { margin-bottom: 3rem; }
++    [hidden] { display: none !important; }
++    /* Kept rendered rather than display:none so programmatic .click() always opens the picker. */
++    .offscreen { position: absolute; width: 1px; height: 1px; opacity: 0; }
++    dialog { max-width: 34rem; border: 1px solid #d9dee6; border-radius: .75rem; padding: 1.25rem; }
++    dialog::backdrop { background: rgb(29 41 57 / .45); }
++    dialog h2 { margin: 0 0 .5rem; font-size: 1.15rem; }
++    dialog p { margin: 0 0 .75rem; }
++    dialog textarea { font: .85rem/1.5 ui-monospace, monospace; width: 100%; box-sizing: border-box; padding: .55rem; border: 1px solid #aab4c2; border-radius: .35rem; resize: vertical; }
++    dialog .actions { margin: .75rem 0 0; }
++    .actions a { padding: .5rem .9rem; border: 1px solid #aab4c2; border-radius: .35rem; background: #f4f6f8; color: inherit; text-decoration: none; }
+   </style>
+ </head>
+ <body>
+@@ -31,10 +42,37 @@
+       <label>备注 <input name="note"></label>
+       <button type="submit">添加链接</button>
+     </form>
+-    <div class="actions"><button id="clear-list" type="button">清空列表</button></div>
++    <div class="actions">
++      <button id="export-list" type="button">备份到文件</button>
++      <button id="import-list" type="button">从备份恢复</button>
++      <button id="undo-restore" type="button" hidden>撤销</button>
++      <button id="clear-list" type="button">清空列表</button>
++    </div>
+     <p id="status" role="status" aria-live="polite"></p>
+     <ul id="items"></ul>
+   </main>
++
++  <input type="file" id="import-file" accept=".json,application/json" tabindex="-1" aria-hidden="true" class="offscreen">
++
++  <dialog id="backup-dialog" aria-labelledby="backup-title" aria-describedby="backup-desc">
++    <h2 id="backup-title">备份列表</h2>
++    <p id="backup-desc">把下面这段内容存成文件，带到另一台电脑后点“从备份恢复”选它就行。下载按钮不管用时，可以直接选中文本复制。</p>
++    <textarea id="backup-text" rows="10" readonly spellcheck="false"></textarea>
++    <div class="actions">
++      <a id="backup-download" download="reading-list.json">下载备份文件</a>
++      <button id="backup-close" type="button">关闭</button>
++    </div>
++  </dialog>
++
++  <dialog id="restore-dialog" role="alertdialog" aria-labelledby="restore-title" aria-describedby="restore-desc">
++    <h2 id="restore-title">确认恢复？</h2>
++    <p id="restore-desc"></p>
++    <div class="actions">
++      <button id="restore-cancel" type="button" autofocus>取消</button>
++      <button id="restore-confirm" type="button">替换当前列表</button>
++    </div>
++  </dialog>
++
+   <script src="./app.js"></script>
+ </body>
+ </html>

@@ -1,0 +1,427 @@
+{
+  "host": "2.1.281 (Claude Code)",
+  "model_override": false,
+  "provider_override": false,
+  "timeout_per_trial_seconds": 600,
+  "max_concurrent_trials": 2,
+  "conditions": {
+    "A": "after",
+    "B": "before"
+  },
+  "allowed_tools": [
+    "Skill",
+    "Read",
+    "Write",
+    "Edit",
+    "Glob",
+    "Grep",
+    "WebSearch",
+    "WebFetch",
+    "Bash(python *)",
+    "Bash(python3 *)",
+    "Bash(node *)",
+    "Bash(npm *)",
+    "Bash(npx *)",
+    "Bash(pnpm *)",
+    "Bash(git status*)",
+    "Bash(git diff*)",
+    "Bash(git ls-files*)",
+    "Bash(rg *)"
+  ],
+  "snapshots": {
+    "before": {
+      "agents/openai.yaml": "85b87d197beb39c41d178e0d44c4a0897a85e9844c2d5c99a280fcccf0fb376c",
+      "assets/project-identity-card.md": "e17b60e74d5496efb240e281289105d23200fa3e884edab4fda22ea6521d805a",
+      "assets/research-report-template.md": "ec76cf19313bdd9dcd3e97a293ca2aefd6f708a28e4a1bf920eb429f52d7ecf9",
+      "references/adapting-depth.md": "2eda3806604f192bc363d8084bc432341583859b8bbcbc1f696409955713d6ae",
+      "references/case-studies.md": "0a71a1be338a7ba026da778b7d29af8ca9c02c0e54147abaabd195cd37651847",
+      "references/contradictions.md": "92de2e349ee3facddc6ac7b07aa7195502864d29a1e3b8b7cb31f2e499517cde",
+      "references/feature-evidence-ledger.md": "8992b1b450c115c99a45988c247e23cfe3944cac79a0210c7c294a4bc5ad1ea4",
+      "references/intent-interpretation-evaluation.md": "299473a335d99f51b8254f57ea4a90b5ff58b9723dbbd85945e424442d3f222b",
+      "references/jev-checkpoints.md": "614b659679074efb986760fdd1c91f6a587eeda93046363e29bc54f58712a449",
+      "references/problem-expansion.md": "f5cc894c58e3e924f41fbb7d064cd70b6b70543ab4a5bb23ae6624f8167b9195",
+      "references/research-examples.md": "34f274bba017965425d31f4f63a5b39f188d3611cb12287713019518aa665084",
+      "references/reuse-and-alternatives.md": "4e0fecc08035efca9188052a9e928906f806ab211fa99f52166d5c7aeda78774",
+      "references/search-quality.md": "907e36c674db865eea768b2c8ab4b1229a984f75e374f47e371a1bd0897db1a2",
+      "scripts/jev_check.py": "442f2c105db6f7ba66cbd48198cfdfd1c21f930cf4b571558576d40287c06a00",
+      "scripts/requirements-dev.txt": "b5bc3730819d623299910c567b3492f909be9d7b46caefab341af14fe882a8ab",
+      "scripts/requirements-jev.txt": "51efe61d857f58462e3ef080662baf62bca09a0eca367df6210ab745c8a09e4c",
+      "scripts/validate_package.py": "f0d0b7a9fc711c37faf9538e2d90f9876f6d7ec8667927a81a434d7be3acd61f",
+      "SKILL.md": "c60d4f5186e388ad5f51bdca43b4b0091a12c576a4f132a37cc04f2bee022635"
+    },
+    "after": {
+      "agents/openai.yaml": "85b87d197beb39c41d178e0d44c4a0897a85e9844c2d5c99a280fcccf0fb376c",
+      "assets/project-identity-card.md": "e17b60e74d5496efb240e281289105d23200fa3e884edab4fda22ea6521d805a",
+      "assets/research-report-template.md": "ec76cf19313bdd9dcd3e97a293ca2aefd6f708a28e4a1bf920eb429f52d7ecf9",
+      "references/adapting-depth.md": "2eda3806604f192bc363d8084bc432341583859b8bbcbc1f696409955713d6ae",
+      "references/case-studies.md": "0a71a1be338a7ba026da778b7d29af8ca9c02c0e54147abaabd195cd37651847",
+      "references/contradictions.md": "92de2e349ee3facddc6ac7b07aa7195502864d29a1e3b8b7cb31f2e499517cde",
+      "references/feature-evidence-ledger.md": "8992b1b450c115c99a45988c247e23cfe3944cac79a0210c7c294a4bc5ad1ea4",
+      "references/intent-interpretation-evaluation.md": "299473a335d99f51b8254f57ea4a90b5ff58b9723dbbd85945e424442d3f222b",
+      "references/jev-checkpoints.md": "614b659679074efb986760fdd1c91f6a587eeda93046363e29bc54f58712a449",
+      "references/problem-expansion.md": "f5cc894c58e3e924f41fbb7d064cd70b6b70543ab4a5bb23ae6624f8167b9195",
+      "references/research-examples.md": "34f274bba017965425d31f4f63a5b39f188d3611cb12287713019518aa665084",
+      "references/reuse-and-alternatives.md": "4bdb6f6e861de076e35f827a7e79b03063e5f8002607f3820e7aea0ffc46079f",
+      "references/search-quality.md": "907e36c674db865eea768b2c8ab4b1229a984f75e374f47e371a1bd0897db1a2",
+      "scripts/jev_check.py": "442f2c105db6f7ba66cbd48198cfdfd1c21f930cf4b571558576d40287c06a00",
+      "scripts/requirements-dev.txt": "b5bc3730819d623299910c567b3492f909be9d7b46caefab341af14fe882a8ab",
+      "scripts/requirements-jev.txt": "51efe61d857f58462e3ef080662baf62bca09a0eca367df6210ab745c8a09e4c",
+      "scripts/validate_package.py": "f0d0b7a9fc711c37faf9538e2d90f9876f6d7ec8667927a81a434d7be3acd61f",
+      "SKILL.md": "0aa792370c5564a1026b3a534b717a15570c74113f6d4acb48f41bfbcdaf20eb"
+    }
+  },
+  "cases": {
+    "contacts": {
+      "prompt": "这些联系人名单每次复制很麻烦，帮我做个从 CSV 导入的功能。",
+      "fixture_sha256": {
+        "example.csv": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+        "index.html": "4f0ea9d695bbcd50f97d0c4e4bf703d9a76bd6aa40da8589698392806c9faed0",
+        "README.md": "dca9500e70d8f935ac9252fb0c302ddb3195997757952fc2e834db7916771301"
+      }
+    },
+    "reading": {
+      "prompt": "我想把这个稍后阅读列表带到另一台电脑，也想在误操作后恢复回来。帮我加个简单的备份和恢复方式；如果恢复会影响当前列表，要让我有机会确认。",
+      "fixture_sha256": {
+        "app.js": "078160e63076a2a6744581a97aacf9a0a8e4656993c3cb75df6a0eb24ffcec47",
+        "index.html": "36193ade3fba0eaa2e63f7b861caf01a0e1781392faf23679f97f77854f926df"
+      }
+    },
+    "forward": {
+      "prompt": "我把日常事情记在这个页面里，事情做完后列表会越堆越长；有时我还要翻回去确认之前处理过什么。能不能帮我把页面整理得更顺手，别让我找不到以前的记录？",
+      "fixture_sha256": {
+        "index.html": "a4c7af775ef56a30f48296c35f5e998ed3f7dc2392d24416b8a3b9f11cfb3ae4"
+      }
+    }
+  },
+  "limitations": [
+    "Single pair per case; no statistical uplift claim.",
+    "Live web responses may vary; preserve actual source access in each trace.",
+    "Host MCP/plugins remain as configured, with identical launch flags for each condition."
+  ],
+  "acceptance": {
+    "schema_version": 1,
+    "frozen_before_trials": true,
+    "inputs_to_worker": "Only original prompt, original fixture and selected skill snapshot; no rubric, prior output, prior failures or intended fix.",
+    "contacts": {
+      "prompt_source": "cases.json contacts-import",
+      "required": [
+        "Visible CSV import of provided example preserves real Unicode and quoted-comma field values and existing contacts.",
+        "Repeat import has understandable duplicate handling, without accidental destruction or unexplained list growth.",
+        "A missing-required-header input gives useful feedback, preserves existing data and permits a later valid import.",
+        "An unterminated quoted field is not silently accepted as a successful, corrupted contact; reject it or explicitly skip the invalid row with feedback.",
+        "The local feature does not require an external runtime service."
+      ],
+      "no_prescribed_solution": "No mandatory preview, mapping, parser dependency or exact UI text. Adapt selectors to actual artifact."
+    },
+    "reading": {
+      "prompt_source": "forward-case.json",
+      "required": [
+        "Visible backup and restore round-trip preserves title, URL, multiline/Unicode note and status.",
+        "Replacing current contents requires a disclosed confirmation and cancellation preserves state.",
+        "Malformed or unsupported backup input leaves data intact with understandable feedback.",
+        "When the implementation defines a versioned format, its acceptance policy is consistent with that contract: reject unsupported versions or document and justify a compatible interpretation before applying them.",
+        "Reload after successful restore preserves the restored list."
+      ],
+      "no_prescribed_solution": "No mandatory file extension, schema envelope, textarea, library, cloud service or format version field. Unknown-version probe applies only to a versioned format."
+    },
+    "forward": "forward_acceptance in this document",
+    "research_review": {
+      "product_workflow": "Actual inspected comparable product/example flow, meaningful local adaptation or supported decision to omit; library capability lists alone do not qualify.",
+      "rejection_premise": "Any material factual reason used to reject a credible alternative is supported by inspected primary material or a probe. An explicit local preference is valid without inventing a limitation.",
+      "failure_expectation": "Evidence the worker derived a relevant state invariant and falsifying case, then executed it against the result rather than relying only on own happy-path test count.",
+      "claim_accuracy": "Inspect material compatibility, recovery and completion statements in artifact and answer. Do not equate source listing or self-reported test totals with evidence."
+    },
+    "grading": "Keep runtime outcomes, research contribution and claim accuracy separate. Same checklist for A and B. Reviewer may inspect implementation for selectors but must not read skill copies or protocol condition mapping. Retain unknown/not_run for inaccessible evidence. Do not change rubric after seeing outputs.",
+    "limits": "One pair per case; results are diagnostic and cannot establish broad model-independent improvement. Live sources and model randomness can differ."
+  },
+  "forward": {
+    "schema_version": 1,
+    "id": "daily-tasks-completion-flow-forward",
+    "frozen_date": "2026-10-03",
+    "prompt": "我把日常事情记在这个页面里，事情做完后列表会越堆越长；有时我还要翻回去确认之前处理过什么。能不能帮我把页面整理得更顺手，别让我找不到以前的记录？",
+    "fixture": "fixtures/daily-tasks",
+    "fixture_files": [
+      "fixtures/daily-tasks/index.html"
+    ],
+    "input_sha256": {
+      "fixtures/daily-tasks/index.html": "A4C7AF775EF56A30F48296C35F5E998ED3F7DC2392D24416B8A3B9F11CFB3AE4"
+    },
+    "acceptance_sha256": "DDF24CF27B65DCCE38E43F7C053BB68F84E8B665D0540FE10B7E79CEE22A0FE9",
+    "prompt_utf8_sha256": "47592042728c98c935c7670509989bce940ae8e5723546f52ef96b719a4a384f"
+  },
+  "forward_acceptance": {
+    "schema_version": 1,
+    "id": "daily-tasks-completion-flow-forward",
+    "private_to_grader": true,
+    "frozen_date": "2026-10-03",
+    "core_acceptance": [
+      "The page still loads without console errors, seeded entries remain intact, and the existing add-task and complete-task interactions still work.",
+      "A first-time user can tell which tasks need attention without scanning the finished items.",
+      "A user can find the original completed-task titles when returning to check past work.",
+      "Organizing the list does not delete or reset tasks; task titles and completion states survive a reload, and completed history remains reachable.",
+      "When the resulting task view has no entries, the page explains that state and offers a clear path back to entries or another useful view."
+    ],
+    "meaningful_failure_checks": [
+      "Submitting a whitespace-only task does not create a blank task or change the saved task count.",
+      "After marking every task complete, the interface does not imply that data disappeared; it explains the empty active view and completed entries remain findable.",
+      "After changing completion state and reloading, task titles and completion states remain; a view may reset if completed history is still easy to reach."
+    ],
+    "discovery_rubric": {
+      "relevance_and_proportion_0_to_2": {
+        "0": "The change misses the stated mix/history problem, adds friction, or breaks the simple local task list.",
+        "1": "The change plausibly separates unfinished work but has a noticeable cost or leaves past-task lookup awkward.",
+        "2": "A small, understandable change makes unfinished work easier to scan while keeping completed history easy to find."
+      },
+      "incremental_usefulness_0_to_2": {
+        "0": "No usable improvement beyond the starting page, or existing tasks/interactions are lost.",
+        "1": "The list is visually reorganized, but history access, state clarity, or empty-state recovery is weak.",
+        "2": "The user can move between a clear active view and the retained history, understands empty states, and retains task state."
+      },
+      "research_contribution_0_to_2": {
+        "0": "No inspected comparable-product user workflow informs a choice; sources are absent, post-hoc, or limited to API/library facts.",
+        "1": "Trace evidence shows an inspected comparable-product workflow and a concrete behavior from it materially informs one local choice.",
+        "2": "Trace evidence supports a real comparison of alternative completed-task workflows (which may be documented in one product or several); the worker adopts/adapts a concrete behavior and gives an evidence-linked reason to reject or defer another, tied to this user's need or the fixture's constraints."
+      },
+      "choice_calibration_0_to_2": {
+        "0": "Product claims or local compatibility are invented, or the scope is unjustified.",
+        "1": "The choice is plausible but its evidence-to-local-fit reasoning or limitations are unclear.",
+        "2": "Observed product behavior, local constraints, and the implementation choice are connected accurately; unsupported compatibility and untested behavior are not claimed."
+      }
+    },
+    "provenance_labels": [
+      "Required",
+      "Local",
+      "Confirmation",
+      "Discovery",
+      "Unknown attribution"
+    ],
+    "reference_workflows_for_graders_only": [
+      {
+        "product": "Microsoft To Do",
+        "url": "https://support.microsoft.com/en-us/accessibility/todo/use-a-screen-reader-to-work-with-lists-in-to-do",
+        "useful_evidence": "The official page documents showing/hiding completed tasks; its web-specific section says completed tasks are hidden by default and can be shown to review, while other platform sections describe them shown by default and collapsible. A careful comparison should preserve the platform distinction."
+      },
+      {
+        "product": "Todoist",
+        "url": "https://www.todoist.com/help/todoist/features/view-completed-tasks-in-todoist-J19h2s",
+        "useful_evidence": "The official page documents a project-level Completed tasks display toggle that places completed tasks at the bottom, permits uncompleting them there, and a separate Reporting path for completed history with different editing/retention limits."
+      }
+    ],
+    "evidence_protocol": [
+      "Inspect actual native Claude Code trace events in sequence: searches, opened product documents, inspected content, and the decision they informed. Citations in the final answer alone do not establish discovery.",
+      "Separate product existence/documentation, worker claims, and independent browser execution. Mark a source Confirmation if it only agrees with an idea already in the prompt or code; mark unsupported attribution Unknown.",
+      "Evaluate the trace and finished artifact separately. Do not let strong research notes compensate for a broken page, or a working artifact compensate for invented research.",
+      "Record actual host/model metadata from the trial, but do not treat a CLI-reported model name or cost field as billing or backend proof."
+    ],
+    "do_not_require": [
+      "A named product, a specific layout, tab, filter, collapsed section, search control, or terminology.",
+      "A source count, feature count, framework, package installation, cloud service, or exhaustive market survey.",
+      "Bulk editing, dates, labels, undo history, recurring tasks, analytics, synchronization, or other features outside the stated task.",
+      "Adopting any particular competitor's behavior; a well-supported decision to retain or adapt the simpler approach is acceptable."
+    ],
+    "independent_acceptance": [
+      "Use a fresh browser profile or clear storage for only the isolated test origin, then load the fixture through a local HTTP server.",
+      "Check all six seeded titles and their initial completion states; exercise adding a normal title and toggling completion.",
+      "Use the delivered interface to locate all three originally completed titles and focus on unfinished tasks; inspect visible counts/labels and empty states.",
+      "Submit whitespace-only input and verify no blank item or persisted count change.",
+      "Mark all tasks complete, inspect the empty active state and the route to completed history, then reload and verify all titles and statuses.",
+      "Test in the installed Windows Edge browser only; report other browsers and platforms as untested."
+    ],
+    "scope_notes": [
+      "A matching product feature proves that the workflow exists, not that it is the right choice here.",
+      "The prompt explicitly values finding old records, so permanent deletion of completed entries is a core failure.",
+      "Do not reward adding every researched feature. One decision with a clear user benefit and low maintenance cost is enough.",
+      "These results characterize only the tested skill revision, prompt, fixture, Windows Claude Code configuration, and one browser run."
+    ]
+  },
+  "runtime_environment_note": "The before/after labels identify this round only; the pre-round snapshot contains the earlier uncommitted Step9 paragraph. Host/model settings were not changed.",
+  "base_commit": "c94db861ede29f3d718ea6be1dc1b0f1875cb88a",
+  "supplementary_pair": {
+    "reason": "Primary reading pair init tool inventories differed because optional MCP availability varied.",
+    "scope": "One supplementary reading pair only; no additional model trials after this pair.",
+    "conditions": {
+      "A": "after",
+      "B": "before"
+    },
+    "flags_added_to_original_launch": [
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}"
+    ],
+    "timeout_each_seconds": 600,
+    "max_concurrency": 2,
+    "prompt": "我想把这个稍后阅读列表带到另一台电脑，也想在误操作后恢复回来。帮我加个简单的备份和恢复方式；如果恢复会影响当前列表，要让我有机会确认。",
+    "acceptance": "Unchanged reading criteria in acceptance-protocol.json",
+    "model_or_provider_override": false,
+    "limits": "Different tool profile from primary round; compare only within this supplemental pair."
+  },
+  "artifact_scope": "Patches preserve all non-hidden application files. Host-created .spec-workflow templates, .git metadata, installed skill copies, and raw host logs are excluded. Skill snapshots have separate reproduction patches and hashes.",
+  "results": [
+    {
+      "case": "contacts",
+      "label": "A",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 217.56,
+      "event_count": 21010,
+      "result_subtype": "success",
+      "is_error": false,
+      "init_model": "deepseek-v4-flash[1m]",
+      "tool_inventory_sha256": "8e7fe55963381fa145b79778b5b9927094d21cda4b6e928f6c4e151916c73fab",
+      "skill_inventory_sha256": "fa15467b2e2a9a9e2f96b651134240a1fdc054db2f799f1ae2c2b743e215a962",
+      "application_file_sha256": {
+        "README.md": "c8233d63c3fdd89cc2d1865d1c1455a703709de0cc0436e9b6bab571894a3542",
+        "example.csv": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+        "index.html": "e342916d1a3b6ec1294b0b27ea6134b87f2cdf48ed684ae5b798bd68b19dd9e0"
+      }
+    },
+    {
+      "case": "contacts",
+      "label": "B",
+      "exit_code": 1,
+      "timed_out": true,
+      "elapsed_seconds": 600.42,
+      "event_count": 23569,
+      "result_subtype": null,
+      "is_error": null,
+      "init_model": "deepseek-v4-flash[1m]",
+      "tool_inventory_sha256": "8e7fe55963381fa145b79778b5b9927094d21cda4b6e928f6c4e151916c73fab",
+      "skill_inventory_sha256": "fa15467b2e2a9a9e2f96b651134240a1fdc054db2f799f1ae2c2b743e215a962",
+      "application_file_sha256": {
+        "README.md": "dca9500e70d8f935ac9252fb0c302ddb3195997757952fc2e834db7916771301",
+        "example.csv": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+        "index.html": "7c2153a78dffb8dc64b3e6472d1d366357132f2793d2817fc4ae55a07bc9e972"
+      }
+    },
+    {
+      "case": "reading",
+      "label": "A",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 239.95,
+      "event_count": 19914,
+      "result_subtype": "success",
+      "is_error": false,
+      "init_model": "deepseek-v4-flash[1m]",
+      "tool_inventory_sha256": "9100d1a15bffb34481f01e5225003cca16111d491f6efa2d94235d5ac8a9089f",
+      "skill_inventory_sha256": "fa15467b2e2a9a9e2f96b651134240a1fdc054db2f799f1ae2c2b743e215a962",
+      "application_file_sha256": {
+        "app.js": "5a338d9adb3781be5c203f085131d117437faa9e0afbbd857d33d7c367872901",
+        "index.html": "d673968c1b0eef15802af79c4a684177c761e8bd927680689d035acb859b4369"
+      }
+    },
+    {
+      "case": "reading",
+      "label": "B",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 366.11,
+      "event_count": 21145,
+      "result_subtype": "success",
+      "is_error": false,
+      "init_model": "deepseek-v4-flash[1m]",
+      "tool_inventory_sha256": "8e7fe55963381fa145b79778b5b9927094d21cda4b6e928f6c4e151916c73fab",
+      "skill_inventory_sha256": "fa15467b2e2a9a9e2f96b651134240a1fdc054db2f799f1ae2c2b743e215a962",
+      "application_file_sha256": {
+        "app.js": "8fc3bdf5153c9ec6dc2e57b58dc42681e36a967a9a2fe2c01ed0dc5067a5914d",
+        "index.html": "ffa99d3fb0cce5392cd9d39c16b8d8cd455dbf802abfd61fc7a8897da4593298"
+      }
+    },
+    {
+      "case": "forward",
+      "label": "A",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 290.53,
+      "event_count": 35200,
+      "result_subtype": "success",
+      "is_error": false,
+      "init_model": "deepseek-v4-flash[1m]",
+      "tool_inventory_sha256": "8e7fe55963381fa145b79778b5b9927094d21cda4b6e928f6c4e151916c73fab",
+      "skill_inventory_sha256": "fa15467b2e2a9a9e2f96b651134240a1fdc054db2f799f1ae2c2b743e215a962",
+      "application_file_sha256": {
+        "index.html": "f9e6613790ce0b5de56850829135c6860027954956c06f3fb79b970f75f7644f"
+      }
+    },
+    {
+      "case": "forward",
+      "label": "B",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 374.84,
+      "event_count": 37842,
+      "result_subtype": "success",
+      "is_error": false,
+      "init_model": "deepseek-v4-flash[1m]",
+      "tool_inventory_sha256": "8e7fe55963381fa145b79778b5b9927094d21cda4b6e928f6c4e151916c73fab",
+      "skill_inventory_sha256": "fa15467b2e2a9a9e2f96b651134240a1fdc054db2f799f1ae2c2b743e215a962",
+      "application_file_sha256": {
+        "index.html": "359c2853a47acfb84367bda274f0ad2af56fedce9e747f38f8e4ee7b5b1afa26"
+      }
+    },
+    {
+      "case": "reading-isolated",
+      "label": "A",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 246.16,
+      "event_count": 27527,
+      "result_subtype": "success",
+      "is_error": false,
+      "init_model": "deepseek-v4-flash[1m]",
+      "tool_inventory_sha256": "8e7fe55963381fa145b79778b5b9927094d21cda4b6e928f6c4e151916c73fab",
+      "skill_inventory_sha256": "fa15467b2e2a9a9e2f96b651134240a1fdc054db2f799f1ae2c2b743e215a962",
+      "application_file_sha256": {
+        "app.js": "2f309a02733a5e3ba3b8ce5d0a71690806067236d922e4fb4e2086da358a8e0b",
+        "index.html": "53894304b7fff56ef44c14b043473dde222cbb11d844c6866b38c0938741b341"
+      }
+    },
+    {
+      "case": "reading-isolated",
+      "label": "B",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 273.64,
+      "event_count": 20871,
+      "result_subtype": "success",
+      "is_error": false,
+      "init_model": "deepseek-v4-flash[1m]",
+      "tool_inventory_sha256": "8e7fe55963381fa145b79778b5b9927094d21cda4b6e928f6c4e151916c73fab",
+      "skill_inventory_sha256": "fa15467b2e2a9a9e2f96b651134240a1fdc054db2f799f1ae2c2b743e215a962",
+      "application_file_sha256": {
+        "app.js": "52e1c5499894c27664dcdefaf0aae51e75c81ab5f88d5daa2c3488fc4752e024",
+        "index.html": "7726ddeb17fcaacb4dbc40e49a59dc71dbaa8c16e20c5be7e875ad87beb132c3"
+      }
+    }
+  ],
+  "paired_inventory_check": {
+    "contacts": {
+      "tools_match": true,
+      "skills_match": true
+    },
+    "reading": {
+      "tools_match": false,
+      "skills_match": true
+    },
+    "forward": {
+      "tools_match": true,
+      "skills_match": true
+    },
+    "reading-isolated": {
+      "tools_match": true,
+      "skills_match": true
+    }
+  },
+  "artifact_sha256": {
+    "artifacts/skill-before-2026-10-03.patch": "aa0dd2a47fbda033ae554e47eb53feff0e2305db7021db8449ee4b22d37176bd",
+    "artifacts/skill-after-2026-10-03.patch": "927467ed520ed4baf4acbcea2413e14553bd25e089768458ac48c2b811a3fc6c",
+    "artifacts/contacts-A-2026-10-03.patch": "4247e1d413dd696e49827bd088e8e093c10673681dfbd1a2fce80a75b8598029",
+    "artifacts/contacts-B-2026-10-03.patch": "52eec223e6c2d1131aa651ac393e164e8daf8a9c7f5cd474d2f3707eec997438",
+    "artifacts/reading-A-2026-10-03.patch": "aa9750d7bd1e6f312bce6934184b392abeaf3ffcfb165f6549e11fd157d0fa95",
+    "artifacts/reading-B-2026-10-03.patch": "25f9f1217f0ff753560a30f8b7232e627c18d7718fc55c9ccf40895ee11ec9dd",
+    "artifacts/forward-A-2026-10-03.patch": "d82e9128e1794aff6846bf1980b35d6d30ff58c0dc5d25219eeb25cfbdb859b2",
+    "artifacts/forward-B-2026-10-03.patch": "011549f7142fa9dac5123a8e504ca806c1e9af06ac3a8e230d3d4b70b5c276bf",
+    "artifacts/reading-isolated-A-2026-10-03.patch": "ae11c02c17be3e9cc4789712d71a0cecd07ea9c33900f2b77812a33bfc1822a6",
+    "artifacts/reading-isolated-B-2026-10-03.patch": "5595d528966acc54f49d612b6cd86fd3aa1f6ae3b55fb3c81c2fd549cf230865"
+  }
+}

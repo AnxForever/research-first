@@ -1,0 +1,16 @@
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -198,6 +198,13 @@
+ those outcomes. If the relevant runtime is unavailable, report that acceptance
+ as unverified and narrow the completion claim accordingly.
+ 
++Review promises in the delivered artifact as well as the final response. Scope
++compatibility and recovery claims to the evidenced inputs, environments, and
++failure stages; one passing example does not establish a general guarantee.
++Challenge consequential broad claims with a relevant counterexample, or narrow
++them. For a getting-started guide, follow the reader's chosen platform and commands
++through subsequent steps, including an applicable failure and recovery path.
++
+ Make acceptance observable: "keyboard works" is too vague. For a modal workflow,
+ check where focus starts, how selection works, and where focus goes after cancel
+ or navigation; closing the panel alone does not verify the return path. For saved

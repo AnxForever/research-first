@@ -1,6 +1,11 @@
 # Keep evaluation corpus hashes stable across platform checkouts.
 evals/*.json text eol=lf
 evals/behavioral/*.json text eol=lf
+evals/discovery/*.json text eol=lf
+evals/discovery/fixtures/** -text whitespace=cr-at-eol
+evals/discovery/artifacts/** -text
+# Preserve blank context/EOF lines within archived patch text.
+evals/discovery/artifacts/*.patch whitespace=-blank-at-eol,-blank-at-eof
 
 # Preserve original result files, CSV bytes (BOM and CRLF), and embedded patches.
 evals/*-results.json -text !eol whitespace=cr-at-eol

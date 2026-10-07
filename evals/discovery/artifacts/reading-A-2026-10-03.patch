@@ -1,0 +1,247 @@
+--- a/app.js
++++ b/app.js
+@@ -1,4 +1,7 @@
+ const STORAGE_KEY = 'reading-list';
++const RECOVERY_KEY = 'reading-list-recovery';
++const BACKUP_FORMAT = 'reading-list-backup';
++const STATUSES = ['unread', 'reading', 'read'];
+ const STARTER_ITEMS = [
+   { id: 'r-1', title: 'Keyboard-friendly forms', url: 'https://example.test/forms', note: 'Review the keyboard flow', status: 'unread' },
+   { id: 'r-2', title: '给新同事的设计笔记', url: 'https://example.test/design', note: '含有逗号，和引号“引用内容”\n第二行备注。', status: 'reading' },
+@@ -7,7 +10,14 @@
+ 
+ const status = document.querySelector('#status');
+ const itemsNode = document.querySelector('#items');
++const importFile = document.querySelector('#import-file');
++const importButton = document.querySelector('#import-backup');
++const undoButton = document.querySelector('#undo-restore');
++const restoreDialog = document.querySelector('#restore-dialog');
++const restoreDetail = document.querySelector('#restore-detail');
++const restoreCancel = document.querySelector('#restore-cancel');
+ let items = loadItems();
++let pendingItems = null;
+ 
+ function loadItems() {
+   const raw = localStorage.getItem(STORAGE_KEY);
+@@ -41,6 +51,159 @@
+   }
+ }
+ 
++function refreshUndoButton() {
++  undoButton.hidden = localStorage.getItem(RECOVERY_KEY) === null;
++}
++
++function takeSnapshot() {
++  if (items.length === 0) return;
++  localStorage.setItem(RECOVERY_KEY, JSON.stringify({ savedAt: new Date().toISOString(), items }));
++  refreshUndoButton();
++}
++
++function exportBackup() {
++  const payload = { format: BACKUP_FORMAT, version: 1, exportedAt: new Date().toISOString(), items };
++  const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
++  const link = document.createElement('a');
++  link.href = url;
++  link.download = `稍后阅读-备份-${new Date().toISOString().slice(0, 10)}.json`;
++  document.body.append(link);
++  link.click();
++  link.remove();
++  URL.revokeObjectURL(url);
++  status.textContent = `已导出 ${items.length} 条备份。`;
++}
++
++function parseBackup(text) {
++  let data;
++  try {
++    data = JSON.parse(text);
++  } catch {
++    return { error: '文件不是有效的 JSON。' };
++  }
++  let rawItems;
++  if (Array.isArray(data)) {
++    rawItems = data;
++  } else if (!data || typeof data !== 'object') {
++    return { error: '文件内容不是列表数据。' };
++  } else if (data.format !== BACKUP_FORMAT) {
++    return { error: '这不是本应用导出的备份文件。' };
++  } else if (data.version !== 1) {
++    return { error: '备份文件的版本无法识别。' };
++  } else {
++    rawItems = data.items;
++  }
++  if (!Array.isArray(rawItems)) return { error: '文件里没有找到列表数据。' };
++
++  const restored = [];
++  for (const [index, raw] of rawItems.entries()) {
++    const at = `第 ${index + 1} 条`;
++    if (!raw || typeof raw !== 'object') return { error: `${at}不是有效的条目。` };
++    const title = typeof raw.title === 'string' ? raw.title.trim() : '';
++    const url = typeof raw.url === 'string' ? raw.url.trim() : '';
++    if (!title) return { error: `${at}缺少标题。` };
++    let parsed;
++    try {
++      parsed = new URL(url);
++    } catch {
++      return { error: `${at}的网址无法识别。` };
++    }
++    // Only http/https links are rendered as clickable anchors.
++    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
++      return { error: `${at}的网址不是 http/https，已停止恢复。` };
++    }
++    restored.push({
++      id: typeof raw.id === 'string' && raw.id ? raw.id : crypto.randomUUID(),
++      title,
++      url,
++      note: typeof raw.note === 'string' ? raw.note : '',
++      status: STATUSES.includes(raw.status) ? raw.status : 'unread',
++    });
++  }
++  return { items: restored };
++}
++
++function applyRestore() {
++  if (pendingItems === null) return;
++  takeSnapshot();
++  items = pendingItems;
++  pendingItems = null;
++  saveItems();
++  renderItems();
++  status.textContent = `已恢复 ${items.length} 条。`;
++}
++
++document.querySelector('#export-backup').addEventListener('click', exportBackup);
++
++importButton.addEventListener('click', () => importFile.click());
++
++importFile.addEventListener('change', async () => {
++  const [file] = importFile.files;
++  if (!file) return;
++
++  let text = null;
++  try {
++    text = await file.text();
++  } catch {
++    // Leave text null; reported below.
++  }
++  // Reset so picking the same file again still fires "change". After the read, so the
++  // File handle is never the only reference to data we still need.
++  importFile.value = '';
++  if (text === null) {
++    status.textContent = '读取文件失败，当前列表没有改动。';
++    return;
++  }
++
++  pendingItems = null;
++  const result = parseBackup(text);
++  if (result.error) {
++    status.textContent = `恢复失败：${result.error}当前列表没有改动。`;
++    return;
++  }
++
++  pendingItems = result.items;
++  if (items.length === 0) {
++    applyRestore();
++    return;
++  }
++  restoreDetail.textContent = `当前列表有 ${items.length} 条，备份文件有 ${pendingItems.length} 条。继续会用备份替换当前的 ${items.length} 条。`;
++  // Esc leaves returnValue untouched, so clear it to keep a stale "confirm" from leaking in.
++  restoreDialog.returnValue = '';
++  restoreDialog.showModal();
++  restoreCancel.focus();
++});
++
++restoreDialog.addEventListener('close', () => {
++  importButton.focus();
++  if (restoreDialog.returnValue === 'confirm') {
++    applyRestore();
++  } else {
++    pendingItems = null;
++    status.textContent = '已取消，当前列表没有改动。';
++  }
++});
++
++undoButton.addEventListener('click', () => {
++  const raw = localStorage.getItem(RECOVERY_KEY);
++  localStorage.removeItem(RECOVERY_KEY);
++  let saved = null;
++  try {
++    saved = JSON.parse(raw);
++  } catch {
++    saved = null;
++  }
++  refreshUndoButton();
++  if (!saved || !Array.isArray(saved.items)) {
++    status.textContent = '没有可以撤销的列表。';
++    return;
++  }
++  items = saved.items;
++  saveItems();
++  renderItems();
++  status.textContent = `已撤销，恢复到 ${items.length} 条。`;
++});
++
+ document.querySelector('#add-form').addEventListener('submit', event => {
+   event.preventDefault();
+   const form = new FormData(event.currentTarget);
+@@ -58,10 +221,16 @@
+ });
+ 
+ document.querySelector('#clear-list').addEventListener('click', () => {
++  if (items.length === 0) {
++    status.textContent = '列表已经是空的。';
++    return;
++  }
++  takeSnapshot();
+   items = [];
+   saveItems();
+   renderItems();
+-  status.textContent = '列表已清空。';
+-});
+-
++  status.textContent = '列表已清空，可以用“撤销上一步”恢复。';
++});
++
++refreshUndoButton();
+ renderItems();
+--- a/index.html
++++ b/index.html
+@@ -19,6 +19,11 @@
+     li p { margin: .4rem 0 0; white-space: pre-wrap; }
+     .actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+     #status { min-height: 1.5em; }
++    dialog { font: inherit; color: #1d2939; background: #fff; border: 1px solid #d9dee6; border-radius: .75rem; padding: 1.25rem; max-width: 34rem; }
++    dialog::backdrop { background: rgb(29 41 57 / .45); }
++    dialog h2 { margin: 0 0 .5rem; font-size: 1.1rem; }
++    dialog .actions { margin-bottom: 0; }
++    #restore-detail { color: #1d2939; }
+   </style>
+ </head>
+ <body>
+@@ -31,9 +36,26 @@
+       <label>备注 <input name="note"></label>
+       <button type="submit">添加链接</button>
+     </form>
+-    <div class="actions"><button id="clear-list" type="button">清空列表</button></div>
++    <div class="actions">
++      <button id="export-backup" type="button">导出备份</button>
++      <button id="import-backup" type="button">从文件恢复</button>
++      <button id="undo-restore" type="button" title="恢复上一次被清空或覆盖的列表" hidden>撤销上一步</button>
++      <button id="clear-list" type="button">清空列表</button>
++      <input id="import-file" type="file" accept="application/json,.json" hidden>
++    </div>
+     <p id="status" role="status" aria-live="polite"></p>
+     <ul id="items"></ul>
++    <dialog id="restore-dialog" aria-labelledby="restore-title">
++      <form method="dialog">
++        <h2 id="restore-title">用备份文件替换当前列表？</h2>
++        <p id="restore-detail"></p>
++        <p>替换前会自动保存一份当前列表，之后可以用“撤销上一步”还原。</p>
++        <div class="actions">
++          <button id="restore-cancel" type="submit">取消</button>
++          <button id="restore-confirm" type="submit" value="confirm">替换</button>
++        </div>
++      </form>
++    </dialog>
+   </main>
+   <script src="./app.js"></script>
+ </body>

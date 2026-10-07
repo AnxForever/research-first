@@ -1,0 +1,237 @@
+--- a/index.html
++++ b/index.html
+@@ -15,20 +15,162 @@
+   th { font-weight: 600; background: #f9fafb; }
+   tr:last-child td { border-bottom: 0; }
+   caption { text-align: left; padding: 16px; font-weight: 600; }
++
++  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0 12px; }
++  .btn { display: inline-block; padding: 8px 16px; border-radius: 8px; background: #182333; color: #fff; font-weight: 600; cursor: pointer; }
++  .btn:hover { background: #2b3a52; }
++  .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
++  #csv-file:focus-visible + .btn { outline: 2px solid #2b6cb0; outline-offset: 2px; }
++  .hint { color: #586476; font-size: 14px; }
++  .status { margin: 0 0 12px; font-size: 14px; }
++  .status:empty { display: none; }
++  .status[data-tone="error"] { color: #a4262c; }
++  .panel.is-dropping { border-color: #2b6cb0; background: #f0f6ff; }
+ </style>
+ <main>
+   <h1>团队联系人</h1>
+   <p>把常用联系信息放在一起，方便查找。</p>
+-  <div class="panel">
++  <div class="toolbar">
++    <input id="csv-file" class="visually-hidden" type="file" accept=".csv,text/csv,text/plain">
++    <label class="btn" for="csv-file">导入 CSV</label>
++    <span class="hint">选择文件，或把 CSV 拖到下面的表格里。列名用 姓名、邮箱、公司。</span>
++  </div>
++  <p id="status" class="status" role="status"></p>
++  <div class="panel" id="drop-zone">
+     <table><caption id="count"></caption><thead><tr><th>姓名</th><th>邮箱</th><th>公司</th></tr></thead><tbody id="rows"></tbody></table>
+   </div>
+ </main>
+ <script>
++  // --- csv core (pure) ---
++  const COLUMN_ALIASES = {
++    name: ['name', 'full name', 'fullname', '姓名', '名字'],
++    email: ['email', 'e-mail', 'mail', '邮箱', '电子邮件', '电子邮箱'],
++    company: ['company', 'organization', 'organisation', 'org', '公司', '单位', '组织', '机构'],
++  };
++
++  // RFC 4180: fields with commas/quotes/newlines are quoted, "" is a literal quote,
++  // records end at CRLF (lone CR or LF tolerated). Unquoted whitespace is content.
++  function parseCsv(text) {
++    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1); // Excel writes a UTF-8 BOM
++    const rows = [];
++    let row = [];
++    let field = '';
++    let quoted = false;
++    let i = 0;
++    const endField = () => { row.push(field); field = ''; };
++    const endRow = () => { endField(); rows.push(row); row = []; };
++    while (i < text.length) {
++      const ch = text[i];
++      if (quoted) {
++        if (ch === '"') {
++          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
++          quoted = false; i += 1; continue;
++        }
++        field += ch; i += 1; continue;
++      }
++      if (ch === '"') { quoted = true; i += 1; continue; }
++      if (ch === ',') { endField(); i += 1; continue; }
++      if (ch === '\r' || ch === '\n') {
++        endRow();
++        i += (ch === '\r' && text[i + 1] === '\n') ? 2 : 1;
++        continue;
++      }
++      field += ch; i += 1;
++    }
++    if (field !== '' || row.length > 0) endRow(); // trailing newline is optional
++    return rows.filter((cells) => cells.some((cell) => cell.trim() !== ''));
++  }
++
++  // Map each known field to its column index, by header name.
++  function headerToIndex(headerRow) {
++    const index = {};
++    headerRow.forEach((cell, i) => {
++      const key = cell.trim().toLowerCase();
++      for (const field of Object.keys(COLUMN_ALIASES)) {
++        if (index[field] === undefined && COLUMN_ALIASES[field].includes(key)) index[field] = i;
++      }
++    });
++    return index;
++  }
++
++  // No synonym list is ever complete, so a field the header does not name takes the next
++  // unused column, in order. Without this, one unfamiliar header (e.g. 邮件) would leave a
++  // field unmapped and every row would look empty. Known names always win; extras are ignored.
++  function resolveColumns(headerRow) {
++    const named = headerToIndex(headerRow);
++    const spare = headerRow.map((_, i) => i).filter((i) => !Object.values(named).includes(i));
++    const at = {};
++    for (const field of ['name', 'email', 'company']) {
++      at[field] = named[field] !== undefined ? named[field] : spare.shift();
++    }
++    return { at, recognized: Object.keys(named).length > 0 };
++  }
++
++  function rowsToContacts(rows) {
++    if (rows.length === 0) {
++      return { contacts: [], skipped: 0, recognizedHeader: false, assumedHeaderRow: false };
++    }
++    const { at, recognized: recognizedHeader } = resolveColumns(rows[0]);
++    const columns = recognizedHeader ? at : { name: 0, email: 1, company: 2 };
++    // With no recognisable column names, a multi-column first row holding no email at all is
++    // far more likely to be titles than a person, so skip it rather than import it as one.
++    // A single-column file is just a list of values, so its first row is data.
++    const assumedHeaderRow = !recognizedHeader && rows.length > 1
++      && rows[0].length > 1 && !rows[0].some((cell) => cell.includes('@'));
++    const body = (recognizedHeader || assumedHeaderRow) ? rows.slice(1) : rows;
++    const contacts = [];
++    let skipped = 0; // header rows are structural, not invalid data
++    for (const cells of body) {
++      const contact = {};
++      for (const field of ['name', 'email', 'company']) {
++        const column = columns[field];
++        contact[field] = column === undefined ? '' : (cells[column] || '').trim();
++      }
++      if (contact.name === '' && contact.email === '') { skipped += 1; continue; }
++      contacts.push(contact);
++    }
++    return { contacts, skipped, recognizedHeader, assumedHeaderRow };
++  }
++
++  // Email is the identity when present, so re-importing the same file stays idempotent.
++  function contactKey(contact) {
++    return (contact.email || contact.name).trim().toLowerCase();
++  }
++
++  function mergeContacts(existing, incoming) {
++    const known = new Set(existing.map(contactKey));
++    const added = [];
++    let duplicates = 0;
++    for (const contact of incoming) {
++      const key = contactKey(contact);
++      if (known.has(key)) { duplicates += 1; continue; }
++      known.add(key);
++      added.push(contact);
++    }
++    return { added, duplicates };
++  }
++
++  // Browser must support "gbk" (https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings),
++  // which is what Chinese Excel writes. Decode UTF-8 strictly first; invalid bytes mean it is not UTF-8.
++  function decodeCsv(buffer) {
++    try {
++      return { text: new TextDecoder('utf-8', { fatal: true }).decode(buffer), encoding: 'utf-8' };
++    } catch (error) {
++      try {
++        return { text: new TextDecoder('gbk').decode(buffer), encoding: 'gbk' };
++      } catch (fallbackError) {
++        return { text: new TextDecoder('utf-8').decode(buffer), encoding: 'utf-8' };
++      }
++    }
++  }
++  // --- end csv core ---
++
+   const contacts = [
+     { name: '陈宁', email: 'chen.ning@example.test', company: '山海工作室' },
+     { name: '林安', email: 'lin.an@example.test', company: '青禾设计' },
+     { name: 'Alex Lee', email: 'alex.lee@example.test', company: 'North Lab' },
+   ];
++
+   function renderContacts() {
+     document.getElementById('rows').replaceChildren();
+     for (const contact of contacts) {
+@@ -42,6 +184,70 @@
+     }
+     document.getElementById('count').textContent = `${contacts.length} 位联系人`;
+   }
++
++  function setStatus(message, tone) {
++    const status = document.getElementById('status');
++    status.textContent = message;
++    if (tone) status.dataset.tone = tone; else delete status.dataset.tone;
++  }
++
++  function importCsv(text, encoding, fileName) {
++    const { contacts: incoming, skipped, recognizedHeader, assumedHeaderRow } = rowsToContacts(parseCsv(text));
++    if (incoming.length === 0) {
++      setStatus(`${fileName} 里没有读到联系人，请确认文件包含 姓名、邮箱、公司 三列。`, 'error');
++      return;
++    }
++    const { added, duplicates } = mergeContacts(contacts, incoming);
++    contacts.push(...added);
++    renderContacts();
++    const parts = [`已从 ${fileName} 导入 ${added.length} 位联系人`];
++    if (duplicates) parts.push(`跳过 ${duplicates} 位重复`);
++    if (skipped) parts.push(`跳过 ${skipped} 行无效数据`);
++    if (encoding !== 'utf-8') parts.push(`按 ${encoding.toUpperCase()} 编码读取`);
++    if (!recognizedHeader) {
++      parts.push(assumedHeaderRow
++        ? '未识别到列名，首行按列名忽略，其余按 姓名、邮箱、公司 顺序读取'
++        : '未识别到列名，按 姓名、邮箱、公司 顺序读取');
++    }
++    setStatus(`${parts.join('，')}。`);
++  }
++
++  function handleFile(file) {
++    if (!file) return;
++    const reader = new FileReader();
++    reader.onerror = () => setStatus(`读取 ${file.name} 失败。`, 'error');
++    reader.onload = () => {
++      const { text, encoding } = decodeCsv(reader.result);
++      if (text.trim() === '') { setStatus(`${file.name} 是空文件。`, 'error'); return; }
++      importCsv(text, encoding, file.name);
++    };
++    reader.readAsArrayBuffer(file); // decode by hand so GBK files survive
++  }
++
++  const dropZone = document.getElementById('drop-zone');
++  const fileInput = document.getElementById('csv-file');
++  fileInput.addEventListener('change', (event) => {
++    handleFile(event.target.files[0]);
++    event.target.value = ''; // so re-picking the same file fires change again
++  });
++  for (const type of ['dragenter', 'dragover']) {
++    dropZone.addEventListener(type, (event) => {
++      event.preventDefault();
++      dropZone.classList.add('is-dropping');
++    });
++  }
++  dropZone.addEventListener('dragleave', (event) => {
++    if (!dropZone.contains(event.relatedTarget)) dropZone.classList.remove('is-dropping');
++  });
++  dropZone.addEventListener('drop', (event) => {
++    event.preventDefault();
++    dropZone.classList.remove('is-dropping');
++    handleFile(event.dataTransfer.files[0]);
++  });
++  // Dropping a file anywhere else would navigate away from the page and lose the session.
++  window.addEventListener('dragover', (event) => event.preventDefault());
++  window.addEventListener('drop', (event) => event.preventDefault());
++
+   renderContacts();
+ </script>
+ </html>

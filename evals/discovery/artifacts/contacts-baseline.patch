@@ -1,0 +1,139 @@
+--- a/index.html
++++ b/index.html
+@@ -15,10 +15,21 @@
+   th { font-weight: 600; background: #f9fafb; }
+   tr:last-child td { border-bottom: 0; }
+   caption { text-align: left; padding: 16px; font-weight: 600; }
++  .import { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
++  .import input { position: absolute; width: 1px; height: 1px; opacity: 0; }
++  .import label { padding: 8px 16px; border: 1px solid #c8d0da; border-radius: 8px; background: white; cursor: pointer; font-weight: 600; }
++  .import label:hover { background: #f2f4f7; }
++  .import:focus-within label { outline: 2px solid #2f6fed; outline-offset: 2px; }
++  .status { color: #586476; }
+ </style>
+ <main>
+   <h1>团队联系人</h1>
+   <p>把常用联系信息放在一起，方便查找。</p>
++  <div class="import">
++    <input id="csv-file" type="file" accept=".csv,text/csv">
++    <label for="csv-file">导入 CSV</label>
++    <span class="status" id="status" role="status" aria-live="polite"></span>
++  </div>
+   <div class="panel">
+     <table><caption id="count"></caption><thead><tr><th>姓名</th><th>邮箱</th><th>公司</th></tr></thead><tbody id="rows"></tbody></table>
+   </div>
+@@ -29,6 +40,15 @@
+     { name: '林安', email: 'lin.an@example.test', company: '青禾设计' },
+     { name: 'Alex Lee', email: 'alex.lee@example.test', company: 'North Lab' },
+   ];
++  const COLUMNS = {
++    name: ['姓名', '名字', '名称', '联系人', 'name', 'fullname', 'contact'],
++    email: ['邮箱', '电子邮件', '电子邮箱', '邮件', 'email', 'mail'],
++    company: ['公司', '单位', '组织', '机构', 'company', 'organization', 'organisation', 'org'],
++  };
++  const status = document.getElementById('status');
++  const fileInput = document.getElementById('csv-file');
++  const known = new Set(contacts.map(contactKey));
++
+   function renderContacts() {
+     document.getElementById('rows').replaceChildren();
+     for (const contact of contacts) {
+@@ -42,6 +62,98 @@
+     }
+     document.getElementById('count').textContent = `${contacts.length} 位联系人`;
+   }
++
++  // RFC 4180: quotes protect commas, line breaks and doubled "" quotes. Any other
++  // character, including non-ASCII text, is ordinary field content.
++  function parseCsv(text) {
++    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
++    const rows = [];
++    let row = [], field = '', quoted = false, i = 0;
++    while (i < text.length) {
++      const char = text[i];
++      if (quoted) {
++        if (char !== '"') { field += char; i++; }
++        else if (text[i + 1] === '"') { field += '"'; i += 2; }
++        else { quoted = false; i++; }
++      } else if (char === '"') { quoted = true; i++; }
++      else if (char === ',') { row.push(field); field = ''; i++; }
++      else if (char === '\n' || char === '\r') {
++        row.push(field); rows.push(row); row = []; field = '';
++        i += char === '\r' && text[i + 1] === '\n' ? 2 : 1;
++      } else { field += char; i++; }
++    }
++    if (field !== '' || row.length) rows.push([...row, field]);
++    return rows.filter(record => record.some(value => value.trim() !== ''));
++  }
++
++  function normalizeHeader(value) {
++    return value.replace(/^﻿/, '').trim().toLowerCase().replace(/[\s\-_]/g, '');
++  }
++
++  function mapColumns(header) {
++    const map = {};
++    header.forEach((cell, index) => {
++      const key = normalizeHeader(cell);
++      for (const [field, aliases] of Object.entries(COLUMNS)) {
++        if (map[field] === undefined && aliases.some(alias => normalizeHeader(alias) === key)) map[field] = index;
++      }
++    });
++    return map;
++  }
++
++  function contactKey(contact) {
++    return contact.email
++      ? `email:${contact.email.toLowerCase()}`
++      : `name:${contact.name.toLowerCase()}|${contact.company.toLowerCase()}`;
++  }
++
++  async function readText(file) {
++    const bytes = new Uint8Array(await file.arrayBuffer());
++    const utf8 = new TextDecoder('utf-8').decode(bytes);
++    if (!utf8.includes('�')) return utf8;
++    try {
++      // Excel on Chinese Windows still writes GBK; keep UTF-8 if the guess is no better.
++      const gbk = new TextDecoder('gbk').decode(bytes);
++      return gbk.includes('�') ? utf8 : gbk;
++    } catch { return utf8; }
++  }
++
++  function importCsv(text) {
++    const rows = parseCsv(text);
++    if (!rows.length) { status.textContent = '文件里没有可导入的内容。'; return; }
++    const map = mapColumns(rows[0]);
++    if (map.name === undefined) {
++      status.textContent = '没有找到“姓名”列。表头需要包含：姓名、邮箱、公司。';
++      return;
++    }
++    const pick = (row, field) => (map[field] === undefined ? '' : (row[map[field]] ?? '').trim());
++    let added = 0, duplicate = 0, skipped = 0;
++    for (const row of rows.slice(1)) {
++      const contact = { name: pick(row, 'name'), email: pick(row, 'email'), company: pick(row, 'company') };
++      if (!contact.name) { skipped++; continue; }
++      const key = contactKey(contact);
++      if (known.has(key)) { duplicate++; continue; }
++      known.add(key);
++      contacts.push(contact);
++      added++;
++    }
++    renderContacts();
++    status.textContent = `已导入 ${added} 位联系人`
++      + (duplicate ? `，跳过 ${duplicate} 行重复` : '')
++      + (skipped ? `，跳过 ${skipped} 行缺少姓名` : '') + '。';
++  }
++
++  fileInput.addEventListener('change', async () => {
++    const file = fileInput.files[0];
++    fileInput.value = '';
++    if (!file) return;
++    try {
++      importCsv(await readText(file));
++    } catch (error) {
++      status.textContent = `导入失败：${error.message}`;
++    }
++  });
++
+   renderContacts();
+ </script>
+ </html>

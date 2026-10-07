@@ -35,7 +35,30 @@
 npx skills add AnxForever/research-first
 ```
 
-也可手动克隆到 agent 的技能发现目录。`npx skills add` 适用于已安装 Node.js/npm 的常见 shell。手动克隆时，目标文件夹必须尚不存在；以下示例以 `~/.agents/skills/research-first` 为目标：
+手动安装时，目录和调用方式取决于实际使用的宿主：
+
+| 宿主 | 个人安装目录 | 当前项目安装目录 | 显式调用 |
+|---|---|---|---|
+| Claude Code | `~/.claude/skills/research-first` | `.claude/skills/research-first` | `/research-first 你的需求` |
+| Codex | `~/.agents/skills/research-first` | `.agents/skills/research-first` | `$research-first 你的需求` |
+
+Claude Code 手动安装示例（WSL、Linux 或 macOS，目标目录尚不存在）：
+
+```bash
+mkdir -p "$HOME/.claude/skills"
+git clone https://github.com/AnxForever/research-first.git "$HOME/.claude/skills/research-first"
+```
+
+Windows 原生 Claude Code（PowerShell，目标目录尚不存在）：
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME/.claude/skills" | Out-Null
+git clone https://github.com/AnxForever/research-first.git "$HOME/.claude/skills/research-first"
+```
+
+在 Claude Code 中输入 `/research-first 给这个项目加一个支持筛选、排序的数据表`。普通需求也可由模型根据 description 自动匹配。同名个人 skill 的优先级高于项目副本，因此测试新版前要核对实际加载的路径；不要假设项目副本覆盖个人旧版。依据：[Claude Code skills 文档](https://code.claude.com/docs/en/skills)。
+
+以下手动克隆示例使用 **Codex** 的 `~/.agents/skills/research-first`；Windows 原生 Claude Code 请把其中 `.agents/skills` 改为 `.claude/skills`。WSL 中运行的 CLI 使用 WSL 内的安装目录。`npx skills add` 适用于已安装 Node.js/npm 的常见 shell；手动克隆时目标文件夹必须尚不存在：
 
 ```bash
 mkdir -p "$HOME/.agents/skills"
@@ -59,7 +82,7 @@ git clone https://github.com/AnxForever/research-first.git "%USERPROFILE%\.agent
 
 其他环境请将仓库克隆到该 agent 的技能发现目录，并保留完整文件夹，使 `SKILL.md` 能找到它引用的资料。若目标目录已存在，请在该目录中更新已有克隆，不要重复克隆到同一路径。
 
-安装后，在支持 `$skill-name` 调用的 agent 中输入：
+以下是 Codex 的调用示例；Claude Code 将开头的 `用 $research-first` 换为 `/research-first`：
 
 ```text
 用 $research-first 给这个项目加一个支持筛选、排序的数据表。
@@ -172,3 +195,7 @@ python -m unittest discover --start-directory tests --pattern "test_*.py" --verb
 判断调研是否改善成品，使用[真实任务评测方法与固定用例](evals/behavioral/README.md)。它将功能验收、调研贡献、约束遵守和投入分别检查；包校验通过不等于效果提升，不能用文档篇幅或搜索次数代替质量。
 
 [2026-10-02 实际任务评估](evals/behavioral/2026-10-02.md)记录了与无 skill、已发布版的导航对照，以及保存视图任务的浏览器验收、实现补丁和已知限制。
+
+[Windows Claude Code 评测](evals/discovery/README.md)另行检查自动触发、简单任务不触发、调研贡献和成品验收，保存失败案例与后续回归；宿主能调用 skill 不等于成品已通过验收。
+
+[2026-10-03 成对测试](evals/discovery/2026-10-03-quality-round.md)检验了流程发现、选型依据和失败路径验收的加强版。结果仍有错误输入处理和来源核实的缺口，目前不能据此声称稳定提升；试用时请检查实际产物与证据。

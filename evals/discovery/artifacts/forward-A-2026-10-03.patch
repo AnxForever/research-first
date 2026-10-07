@@ -1,0 +1,428 @@
+--- a/index.html
++++ b/index.html
+@@ -6,31 +6,63 @@
+ <title>日常待办</title>
+ <style>
+ :root { color-scheme: light; font: 16px/1.5 system-ui, sans-serif; }
++[hidden] { display: none !important; }
+ body { margin: 0; padding: 2rem 1rem; background: #f4f6f8; color: #202a35; }
+ main { max-width: 42rem; margin: auto; padding: 1.5rem; background: white; border-radius: 12px; }
+-h1 { margin-top: 0; } form { display: flex; gap: .5rem; margin: 1rem 0; }
+-input[type="text"] { flex: 1; min-width: 0; padding: .65rem; }
++h1 { margin-top: 0; }
++form, .search-row { display: flex; gap: .5rem; align-items: center; margin: 1rem 0; }
++input[type="text"], input[type="search"] { flex: 1; min-width: 0; padding: .65rem; }
+ button { padding: .6rem .9rem; cursor: pointer; }
+-ul { padding: 0; list-style: none; }
++ul { padding: 0; margin: 0; list-style: none; }
+ li { display: flex; gap: .65rem; align-items: center; padding: .65rem .2rem; border-bottom: 1px solid #e5e9ee; }
+-li.done span { color: #687482; text-decoration: line-through; }
++li label { display: flex; flex: 1; min-width: 0; gap: .65rem; align-items: center; cursor: pointer; }
++li label > span { overflow-wrap: anywhere; }
++li.done label > span { color: #687482; text-decoration: line-through; }
+ .hint { color: #596675; font-size: .92rem; }
++.warn { color: #8a3b12; background: #fdf1e7; border: 1px solid #f0cdb3; border-radius: 8px; padding: .6rem .75rem; font-size: .92rem; }
++.section-title { font-size: 1rem; margin: 1.5rem 0 .25rem; color: #3b4756; }
++h3.day { font-size: .92rem; margin: 1.1rem 0 .2rem; color: #3b4756; }
++time.when { flex: none; color: #7a8797; font-size: .82rem; font-variant-numeric: tabular-nums; }
++#done-section { margin-top: 2rem; border-top: 2px solid #e5e9ee; padding-top: .6rem; }
++#done-section > summary { cursor: pointer; font-weight: 600; padding: .35rem 0; }
++#done-section > summary::marker { color: #7a8797; }
++:focus-visible { outline: 2px solid #2f6fd0; outline-offset: 2px; }
+ </style>
+ </head>
+ <body>
+ <main>
+   <h1>日常待办</h1>
+-  <p class="hint">任务保存在当前浏览器中。勾选方框可标记完成。</p>
++  <p class="hint">任务保存在当前浏览器中。勾选方框表示完成，完成后会移到下方“已完成”；取消勾选可退回未完成。</p>
++
+   <form id="task-form">
+     <label for="task-input">添加任务</label>
+     <input id="task-input" type="text" maxlength="100" required>
+     <button type="submit">添加</button>
+   </form>
+-  <ul id="task-list" aria-label="任务"></ul>
++
++  <p id="storage-warning" class="warn" role="alert" hidden></p>
++
++  <div class="search-row">
++    <label for="search-input">搜索</label>
++    <input id="search-input" type="search" autocomplete="off" placeholder="关键词，历史记录一并搜索">
++  </div>
++  <p id="search-hint" class="hint" hidden>正在搜索：已自动展开下面的“已完成”，未完成与已完成的记录都会参与匹配。</p>
++
+   <p id="task-count" class="hint" aria-live="polite"></p>
++
++  <h2 class="section-title">未完成</h2>
++  <p id="open-empty" class="hint" hidden></p>
++  <ul id="open-list" aria-label="未完成的任务"></ul>
++
++  <details id="done-section">
++    <summary id="done-summary">已完成 <span id="done-count">0</span> 项</summary>
++    <p id="done-empty" class="hint" hidden></p>
++    <div id="done-groups"></div>
++  </details>
+ </main>
+ <script>
+ const KEY = "daily-tasks.v1";
++
+ const seed = [
+   { id: "t1", title: "整理十月报销材料", done: false },
+   { id: "t2", title: "给周然回复活动时间", done: false },
+@@ -39,52 +71,317 @@
+   { id: "t5", title: "发布网页第一版", done: true },
+   { id: "t6", title: "预约牙医复查", done: true }
+ ];
+-let tasks;
+-try {
+-  const saved = localStorage.getItem(KEY);
+-  tasks = saved ? JSON.parse(saved) : seed;
+-  if (!Array.isArray(tasks)) tasks = seed;
+-} catch { tasks = seed; }
+-const list = document.querySelector("#task-list");
+-const count = document.querySelector("#task-count");
+-function save() { localStorage.setItem(KEY, JSON.stringify(tasks)); }
++
++const el = {
++  form: document.querySelector("#task-form"),
++  input: document.querySelector("#task-input"),
++  search: document.querySelector("#search-input"),
++  searchHint: document.querySelector("#search-hint"),
++  count: document.querySelector("#task-count"),
++  warning: document.querySelector("#storage-warning"),
++  openList: document.querySelector("#open-list"),
++  openEmpty: document.querySelector("#open-empty"),
++  doneSection: document.querySelector("#done-section"),
++  doneSummary: document.querySelector("#done-summary"),
++  doneCount: document.querySelector("#done-count"),
++  doneEmpty: document.querySelector("#done-empty"),
++  doneGroups: document.querySelector("#done-groups")
++};
++
++let tasks = [];
++let loadWarning = null;
++let saveWarning = null;
++let pendingFocus = null;
++
++/* crypto.randomUUID() exists only in a secure context, and its behaviour on
++   file:// is browser-dependent, so fall back instead of letting "add" throw. */
++function newId() {
++  if (typeof crypto !== "undefined") {
++    if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
++    if (typeof crypto.getRandomValues === "function") {
++      const bytes = crypto.getRandomValues(new Uint8Array(16));
++      return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
++    }
++  }
++  return "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
++}
++
++/* Accepts the old {id,title,done} shape; timestamps are added going forward and
++   are never invented for records that predate them. */
++function normalize(raw) {
++  if (!Array.isArray(raw)) return null;
++  const list = [];
++  for (const item of raw) {
++    if (!item || typeof item.title !== "string") continue;
++    const title = item.title.trim();
++    if (!title) continue;
++    const done = item.done === true;
++    list.push({
++      id: typeof item.id === "string" && item.id ? item.id : newId(),
++      title: title,
++      done: done,
++      completedAt: done && Number.isFinite(item.completedAt) ? item.completedAt : null
++    });
++  }
++  return list;
++}
++
++function quarantine(raw) {
++  try {
++    localStorage.setItem(KEY + ".corrupt-backup", raw);
++    return "原有记录无法读取，已把原始内容备份到 " + KEY + ".corrupt-backup，列表暂时为空。";
++  } catch {
++    return "原有记录无法读取，列表暂时为空。请先不要添加任务，以免覆盖原数据。";
++  }
++}
++
++function load() {
++  let raw;
++  try {
++    raw = localStorage.getItem(KEY);
++  } catch {
++    return { tasks: normalize(seed) || [], warning: "这个浏览器不允许访问本地存储，改动在关闭页面后不会保留。" };
++  }
++  if (raw === null) return { tasks: normalize(seed) || [], warning: null };
++
++  let parsed;
++  try {
++    parsed = JSON.parse(raw);
++  } catch {
++    return { tasks: [], warning: quarantine(raw) };
++  }
++  const list = normalize(parsed);
++  if (!list) return { tasks: [], warning: quarantine(raw) };
++  return { tasks: list, warning: null };
++}
++
++/* Roll back in memory when the write fails, so the page never shows a change
++   that was not actually stored. */
++function commit(mutate) {
++  const before = tasks.map(task => ({ ...task }));
++  mutate();
++  try {
++    localStorage.setItem(KEY, JSON.stringify(tasks));
++    saveWarning = null;
++    return true;
++  } catch {
++    tasks = before;
++    saveWarning = "无法写入浏览器存储，刚才的改动没有保存，列表已还原。";
++    return false;
++  }
++}
++
++const dayFmt = new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "long", day: "numeric" });
++const timeFmt = new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit" });
++
++function startOfDay(ts) {
++  const d = new Date(ts);
++  d.setHours(0, 0, 0, 0);
++  return d.getTime();
++}
++
++function dayLabel(dayStart) {
++  const now = new Date();
++  if (dayStart === startOfDay(now.getTime())) return "今天";
++  const yesterday = new Date(now);
++  yesterday.setDate(now.getDate() - 1);
++  if (dayStart === startOfDay(yesterday.getTime())) return "昨天";
++  return dayFmt.format(dayStart);
++}
++
++function matchTask(task, query) {
++  return query.length === 0 || task.title.toLowerCase().includes(query);
++}
++
++/* Newest first, bucketed by completion day; records with no timestamp are kept
++   in a trailing group rather than being given a made-up date. */
++function groupCompleted(list) {
++  const dated = [];
++  const undated = [];
++  for (const task of list) {
++    if (Number.isFinite(task.completedAt)) dated.push(task);
++    else undated.push(task);
++  }
++  dated.sort((a, b) => b.completedAt - a.completedAt);
++
++  const groups = [];
++  let current = null;
++  for (const task of dated) {
++    const day = startOfDay(task.completedAt);
++    if (!current || current.day !== day) {
++      current = { day: day, items: [] };
++      groups.push(current);
++    }
++    current.items.push(task);
++  }
++  if (undated.length) groups.push({ day: null, items: undated });
++  return groups;
++}
++
++function buildRow(task) {
++  const row = document.createElement("li");
++  if (task.done) row.className = "done";
++
++  const label = document.createElement("label");
++  const box = document.createElement("input");
++  box.type = "checkbox";
++  box.checked = task.done;
++  box.dataset.id = task.id;
++  box.addEventListener("change", () => setDone(task.id, box.checked));
++
++  const title = document.createElement("span");
++  title.textContent = task.title;
++  label.append(box, title);
++  row.append(label);
++
++  if (task.done && Number.isFinite(task.completedAt)) {
++    const when = document.createElement("time");
++    when.className = "when";
++    when.dateTime = new Date(task.completedAt).toISOString();
++    when.textContent = timeFmt.format(new Date(task.completedAt));
++    row.append(when);
++  }
++  return row;
++}
++
++function findIn(root, id) {
++  for (const box of root.querySelectorAll("input[type=checkbox]")) {
++    if (box.dataset.id === id) return box;
++  }
++  return null;
++}
++
++/* Toggling removes the row that currently holds focus. Put focus somewhere
++   sensible instead of dropping it back to the top of the document. */
++function findFocusTarget(id) {
++  const inOpen = findIn(el.openList, id);
++  if (inOpen) return inOpen;
++  return el.doneSection.open ? findIn(el.doneGroups, id) : null;
++}
++
++function applyPendingFocus() {
++  const want = pendingFocus;
++  pendingFocus = null;
++  if (!want) return;
++
++  if (want.id) {
++    const target = findFocusTarget(want.id);
++    if (target) { target.focus(); return; }
++  }
++  if (want.index != null) {
++    const boxes = el.openList.querySelectorAll("input[type=checkbox]");
++    if (boxes.length) {
++      boxes[Math.min(want.index, boxes.length - 1)].focus();
++      return;
++    }
++  }
++  if (want.fallbackToSummary) el.doneSummary.focus();
++}
++
++function setDone(id, done) {
++  const openIds = Array.from(el.openList.querySelectorAll("input[type=checkbox]"), box => box.dataset.id);
++  const index = openIds.indexOf(id);
++
++  const ok = commit(() => {
++    const target = tasks.find(task => task.id === id);
++    if (!target) return;
++    target.done = done;
++    target.completedAt = done ? Date.now() : null;
++  });
++
++  if (!ok) pendingFocus = { id: id };
++  else if (done) pendingFocus = { index: index < 0 ? null : index, fallbackToSummary: true };
++  else pendingFocus = { id: id };
++
++  renderWarning();
++  render();
++}
++
++function renderWarning() {
++  const messages = [saveWarning, loadWarning].filter(Boolean);
++  el.warning.hidden = messages.length === 0;
++  el.warning.textContent = messages.join(" ");
++}
++
+ function render() {
+-  list.replaceChildren();
+-  for (const task of tasks) {
+-    const row = document.createElement("li");
+-    if (task.done) row.className = "done";
+-    const label = document.createElement("label");
+-    const box = document.createElement("input");
+-    box.type = "checkbox";
+-    box.checked = Boolean(task.done);
+-    box.addEventListener("change", () => {
+-      task.done = box.checked; save(); render();
+-    });
+-    const title = document.createElement("span");
+-    title.textContent = task.title;
+-    label.append(box, title);
+-    row.append(label);
+-    list.append(row);
+-  }
+-  const open = tasks.filter(task => !task.done).length;
+-  count.textContent = open + " 项未完成，共 " + tasks.length + " 项";
+-}
+-document.querySelector("#task-form").addEventListener("submit", event => {
++  const query = el.search.value.trim().toLowerCase();
++  const searching = query.length > 0;
++
++  const open = tasks.filter(task => !task.done && matchTask(task, query));
++  const done = tasks.filter(task => task.done && matchTask(task, query));
++  const openTotal = tasks.reduce((n, task) => n + (task.done ? 0 : 1), 0);
++  const doneTotal = tasks.length - openTotal;
++
++  el.openList.replaceChildren();
++  for (const task of open) el.openList.append(buildRow(task));
++  el.openEmpty.hidden = open.length > 0;
++  el.openEmpty.textContent = searching ? "未完成的任务里没有匹配项。" : "没有未完成的任务，辛苦了。";
++
++  el.doneGroups.replaceChildren();
++  for (const group of groupCompleted(done)) {
++    const label = group.day === null ? "更早完成（当时没有记录时间）" : dayLabel(group.day);
++
++    const heading = document.createElement("h3");
++    heading.className = "day";
++    heading.textContent = label;
++
++    const list = document.createElement("ul");
++    list.setAttribute("aria-label", "已完成：" + label);
++    for (const task of group.items) list.append(buildRow(task));
++
++    el.doneGroups.append(heading, list);
++  }
++  el.doneCount.textContent = String(doneTotal);
++  el.doneEmpty.hidden = done.length > 0;
++  el.doneEmpty.textContent = searching ? "已完成的任务里没有匹配项。" : "还没有已完成的任务。";
++
++  /* A search must never leave a matching record hidden inside a closed
++     section. The browser's own find-in-page cannot help with "what did I
++     finish last week", so this stays open until the query is cleared. */
++  if (searching && !el.doneSection.open) el.doneSection.open = true;
++  el.searchHint.hidden = !searching;
++
++  el.count.textContent = searching
++    ? "找到 " + (open.length + done.length) + " 项匹配（未完成 " + open.length + " 项 · 已完成 " + done.length + " 项），共 " + tasks.length + " 项记录"
++    : "未完成 " + openTotal + " 项 · 已完成 " + doneTotal + " 项，共 " + tasks.length + " 项记录";
++
++  applyPendingFocus();
++}
++
++el.form.addEventListener("submit", event => {
+   event.preventDefault();
+-  const input = document.querySelector("#task-input");
+-  const title = input.value.trim();
++  const title = el.input.value.trim();
+   if (!title) {
+-    input.setCustomValidity("请输入任务内容");
+-    input.reportValidity();
++    el.input.setCustomValidity("请输入任务内容");
++    el.input.reportValidity();
+     return;
+   }
+-  input.setCustomValidity("");
+-  tasks.push({ id: crypto.randomUUID(), title, done: false });
+-  save(); input.value = ""; render(); input.focus();
++  el.input.setCustomValidity("");
++  const ok = commit(() => {
++    tasks.push({ id: newId(), title: title, done: false, completedAt: null });
++  });
++  if (ok) el.input.value = "";
++  renderWarning();
++  render();
++  el.input.focus();
+ });
+-document.querySelector("#task-input").addEventListener("input", event => {
++
++el.input.addEventListener("input", event => {
+   event.currentTarget.setCustomValidity("");
+ });
++
++el.search.addEventListener("input", render);
++el.search.addEventListener("keydown", event => {
++  if (event.key === "Escape" && el.search.value) {
++    el.search.value = "";
++    render();
++  }
++});
++
++const loaded = load();
++tasks = loaded.tasks;
++loadWarning = loaded.warning;
++renderWarning();
+ render();
+ </script>
+ </body>

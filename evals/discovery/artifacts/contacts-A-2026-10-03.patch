@@ -1,0 +1,386 @@
+--- a/README.md
++++ b/README.md
+@@ -7,3 +7,32 @@
+ Contacts currently live only in the page session. Preserve the existing list and
+ keep the result runnable locally; no external service is needed. A typical input
+ is in `example.csv`.
++
++## Importing from CSV
++
++Pick a file with the control on the page, or drop it onto that panel. A typical
++input is `example.csv`.
++
++- **Headers.** The first row must identify 姓名 and 邮箱; 公司 is optional. English
++  headers (`name`, `email`/`e-mail`, `company`/`organization`) and a few common
++  variants are accepted. Unrecognized extra columns are ignored and reported.
++  If 姓名 or 邮箱 is missing, nothing is imported and the error names the expected
++  headers.
++- **Import is additive.** Existing contacts are never overwritten or deleted.
++  An imported row that exactly matches an existing contact (same name, email and
++  company; email compared case-insensitively) is skipped as a duplicate.
++- **Bad rows are skipped, not guessed.** A row missing a name or email, or with a
++  malformed email, is reported with its line number while the remaining rows still
++  import. A row with more columns than the header — the signature of a comma that
++  was not quoted — is rejected rather than mapped by position, because the shift
++  would put values in the wrong columns.
++- **Quoting** follows RFC 4180: fields containing commas or line breaks must be
++  wrapped in double quotes, and a literal quote is written twice (`""`).
++- **Encoding.** UTF-8 is assumed first. If the file is not valid UTF-8 it is read
++  as GB18030/GBK, which is what Excel writes on a Chinese Windows system, and the
++  page says so. GB18030 is not available in every browser (notably some Safari
++  versions), in which case a UTF-8 best-effort decode is used and disclosed.
++- **Undo.** After an import that added contacts, the summary offers an undo that
++  restores the list as it was before that import.
++- **Session only.** Imported contacts are not persisted. Reloading the page
++  returns the list to the three built-in contacts.
+--- a/index.html
++++ b/index.html
+@@ -15,12 +15,38 @@
+   th { font-weight: 600; background: #f9fafb; }
+   tr:last-child td { border-bottom: 0; }
+   caption { text-align: left; padding: 16px; font-weight: 600; }
++
++  .import { margin: 24px 0; padding: 20px; background: #fff; border: 1px dashed #c6ced9; border-radius: 12px; }
++  .import.is-dragging { border-color: #3b6fd4; background: #f2f6ff; }
++  .import-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
++  .import input[type=file] { font: inherit; max-width: 100%; }
++  .hint { color: #586476; font-size: 14px; }
++
++  .status { margin: 0 0 24px; padding: 16px 20px; background: #fff; border: 1px solid #dde2e8; border-left-width: 4px; border-radius: 12px; }
++  .status.is-ok { border-left-color: #2f8f4e; }
++  .status.is-warn { border-left-color: #b8791a; }
++  .status.is-error { border-left-color: #c0392b; }
++  .status p { margin: 0; color: #182333; }
++  .status ul { margin: 8px 0 0; padding-left: 20px; color: #586476; font-size: 14px; }
++  .status button { margin-top: 12px; font: inherit; padding: 6px 14px; border: 1px solid #c6ced9; background: #f9fafb; border-radius: 8px; cursor: pointer; }
++  .status button:hover { background: #eef1f5; }
+ </style>
+ <main>
+   <h1>团队联系人</h1>
+   <p>把常用联系信息放在一起，方便查找。</p>
++
++  <section class="import" id="dropZone">
++    <div class="import-row">
++      <label for="csvFile">从 CSV 导入：</label>
++      <input type="file" id="csvFile" accept=".csv,text/csv">
++      <span class="hint">也可以把文件拖到这块区域。表头需含 姓名、邮箱、公司（或 name / email / company）；导入只新增，不会覆盖或删除现有联系人。</span>
++    </div>
++  </section>
++
++  <div id="importStatus" class="status" role="status" aria-live="polite" hidden></div>
++
+   <div class="panel">
+-    <table><caption id="count"></caption><thead><tr><th>姓名</th><th>邮箱</th><th>公司</th></tr></thead><tbody id="rows"></tbody></table>
++    <table><caption id="count"></caption><thead><tr><th scope="col">姓名</th><th scope="col">邮箱</th><th scope="col">公司</th></tr></thead><tbody id="rows"></tbody></table>
+   </div>
+ </main>
+ <script>
+@@ -29,6 +55,7 @@
+     { name: '林安', email: 'lin.an@example.test', company: '青禾设计' },
+     { name: 'Alex Lee', email: 'alex.lee@example.test', company: 'North Lab' },
+   ];
++
+   function renderContacts() {
+     document.getElementById('rows').replaceChildren();
+     for (const contact of contacts) {
+@@ -42,6 +69,300 @@
+     }
+     document.getElementById('count').textContent = `${contacts.length} 位联系人`;
+   }
++
++  // ==== CSV 核心：纯函数，不接触 DOM，便于单独测试 ====
++
++  const COLUMN_ALIASES = {
++    name: ['姓名', '名字', '联系人', 'name', 'fullname', 'contact'],
++    email: ['邮箱', '电子邮箱', '电子邮件', '邮件', 'email', 'mail', 'emailaddress'],
++    company: ['公司', '单位', '机构', '组织', 'company', 'organization', 'organisation', 'org'],
++  };
++
++  function normalizeLabel(value) {
++    return String(value).trim().toLowerCase().replace(/[\s\-_]+/g, '');
++  }
++
++  const NORMALIZED_ALIASES = Object.fromEntries(
++    Object.entries(COLUMN_ALIASES).map(([field, labels]) => [field, labels.map(normalizeLabel)])
++  );
++
++  // 按 RFC 4180 解析：引号包裹的逗号与换行、双写引号转义、CRLF/CR/LF、末尾换行
++  // 不产生空记录。引号只在字段开头才有特殊含义，字段中间的引号按字面处理。
++  function parseCsvRows(text) {
++    const rows = [];
++    let cells = [];
++    let field = '';
++    let fieldStart = true;
++    let inQuotes = false;
++    let line = 1;
++    let rowLine = 1;
++    let i = 0;
++
++    const endField = () => { cells.push(field); field = ''; fieldStart = true; };
++    const endRow = () => { endField(); rows.push({ cells, line: rowLine }); cells = []; };
++
++    while (i < text.length) {
++      const ch = text[i];
++
++      if (inQuotes) {
++        if (ch === '"') {
++          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
++          inQuotes = false; i += 1; continue;
++        }
++        if (ch === '\n') line += 1;
++        field += ch; i += 1; continue;
++      }
++
++      if (ch === '"' && fieldStart) { inQuotes = true; fieldStart = false; i += 1; continue; }
++      if (ch === ',') { endField(); i += 1; continue; }
++      if (ch === '\r' || ch === '\n') {
++        if (ch === '\r' && text[i + 1] === '\n') i += 1;
++        i += 1;
++        endRow();
++        line += 1;
++        rowLine = line;
++        continue;
++      }
++
++      field += ch;
++      fieldStart = false;
++      i += 1;
++    }
++
++    const unterminatedQuote = inQuotes;
++    if (field !== '' || cells.length > 0) { endField(); rows.push({ cells, line: rowLine }); }
++    return { rows, unterminatedQuote };
++  }
++
++  // 字节 → 文本。Excel 在中文 Windows 上默认导出 GBK，而 Blob.text() 只认 UTF-8，
++  // 直接用它会把中文读成乱码，所以先按 UTF-8 严格解码，失败再退回 GB18030。
++  function decodeCsvBytes(buffer) {
++    const bytes = new Uint8Array(buffer);
++    const decode = (label, fatal) => new TextDecoder(label, { fatal }).decode(bytes);
++
++    try {
++      return { text: decode('utf-8', true).replace(/^﻿/, ''), encoding: 'UTF-8', note: '' };
++    } catch (error) {
++      // 不是合法的 UTF-8，继续尝试中文编码。
++    }
++
++    try {
++      return {
++        text: decode('gb18030', true),
++        encoding: 'GB18030',
++        note: '这个文件不是 UTF-8，已按 GB18030/GBK 解读。若出现乱码，请在 Excel 里另存为「CSV UTF-8」再导入。',
++      };
++    } catch (error) {
++      // 某些浏览器（如部分 Safari）不提供 gb18030 解码器。
++    }
++
++    return {
++      text: new TextDecoder('utf-8').decode(bytes).replace(/^﻿/, ''),
++      encoding: 'UTF-8（容错）',
++      note: '无法确定这个文件的编码，已按 UTF-8 尽力解读，个别字符可能显示为乱码。',
++    };
++  }
++
++  function mapHeaderRow(headerCells) {
++    const labels = headerCells.map(normalizeLabel);
++    const mapping = {};
++    for (const [field, aliases] of Object.entries(NORMALIZED_ALIASES)) {
++      const index = labels.findIndex((label) => aliases.includes(label));
++      if (index !== -1) mapping[field] = index;
++    }
++    const mappedIndexes = Object.values(mapping);
++    const missing = ['name', 'email'].filter((field) => !(field in mapping));
++    const unknown = headerCells
++      .map((cell, index) => (cell.trim() !== '' && !mappedIndexes.includes(index) ? cell.trim() : ''))
++      .filter(Boolean);
++    return { mapping, missing, unknown };
++  }
++
++  const EMAIL_PATTERN = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
++
++  function contactKey(contact) {
++    return [contact.name, contact.email.toLowerCase(), contact.company].join('\u0000');
++  }
++
++  // 纯函数：算出「会新增什么、跳过什么、哪几行有问题」，不改动 existing。
++  function buildImportPlan(existing, text) {
++    const { rows, unterminatedQuote } = parseCsvRows(text);
++    const notes = [];
++    if (unterminatedQuote) notes.push('文件里有未闭合的引号，解析结果可能不完整，建议检查这个文件。');
++
++    const empty = { fatal: '', notes, toAdd: [], duplicates: 0, errors: [], unknown: [] };
++    const dataRows = rows.filter((row) => row.cells.some((cell) => cell.trim() !== ''));
++
++    if (dataRows.length === 0) {
++      return { ...empty, fatal: '文件里没有可读取的内容。' };
++    }
++
++    const header = dataRows[0];
++    const { mapping, missing, unknown } = mapHeaderRow(header.cells);
++
++    if (missing.length > 0) {
++      const names = missing.map((field) => (field === 'name' ? '「姓名」' : '「邮箱」')).join('和');
++      return {
++        ...empty,
++        fatal: `第一行表头里没有找到${names}列。请让表头包含 姓名、邮箱、公司，或对应的 name / email / company。`,
++      };
++    }
++
++    const headerWidth = header.cells.length;
++    const seen = new Set(existing.map(contactKey));
++    const toAdd = [];
++    const errors = [];
++    let duplicates = 0;
++
++    for (const row of dataRows.slice(1)) {
++      const raw = row.cells.map((cell) => cell.trim());
++
++      // 列数比表头多，最可能是某个字段里的逗号没有用引号包起来，
++      // 此时按列号取值会取错，所以整行跳过而不是猜。
++      if (raw.length > headerWidth) {
++        errors.push({
++          line: row.line,
++          message: `这一行有 ${raw.length} 列，多于表头的 ${headerWidth} 列，可能有逗号没有用引号包起来。`,
++        });
++        continue;
++      }
++
++      const pick = (field) => (field in mapping ? raw[mapping[field]] ?? '' : '');
++      const contact = { name: pick('name'), email: pick('email'), company: pick('company') };
++
++      if (!contact.name) { errors.push({ line: row.line, message: '缺少姓名。' }); continue; }
++      if (!contact.email) { errors.push({ line: row.line, message: '缺少邮箱。' }); continue; }
++      if (!EMAIL_PATTERN.test(contact.email)) {
++        errors.push({ line: row.line, message: `邮箱格式不正确：${contact.email}` });
++        continue;
++      }
++
++      const key = contactKey(contact);
++      if (seen.has(key)) { duplicates += 1; continue; }
++      seen.add(key);
++      toAdd.push(contact);
++    }
++
++    return { fatal: '', notes, toAdd, duplicates, errors, unknown };
++  }
++
++  // ==== CSV 核心结束 ====
++
++  const dropZone = document.getElementById('dropZone');
++  const fileInput = document.getElementById('csvFile');
++  const statusBox = document.getElementById('importStatus');
++  const MAX_LISTED_ERRORS = 20;
++  let undoSnapshot = null;
++
++  // 全部用 textContent 写入：CSV 内容属于外部输入，不能当成 HTML 解析。
++  function showStatus(kind, summary, details, onUndo) {
++    statusBox.className = `status is-${kind}`;
++    statusBox.hidden = false;
++    statusBox.replaceChildren();
++
++    const lead = document.createElement('p');
++    lead.textContent = summary;
++    statusBox.append(lead);
++
++    if (details.length > 0) {
++      const list = document.createElement('ul');
++      for (const detail of details) {
++        const item = document.createElement('li');
++        item.textContent = detail;
++        list.append(item);
++      }
++      statusBox.append(list);
++    }
++
++    if (onUndo) {
++      const button = document.createElement('button');
++      button.type = 'button';
++      button.textContent = '撤销这次导入';
++      button.addEventListener('click', onUndo);
++      statusBox.append(button);
++    }
++  }
++
++  function undoImport() {
++    if (!undoSnapshot) return;
++    contacts.length = 0;
++    contacts.push(...undoSnapshot);
++    undoSnapshot = null;
++    renderContacts();
++    showStatus('ok', `已撤销导入，恢复到 ${contacts.length} 位联系人。`, []);
++  }
++
++  async function importFile(file) {
++    if (!file) return;
++
++    let decoded;
++    try {
++      decoded = decodeCsvBytes(await file.arrayBuffer());
++    } catch (error) {
++      showStatus('error', `读取「${file.name}」失败：${error.message}`, []);
++      return;
++    }
++
++    const plan = buildImportPlan(contacts, decoded.text);
++
++    if (plan.fatal) {
++      showStatus('error', `没有导入任何联系人：${plan.fatal}`, plan.notes);
++      return;
++    }
++
++    const details = [...plan.notes];
++    if (decoded.note) details.push(decoded.note);
++    if (plan.unknown.length > 0) details.push(`已忽略未识别的列：${plan.unknown.join('、')}`);
++
++    const listed = plan.errors.slice(0, MAX_LISTED_ERRORS);
++    for (const error of listed) details.push(`第 ${error.line} 行：${error.message}`);
++    if (plan.errors.length > listed.length) {
++      details.push(`……另外还有 ${plan.errors.length - listed.length} 行有同样的问题。`);
++    }
++
++    const counts = `新增 ${plan.toAdd.length} 位，跳过重复 ${plan.duplicates} 位，忽略错误行 ${plan.errors.length} 行`;
++
++    if (plan.toAdd.length === 0) {
++      showStatus('warn', `没有新增联系人（${counts}）。现有 ${contacts.length} 位联系人未改动。`, details);
++      return;
++    }
++
++    undoSnapshot = contacts.map((contact) => ({ ...contact }));
++    contacts.push(...plan.toAdd);
++    renderContacts();
++
++    showStatus(
++      plan.errors.length > 0 ? 'warn' : 'ok',
++      `已从「${file.name}」导入：${counts}。现在共 ${contacts.length} 位联系人。`,
++      details,
++      undoImport,
++    );
++  }
++
++  fileInput.addEventListener('change', () => {
++    const file = fileInput.files && fileInput.files[0];
++    fileInput.value = ''; // 清空后才能连续选择同一个文件再导入一次
++    importFile(file);
++  });
++
++  for (const type of ['dragenter', 'dragover']) {
++    dropZone.addEventListener(type, (event) => {
++      event.preventDefault();
++      dropZone.classList.add('is-dragging');
++    });
++  }
++
++  dropZone.addEventListener('dragleave', (event) => {
++    if (!dropZone.contains(event.relatedTarget)) dropZone.classList.remove('is-dragging');
++  });
++
++  dropZone.addEventListener('drop', (event) => {
++    event.preventDefault();
++    dropZone.classList.remove('is-dragging');
++    const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
++    if (file) importFile(file);
++  });
++
+   renderContacts();
+ </script>
+ </html>

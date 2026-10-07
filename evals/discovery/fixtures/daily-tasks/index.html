@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日常待办</title>
+<style>
+:root { color-scheme: light; font: 16px/1.5 system-ui, sans-serif; }
+body { margin: 0; padding: 2rem 1rem; background: #f4f6f8; color: #202a35; }
+main { max-width: 42rem; margin: auto; padding: 1.5rem; background: white; border-radius: 12px; }
+h1 { margin-top: 0; } form { display: flex; gap: .5rem; margin: 1rem 0; }
+input[type="text"] { flex: 1; min-width: 0; padding: .65rem; }
+button { padding: .6rem .9rem; cursor: pointer; }
+ul { padding: 0; list-style: none; }
+li { display: flex; gap: .65rem; align-items: center; padding: .65rem .2rem; border-bottom: 1px solid #e5e9ee; }
+li.done span { color: #687482; text-decoration: line-through; }
+.hint { color: #596675; font-size: .92rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>日常待办</h1>
+  <p class="hint">任务保存在当前浏览器中。勾选方框可标记完成。</p>
+  <form id="task-form">
+    <label for="task-input">添加任务</label>
+    <input id="task-input" type="text" maxlength="100" required>
+    <button type="submit">添加</button>
+  </form>
+  <ul id="task-list" aria-label="任务"></ul>
+  <p id="task-count" class="hint" aria-live="polite"></p>
+</main>
+<script>
+const KEY = "daily-tasks.v1";
+const seed = [
+  { id: "t1", title: "整理十月报销材料", done: false },
+  { id: "t2", title: "给周然回复活动时间", done: false },
+  { id: "t3", title: "故障演练：检查备份", done: false },
+  { id: "t4", title: "采购会议转接头", done: true },
+  { id: "t5", title: "发布网页第一版", done: true },
+  { id: "t6", title: "预约牙医复查", done: true }
+];
+let tasks;
+try {
+  const saved = localStorage.getItem(KEY);
+  tasks = saved ? JSON.parse(saved) : seed;
+  if (!Array.isArray(tasks)) tasks = seed;
+} catch { tasks = seed; }
+const list = document.querySelector("#task-list");
+const count = document.querySelector("#task-count");
+function save() { localStorage.setItem(KEY, JSON.stringify(tasks)); }
+function render() {
+  list.replaceChildren();
+  for (const task of tasks) {
+    const row = document.createElement("li");
+    if (task.done) row.className = "done";
+    const label = document.createElement("label");
+    const box = document.createElement("input");
+    box.type = "checkbox";
+    box.checked = Boolean(task.done);
+    box.addEventListener("change", () => {
+      task.done = box.checked; save(); render();
+    });
+    const title = document.createElement("span");
+    title.textContent = task.title;
+    label.append(box, title);
+    row.append(label);
+    list.append(row);
+  }
+  const open = tasks.filter(task => !task.done).length;
+  count.textContent = open + " 项未完成，共 " + tasks.length + " 项";
+}
+document.querySelector("#task-form").addEventListener("submit", event => {
+  event.preventDefault();
+  const input = document.querySelector("#task-input");
+  const title = input.value.trim();
+  if (!title) {
+    input.setCustomValidity("请输入任务内容");
+    input.reportValidity();
+    return;
+  }
+  input.setCustomValidity("");
+  tasks.push({ id: crypto.randomUUID(), title, done: false });
+  save(); input.value = ""; render(); input.focus();
+});
+document.querySelector("#task-input").addEventListener("input", event => {
+  event.currentTarget.setCustomValidity("");
+});
+render();
+</script>
+</body>
+</html>

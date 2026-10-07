@@ -76,6 +76,13 @@ than making them mandatory report sections. For unfamiliar domains, use
 
 Start with local constraints and installed resources, then investigate applicable
 products or prior implementations, reusable resources, and primary guidance.
+When shaping a user workflow, inspect a comparable product flow or established
+exemplar, separately from its implementation mechanism. Follow the user's action
+through feedback and recovery; explain which documented or observed behavior
+fits the local need, its cost, and what to adapt or leave out. An API survey alone
+does not establish product-workflow discovery. If no suitable exemplar can be
+inspected, disclose that gap and continue a contained, reversible approach.
+
 For each serious candidate inspect enough official APIs, relevant source, tests,
 or examples to support adoption claims. Check target versions, fit, maintenance,
 license and integration cost where relevant. Package names or marketing alone
@@ -134,6 +141,13 @@ tradeoffs, the recommendation, and remaining custom work. The strategy may be
 user preference that justifies custom work; do not invent weak alternatives to
 fill a table. Keep independent choices separate, such as table state and animation.
 
+Before rejecting a credible option, verify the decisive premise: the exact missing
+behavior, incompatibility, or material cost. Check primary material or run a
+bounded probe. If that premise remains unknown, keep the option conditional;
+do not turn an assumption into a factual reason it cannot work. A supported local
+preference may still justify the choice. Use the comparison procedure in
+[references/reuse-and-alternatives.md](references/reuse-and-alternatives.md).
+
 A request to implement a feature normally includes choosing routine, reversible
 details within the existing stack and scope. Disclose the comparison and continue;
 the user need not separately say "you may choose." Respect an explicit request to
@@ -154,6 +168,12 @@ can be that record; **no separate ledger file is required**. Include:
 Outcome and constraints -> material question -> inspected evidence and limits
 -> options and selected approach -> acceptance checks and their execution status
 ```
+
+Before implementing, name the observable successful outcome and the consequential
+failure that could invalidate the choice. For a state-changing operation, record
+what must remain unchanged if input is rejected, the user cancels, or a relevant
+write fails. Derive these expectations from the request and inspected contracts,
+not from the implementation's own tests; select applicable cases only.
 
 Update it after execution with actual results and what remains unverified.
 A label-only or other mechanical edit needs only its targeted verification.
@@ -186,28 +206,28 @@ need not produce either template.
 
 ## Step 9: Verify and Update the Record
 
-Check the requested behavior and important failure cases with appropriate tests,
-experiments, builds, artifact inspection, or runtime evidence. Revisit assumptions
-that the results challenge. Report delivered behavior, executed verification,
-and remaining limits; update the summary or ledger used in Step 7.
+Exercise the Step 7 expectations at the promised user boundary, checking the
+request, inspected contracts and actual data flow independently of the existing tests.
+Use a concrete input or state that could falsify each consequential guarantee;
+inspect resulting data and visible feedback, not only a return value or test count.
+If an invariant fails, fix the authorized behavior and rerun the affected check
+before calling it complete. Keep unavailable checks explicitly unverified.
+When a separate reviewer is available and the consequences justify it, provide
+the request, contracts and artifact for an independent check, without supplying
+the implementer's proposed verdict. Otherwise perform a separate acceptance pass.
 
-Exercise the complete user journey at the boundary where success is promised:
-for an interaction, enter, act, exit, and return; for saved state, save and reload;
-for an export, inspect the produced file. Check the consequential finding from
-research in the assembled result. A build or mocked call alone cannot establish
-those outcomes. If the relevant runtime is unavailable, report that acceptance
-as unverified and narrow the completion claim accordingly.
+Follow the whole relevant journey: interaction entry, action, exit and return;
+saved state after reload; actual exported file contents. A modal check includes
+focus after cancel or navigation. A getting-started guide must carry the reader's
+chosen platform commands through the subsequent recovery step. A build, stubbed
+DOM or mocked service does not establish the corresponding real user journey.
 
-Make acceptance observable: "keyboard works" is too vague. For a modal workflow,
-check where focus starts, how selection works, and where focus goes after cancel
-or navigation; closing the panel alone does not verify the return path. For saved
-state, check restored values and the visible result of a failed write, not merely
-the presence of a storage key. Choose only checks relevant to the promised outcome.
-
-Tests establish behavior within their coverage, not that a product decision is
-correct. Planned or skipped checks are not passes; local tests do not prove live
-integrations or user outcomes. Keep added requirements tied to purpose and evidence,
-and preserve every explicit constraint.
+Audit promises in both the artifact and the final response against these results.
+For a compatibility or recovery claim, name the supported inputs, environment and
+failure stage. Narrow or remove a claim that its evidence does not support;
+neither a passing example nor a large test count warrants "everything verified."
+Update the Step 7 record with executed outcomes and remaining limits. Tests prove
+covered behavior, not user preference or the merit of a product decision.
 
 ## Optional Jev Checks and Examples
 

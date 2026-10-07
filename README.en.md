@@ -39,7 +39,37 @@ Manual cloning does not require Node.js.
 npx skills add AnxForever/research-first
 ```
 
-Alternatively, clone the repository into your agent's skill discovery directory. `npx skills add` works in common shells when Node.js/npm are installed. For a manual clone, the destination folder must not already exist. These examples use `~/.agents/skills/research-first`:
+For manual installation, use the directory and invocation syntax of the actual host:
+
+| Host | Personal installation | Project installation | Explicit invocation |
+|---|---|---|---|
+| Claude Code | `~/.claude/skills/research-first` | `.claude/skills/research-first` | `/research-first your request` |
+| Codex | `~/.agents/skills/research-first` | `.agents/skills/research-first` | `$research-first your request` |
+
+Claude Code example for WSL, Linux or macOS, with a destination that does not yet exist:
+
+```bash
+mkdir -p "$HOME/.claude/skills"
+git clone https://github.com/AnxForever/research-first.git "$HOME/.claude/skills/research-first"
+```
+
+Native Windows Claude Code (PowerShell, destination must not already exist):
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME/.claude/skills" | Out-Null
+git clone https://github.com/AnxForever/research-first.git "$HOME/.claude/skills/research-first"
+```
+
+In Claude Code, enter `/research-first add a filterable, sortable table to this project`.
+Ordinary requests can also match the description automatically. A personal skill takes
+precedence over a project skill with the same name, so check the actual loaded path
+before testing a new copy. See the [Claude Code skills documentation](https://code.claude.com/docs/en/skills).
+
+The following manual examples use **Codex**'s `~/.agents/skills/research-first`.
+For native Windows Claude Code, replace `.agents/skills` with `.claude/skills`.
+A CLI running inside WSL uses its WSL installation directories. `npx skills add`
+works in common shells with Node.js/npm installed. Manual clone destinations must
+not already exist:
 
 ```bash
 mkdir -p "$HOME/.agents/skills"
@@ -63,7 +93,8 @@ git clone https://github.com/AnxForever/research-first.git "%USERPROFILE%\.agent
 
 For other environments, clone the repository into the directory where that agent discovers skills. Keep the entire folder so `SKILL.md` can resolve its references. If the destination already exists, update the existing clone there instead of cloning again to the same path.
 
-After installation, invoke it in an agent that supports `$skill-name`:
+The following examples use Codex syntax. In Claude Code, replace the initial
+`Use $research-first` with `/research-first`:
 
 ```text
 Use $research-first to add a filterable, sortable table to this project.
@@ -197,3 +228,14 @@ These dependencies and commands are for maintenance and validation; they are
 not skill runtime dependencies. Everyday use only needs the Markdown
 instructions. Jev SDK contract tests use a mock and do not send live API
 requests.
+
+The [Windows Claude Code evaluation](evals/discovery/README.md) separately checks
+automatic invocation, negative controls, research contribution and delivered
+behavior. It preserves failed cases and follow-up trials; successful invocation
+does not establish that the deliverable passed acceptance.
+
+The [2026-10-03 paired trials](evals/discovery/2026-10-03-quality-round.md) examine
+stronger workflow discovery, option-rejection evidence and failure acceptance.
+Invalid-input handling and source verification still have gaps; these results do
+not establish reliable uplift. Inspect the actual artifact and evidence when
+trying the skill.

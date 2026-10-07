@@ -1,0 +1,416 @@
+--- a/index.html
++++ b/index.html
+@@ -9,28 +9,58 @@
+ body { margin: 0; padding: 2rem 1rem; background: #f4f6f8; color: #202a35; }
+ main { max-width: 42rem; margin: auto; padding: 1.5rem; background: white; border-radius: 12px; }
+ h1 { margin-top: 0; } form { display: flex; gap: .5rem; margin: 1rem 0; }
+-input[type="text"] { flex: 1; min-width: 0; padding: .65rem; }
++input[type="text"], input[type="search"] { flex: 1; min-width: 0; padding: .65rem; }
+ button { padding: .6rem .9rem; cursor: pointer; }
+-ul { padding: 0; list-style: none; }
++ul { padding: 0; margin: .4rem 0 0; list-style: none; }
+ li { display: flex; gap: .65rem; align-items: center; padding: .65rem .2rem; border-bottom: 1px solid #e5e9ee; }
+ li.done span { color: #687482; text-decoration: line-through; }
+ .hint { color: #596675; font-size: .92rem; }
++.tools { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
++#task-filters { display: flex; gap: .35rem; }
++#task-filters button { padding: .45rem .8rem; border: 1px solid #ccd4dd; background: #fff; border-radius: 999px; }
++#task-filters button[aria-pressed="true"] { background: #202a35; border-color: #202a35; color: #fff; }
++.search { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 12rem; }
++h2 { font-size: .95rem; margin: 1.4rem 0 .2rem; color: #596675; font-weight: 600; }
++.empty { color: #596675; font-size: .95rem; padding: .8rem .2rem; margin: .4rem 0 0; }
++#task-hint { margin: .6rem 0 0; }
++#task-hint button { padding: .3rem .6rem; font-size: .92rem; }
++.warn { color: #8a1f11; font-size: .92rem; margin: .6rem 0 0; }
++.warn:empty { display: none; }
+ </style>
+ </head>
+ <body>
+ <main>
+   <h1>日常待办</h1>
+-  <p class="hint">任务保存在当前浏览器中。勾选方框可标记完成。</p>
++  <p class="hint">任务保存在当前浏览器中。勾选方框可标记完成，已完成的任务不会消失，可在「已完成」中随时回看。</p>
++
+   <form id="task-form">
+     <label for="task-input">添加任务</label>
+     <input id="task-input" type="text" maxlength="100" required>
+     <button type="submit">添加</button>
+   </form>
+-  <ul id="task-list" aria-label="任务"></ul>
+-  <p id="task-count" class="hint" aria-live="polite"></p>
++
++  <div class="tools">
++    <div id="task-filters" role="group" aria-label="筛选任务">
++      <button type="button" id="filter-all" aria-pressed="false">全部</button>
++      <button type="button" id="filter-active" aria-pressed="true">未完成</button>
++      <button type="button" id="filter-done" aria-pressed="false">已完成</button>
++    </div>
++    <p class="search">
++      <label for="task-search">搜索</label>
++      <input id="task-search" type="search" placeholder="按内容查找旧记录">
++    </p>
++  </div>
++
++  <p id="task-warning" class="warn" role="alert"></p>
++  <p id="task-count" class="hint" role="status"></p>
++  <p id="task-hint" class="hint"></p>
++  <div id="task-list"></div>
+ </main>
++
+ <script>
+ const KEY = "daily-tasks.v1";
++const VIEW_KEY = "daily-tasks.view.v1";
++const VIEWS = ["all", "active", "done"];
+ const seed = [
+   { id: "t1", title: "整理十月报销材料", done: false },
+   { id: "t2", title: "给周然回复活动时间", done: false },
+@@ -39,52 +69,311 @@
+   { id: "t5", title: "发布网页第一版", done: true },
+   { id: "t6", title: "预约牙医复查", done: true }
+ ];
+-let tasks;
+-try {
+-  const saved = localStorage.getItem(KEY);
+-  tasks = saved ? JSON.parse(saved) : seed;
+-  if (!Array.isArray(tasks)) tasks = seed;
+-} catch { tasks = seed; }
+-const list = document.querySelector("#task-list");
+-const count = document.querySelector("#task-count");
+-function save() { localStorage.setItem(KEY, JSON.stringify(tasks)); }
++
++// crypto.randomUUID 只在安全上下文可用（https / localhost）。
++// 这里退到同样可靠的 getRandomValues，避免页面被放到普通 http 上时整个坏掉。
++function newId() {
++  const c = globalThis.crypto;
++  if (c && typeof c.randomUUID === "function") return c.randomUUID();
++  if (c && typeof c.getRandomValues === "function") {
++    return [...c.getRandomValues(new Uint8Array(8))]
++      .map(byte => byte.toString(16).padStart(2, "0")).join("");
++  }
++  return "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
++}
++
++// 迁移：只补齐缺的字段，不伪造数据。
++// 旧记录没有 completedAt，就保持没有——宁可显示“日期未记录”，也不要写一个假日期。
++function normalize(raw) {
++  if (!Array.isArray(raw)) return null;
++  const out = [];
++  for (const item of raw) {
++    if (!item || typeof item !== "object") continue;
++    const title = typeof item.title === "string" ? item.title.trim() : "";
++    out.push({
++      id: typeof item.id === "string" && item.id ? item.id : newId(),
++      title: title || "（无标题）",
++      done: Boolean(item.done),
++      ...(typeof item.completedAt === "number" ? { completedAt: item.completedAt } : {})
++    });
++  }
++  return out;
++}
++
++// 读存储和“读到的内容坏了”是两回事：前者要告诉用户，后者只当没有。
++let storedRaw = null;
++let storageUnreadable = false;
++try { storedRaw = localStorage.getItem(KEY); } catch { storageUnreadable = true; }
++
++let parsed = null;
++if (!storageUnreadable && storedRaw !== null) {
++  try { parsed = JSON.parse(storedRaw); } catch { parsed = null; }
++}
++let tasks = (storageUnreadable ? null : normalize(parsed)) ?? normalize(seed);
++
++let view;
++try { view = localStorage.getItem(VIEW_KEY); } catch { view = null; }
++if (!VIEWS.includes(view)) view = "active";
++let query = "";
++
++const warningEl = document.querySelector("#task-warning");
++const listEl = document.querySelector("#task-list");
++const countEl = document.querySelector("#task-count");
++const hintEl = document.querySelector("#task-hint");
++const searchEl = document.querySelector("#task-search");
++const inputEl = document.querySelector("#task-input");
++const formEl = document.querySelector("#task-form");
++const filterButtons = VIEWS.map(name => ({
++  name,
++  el: document.querySelector("#filter-" + name)
++}));
++
++let warning = "";
++function warn(message) {
++  if (warning === message) return;
++  warning = message;
++  warningEl.textContent = message;
++}
++
++// 写失败绝不能不吭声：用户以为记下了、其实没有，才是真正会丢记录的情况。
++// 另外，读不到旧记录时一律不写——否则会拿示例数据盖掉还没读出来的真实记录。
++function save() {
++  if (storageUnreadable) {
++    warn("读不到原有的记录，为避免覆盖，这次的改动没有保存。");
++    return;
++  }
++  try {
++    localStorage.setItem(KEY, JSON.stringify(tasks));
++  } catch {
++    warn("无法保存到浏览器存储，这次的改动刷新后会丢失。");
++  }
++}
++
++function saveView() {
++  try { localStorage.setItem(VIEW_KEY, view); } catch { /* 视图偏好丢了无所谓 */ }
++}
++
++if (storageUnreadable) {
++  warn("读不到浏览器存储，下面显示的是示例任务；你原有的记录没有被改动。");
++}
++
++function matches(task) {
++  return query === "" || task.title.toLowerCase().includes(query);
++}
++
++// 按“本地”日期取键。用 toISOString() 会得到 UTC 日期，
++// 在 UTC+8 的凌晨会把任务归到前一天，所以必须手工拼本地年月日。
++function dayKey(ms) {
++  const d = new Date(ms);
++  const pad = n => String(n).padStart(2, "0");
++  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
++}
++
++const shortDate = new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric", weekday: "short" });
++const longDate = new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "long", day: "numeric" });
++
++function dayLabel(ms) {
++  if (typeof ms !== "number") return "日期未记录";
++  const now = new Date();
++  const then = new Date(ms);
++  const midnight = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
++  const days = Math.round((midnight(now) - midnight(then)) / 86400000);
++  if (days === 0) return "今天";
++  if (days === 1) return "昨天";
++  if (then.getFullYear() === now.getFullYear()) return shortDate.format(then);
++  return longDate.format(then);
++}
++
++function groups() {
++  const out = [];
++  if (view !== "done") {
++    const active = tasks.filter(task => !task.done && matches(task));
++    if (active.length) out.push({ label: "未完成", items: active });
++  }
++  if (view !== "active") {
++    const buckets = new Map();
++    for (const task of tasks) {
++      if (!task.done || !matches(task)) continue;
++      const key = typeof task.completedAt === "number" ? dayKey(task.completedAt) : "unknown";
++      if (!buckets.has(key)) buckets.set(key, []);
++      buckets.get(key).push(task);
++    }
++    const dated = [...buckets.keys()].filter(key => key !== "unknown").sort().reverse();
++    if (buckets.has("unknown")) dated.push("unknown");
++    for (const key of dated) {
++      const items = buckets.get(key);
++      if (key !== "unknown") items.sort((a, b) => b.completedAt - a.completedAt);
++      out.push({ label: "已完成 · " + dayLabel(items[0].completedAt), items });
++    }
++  }
++  return out;
++}
++
++// 每次重新渲染都会重建整行，所以必须显式把焦点放回去，
++// 否则键盘用户勾选一次就会掉到 <body>。
++let pendingFocus = null;
++let renderedBoxes = new Map();
++let renderedOrder = [];
++
+ function render() {
+-  list.replaceChildren();
+-  for (const task of tasks) {
+-    const row = document.createElement("li");
+-    if (task.done) row.className = "done";
+-    const label = document.createElement("label");
+-    const box = document.createElement("input");
+-    box.type = "checkbox";
+-    box.checked = Boolean(task.done);
+-    box.addEventListener("change", () => {
+-      task.done = box.checked; save(); render();
+-    });
+-    const title = document.createElement("span");
+-    title.textContent = task.title;
+-    label.append(box, title);
+-    row.append(label);
+-    list.append(row);
+-  }
+-  const open = tasks.filter(task => !task.done).length;
+-  count.textContent = open + " 项未完成，共 " + tasks.length + " 项";
+-}
+-document.querySelector("#task-form").addEventListener("submit", event => {
++  const focus = pendingFocus;
++  pendingFocus = null;
++  renderedBoxes = new Map();
++  renderedOrder = [];
++  listEl.replaceChildren();
++
++  const sections = groups();
++  if (sections.length === 0) {
++    const empty = document.createElement("p");
++    empty.className = "empty";
++    empty.textContent = emptyMessage();
++    listEl.append(empty);
++  }
++
++  let index = 0;
++  for (const group of sections) {
++    const section = document.createElement("section");
++    const heading = document.createElement("h2");
++    heading.id = "task-group-" + (++index);
++    heading.textContent = group.label + " · " + group.items.length + " 项";
++    section.setAttribute("aria-labelledby", heading.id);
++
++    const list = document.createElement("ul");
++    for (const task of group.items) {
++      const row = document.createElement("li");
++      if (task.done) row.className = "done";
++
++      const label = document.createElement("label");
++      const box = document.createElement("input");
++      box.type = "checkbox";
++      box.checked = task.done;
++      box.setAttribute("data-task-id", task.id);
++      box.addEventListener("change", () => toggle(task.id, box.checked));
++
++      const title = document.createElement("span");
++      title.textContent = task.title;
++      label.append(box, title);
++      row.append(label);
++      list.append(row);
++
++      renderedBoxes.set(task.id, box);
++      renderedOrder.push(task.id);
++    }
++    section.append(heading, list);
++    listEl.append(section);
++  }
++
++  for (const { name, el } of filterButtons) {
++    el.setAttribute("aria-pressed", name === view ? "true" : "false");
++  }
++  updateStatus();
++  renderHint();
++
++  if (focus) {
++    let target = null;
++    if (focus.taskId && renderedBoxes.has(focus.taskId)) target = renderedBoxes.get(focus.taskId);
++    else if (typeof focus.index === "number" && renderedOrder.length) {
++      target = renderedBoxes.get(renderedOrder[Math.min(focus.index, renderedOrder.length - 1)]);
++    }
++    (target || inputEl).focus();
++  }
++}
++
++function emptyMessage() {
++  if (query) return "没有匹配「" + query + "」的任务。";
++  if (tasks.length === 0) return "还没有任务，在上面添加第一条。";
++  if (view === "active") return "没有未完成的任务了，都处理完了。";
++  if (view === "done") return "还没有已完成的任务。";
++  return "这里没有任务。";
++}
++
++function updateStatus() {
++  const done = tasks.filter(task => task.done).length;
++  const shown = groups().reduce((sum, group) => sum + group.items.length, 0);
++  let text = (tasks.length - done) + " 项未完成，共 " + tasks.length + " 项";
++  if (view !== "active" || query) text = "当前显示 " + shown + " 项 · " + text;
++  countEl.textContent = text;
++}
++
++// 搜索在当前视图没有结果、但别的视图有时，直接给一条跳过去的入口，
++// 免得用户以为记录丢了。
++function renderHint() {
++  hintEl.replaceChildren();
++  if (!query) return;
++  const activeMatches = tasks.filter(task => !task.done && matches(task)).length;
++  const doneMatches = tasks.filter(task => task.done && matches(task)).length;
++  const other = view === "active" ? "done" : view === "done" ? "active" : null;
++  const otherCount = other === "done" ? doneMatches : other === "active" ? activeMatches : 0;
++  const hereCount = view === "done" ? doneMatches : view === "active" ? activeMatches : activeMatches + doneMatches;
++  if (!other || hereCount > 0 || otherCount === 0) return;
++
++  const name = other === "done" ? "已完成" : "未完成";
++  hintEl.append("「" + (view === "done" ? "已完成" : "未完成") + "」里没有匹配的，");
++  hintEl.append("「" + name + "」里有 " + otherCount + " 条。 ");
++  const jump = document.createElement("button");
++  jump.type = "button";
++  jump.textContent = "查看" + name;
++  jump.addEventListener("click", () => setView(other));
++  hintEl.append(jump);
++}
++
++function setView(next) {
++  view = next;
++  saveView();
++  render();
++}
++
++function toggle(id, done) {
++  const task = tasks.find(item => item.id === id);
++  if (!task) return;
++  const index = renderedOrder.indexOf(id);
++  task.done = done;
++  if (done) task.completedAt = Date.now();
++  else delete task.completedAt; // 取消勾选就清掉，重新完成时记新的时间
++  pendingFocus = { taskId: id, index: index < 0 ? undefined : index };
++  save();
++  render();
++}
++
++formEl.addEventListener("submit", event => {
+   event.preventDefault();
+-  const input = document.querySelector("#task-input");
+-  const title = input.value.trim();
++  const title = inputEl.value.trim();
+   if (!title) {
+-    input.setCustomValidity("请输入任务内容");
+-    input.reportValidity();
++    inputEl.setCustomValidity("请输入任务内容");
++    inputEl.reportValidity();
+     return;
+   }
+-  input.setCustomValidity("");
+-  tasks.push({ id: crypto.randomUUID(), title, done: false });
+-  save(); input.value = ""; render(); input.focus();
++  inputEl.setCustomValidity("");
++  const task = { id: newId(), title, done: false };
++  tasks.push(task);
++  save();
++  inputEl.value = "";
++
++  // 保证刚添加的任务一定看得见：当前视图或搜索会把它藏起来时，自动让开。
++  const hidden = (view === "done") || !matches(task);
++  if (hidden) {
++    query = "";
++    searchEl.value = "";
++    view = "active";
++    saveView();
++  }
++  pendingFocus = { input: true };
++  render();
+ });
+-document.querySelector("#task-input").addEventListener("input", event => {
++
++inputEl.addEventListener("input", event => {
+   event.currentTarget.setCustomValidity("");
+ });
++
++searchEl.addEventListener("input", event => {
++  query = event.currentTarget.value.trim().toLowerCase();
++  render();
++});
++
++for (const { name, el } of filterButtons) {
++  el.addEventListener("click", () => setView(name));
++}
++
+ render();
+ </script>
+ </body>

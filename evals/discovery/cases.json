@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "c94db861ede29f3d718ea6be1dc1b0f1875cb88a",
+  "fixture_sha256": {
+    "fixtures/contacts/example.csv": "4a1723b6a4d9bd621e67cd114c901518c4592c6beb749e64981ded0e6f032d62",
+    "fixtures/contacts/index.html": "4f0ea9d695bbcd50f97d0c4e4bf703d9a76bd6aa40da8589698392806c9faed0",
+    "fixtures/contacts/README.md": "dca9500e70d8f935ac9252fb0c302ddb3195997757952fc2e834db7916771301",
+    "fixtures/onboarding/example.csv": "93835859fe986d3150a3abd64673f49f2353db42046e0b7273ac33f06ee7779c",
+    "fixtures/onboarding/README.md": "a34ae0c1558bc542fefcef17e037e0948b762184b4564eece6be77d6f24cdcd1",
+    "fixtures/onboarding/receipt_summary.py": "80197f9fa8766e28350f5cc7a93691de4885477f86fe0a4a10a50d205db163d6"
+  },
+  "purpose": "Evaluate whether research discovers a worthwhile workflow improvement and carries it into the artifact, without requiring a particular feature or library.",
+  "cases": [
+    {
+      "id": "contacts-import",
+      "fixture": "fixtures/contacts",
+      "prompt": "这些联系人名单每次复制很麻烦，帮我做个从 CSV 导入的功能。",
+      "core_outcomes": [
+        "A user can import the provided example through the visible interface and find the resulting contact values.",
+        "Quoted comma-containing fields and non-ASCII text retain their actual values.",
+        "Existing contacts are not silently lost; the handling of duplicate entries and invalid input is understandable.",
+        "The feature runs locally without requiring an external service."
+      ],
+      "discovery_question": "Does investigated product behavior or an implementation contract reveal a useful way to reduce import effort or mistakes in this local contact workflow?",
+      "scope_guard": "Do not require a particular preview, mapping, deduplication or parser implementation. Compare useful behavior and its cost; adding all imaginable import features is not a success criterion."
+    },
+    {
+      "id": "newcomer-guide",
+      "fixture": "fixtures/onboarding",
+      "prompt": "帮我给这个小工具写一份新同事能自己上手的说明。",
+      "core_outcomes": [
+        "A fresh reader can locate the prerequisites, run the provided example and verify the actual output using the guide.",
+        "Commands, data requirements and output overwrite behavior agree with the supplied implementation.",
+        "Relevant failure recovery is usable; unsupported behavior is not invented.",
+        "The application code and supplied example data remain unchanged."
+      ],
+      "discovery_question": "Does investigating relevant onboarding or documentation practice lead to a useful improvement for a first-time reader, beyond an API flag inventory?",
+      "scope_guard": "No prescribed documentation framework, section count or source quota. Evaluate first successful use and an applicable recovery path."
+    }
+  ],
+  "provenance_rules": [
+    "Freeze prompts, fixture hashes and criteria before a trial; do not show graders' expectations to the implementation worker.",
+    "Keep evidence of actual source inspection separate from worker recollection. Label a source as confirmation if it did not introduce the idea.",
+    "An appropriate decision to retain the original approach can be useful research; do not invent a product addition to earn points.",
+    "Use new cases for forward testing. A repaired instruction replayed on its motivating case is a regression check, not independent evidence.",
+    "Record explicit skill loading separately from automatic invocation. Record all conditions and missing metadata."
+  ]
+}

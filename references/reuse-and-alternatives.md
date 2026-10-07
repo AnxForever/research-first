@@ -16,6 +16,15 @@ For each material feature, investigate the applicable sources:
 
 These sources answer different questions. A product demo does not establish implementation quality; an official API page does not show whether the workflow serves users. A whole-project comparison does not cover every material feature. Reuse valid prior research when it matches the feature and current versions, and research only changed or missing decisions. Mechanical edits do not require another survey.
 
+When an underspecified request leaves a material user-flow choice open, inspect a
+comparable product's relevant flow or an established artifact serving the same
+purpose. Follow the actual user step, feedback, and recovery behavior in official
+help, a demo, or an accessible interface. Keep documented behavior distinct from
+behavior you personally exercised. Connect the useful finding to this project's
+friction and cost before adopting, adapting, or rejecting it; similarity alone
+does not prove local demand. If no suitable flow is accessible, label that gap
+rather than substituting a package feature list or inventing an improvement.
+
 Search for both direct reuse and better approaches: a smaller dependency, a platform capability, an established composition, or a documented technique may fit better than adopting a whole project. For documents and other non-code work, look for authoritative materials, reusable structures, and relevant exemplars instead of forcing a package search.
 
 ## Frontend Discovery
@@ -38,6 +47,14 @@ Inspect enough primary material to support the claims that would drive adoption.
 - **Frontend fit:** verify styling control, composability, accessibility claims, animation behavior, and relevant performance constraints against primary evidence or a focused experiment.
 
 Record source links and the relevant version, revision, or date when behavior can drift. If a needed check is unavailable, mark it unverified and explain its effect on the recommendation. Never present a search result or remembered capability as a verified candidate.
+
+Apply the same standard to rejection. First identify the premise that excludes a
+credible option, then try to disprove that premise with primary documentation,
+relevant source, or a small probe. An absent mention, search snippet, or assumed
+maintenance cost cannot establish that a capability is unavailable. If unknown,
+state the uncertainty and compare verified tradeoffs; a local preference does not
+need an invented technical limitation. Keep this check on decision-changing claims,
+not every incidental sentence or every result in a search.
 
 ## Prove Fit at the Integration Boundary
 

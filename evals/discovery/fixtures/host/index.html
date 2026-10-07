@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><title>任务列表</title>
+<body><main><h1>我的任务</h1>
+<form id="task-form"><input aria-label="任务名称" placeholder="添加任务"><button type="submit" id="submit">提交</button></form>
+<nav aria-label="筛选"><button data-filter="all">全部</button><button data-filter="open">待办</button><button data-filter="done">已完成</button></nav>
+<ul id="tasks"><li data-state="open">任务 A</li><li data-state="done">任务 B</li><li data-state="open">任务 C</li></ul>
+<script>
+function getVisibleTasks(tasks, filter) {
+  if (filter === 'all') return tasks;
+  return tasks.filter((task) => task.dataset.state === filter);
+}
+</script></main></body></html>

@@ -1,0 +1,15 @@
+{
+  "purpose": "Frozen synthetic evaluation artifacts, including known failures; not recommended implementations.",
+  "files_sha256": {
+    "artifacts/contacts-baseline.patch": "e048246a0a68b85c872908677ccaa969dd28e20c9f9f7fd4157ef51255c3dc52",
+    "artifacts/onboarding-baseline.md": "88835f9b034e3b37840a657aba8c5cdaad0a947f0d44e5a6942768564d66cc50",
+    "artifacts/onboarding-candidate.md": "6265f5940d0a88f55806141e6bda50ab23a8a2147786b6243155b9dea6f33b1b",
+    "artifacts/reading-list-candidate.patch": "f8e34bc2f4137c802d475feec5f83ecad3826a2ba528017158e356dc31306a99"
+  },
+  "baseline_commit": "c94db861ede29f3d718ea6be1dc1b0f1875cb88a",
+  "candidate_skill_sha256": "c60d4f5186e388ad5f51bdca43b4b0091a12c576a4f132a37cc04f2bee022635",
+  "candidate_skill_lf_sha256": "c60d4f5186e388ad5f51bdca43b4b0091a12c576a4f132a37cc04f2bee022635",
+  "candidate_skill_hash_note": "candidate_skill_sha256 preserves actual trial bytes; candidate_skill_lf_sha256 permits checking equivalent text after checkout line-ending conversion.",
+  "candidate_reproduction_patch": "artifacts/skill-before-2026-10-03.patch",
+  "candidate_snapshot_note": "Historical 2026-10-02 candidate; not necessarily the current working-tree SKILL.md. Reconstruct from c94db86 plus candidate_reproduction_patch."
+}
