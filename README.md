@@ -27,6 +27,8 @@
 
 ## 快速开始
 
+准备上传到 **WorkBuddy 开放平台**时，使用[独立发布包说明](packaging/README.workbuddy.md)：包含构建命令、刊登文案和平台内验收清单。不要直接上传 `dist` 中的历史 ZIP。
+
 通过 Skills CLI 安装：
 
 2026-10-02 核实的 [`skills@1.7.0`](https://registry.npmjs.org/skills/1.7.0) 要求 **Node.js >=22.20.0**，已在 Node 22.21.1 验证发现。下面的命令未固定 CLI 版本；可用 `npx skills@1.7.0 add AnxForever/research-first` 复现已测版本，后续 CLI 的要求以其元数据为准。手动克隆方式不依赖 Node.js。

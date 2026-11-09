@@ -27,6 +27,8 @@ The same principle applies to backend work, architecture, integrations, document
 
 ## Quick start
 
+For the **WorkBuddy Open Platform**, see the [dedicated package guide](packaging/README.workbuddy.md) for the build command, listing copy, and runtime acceptance checklist. Build a fresh ZIP instead of uploading an old archive from `dist`.
+
 Install with the Skills CLI:
 
 As checked on 2026-10-02, [`skills@1.7.0`](https://registry.npmjs.org/skills/1.7.0)

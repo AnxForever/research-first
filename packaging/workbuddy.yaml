@@ -1,0 +1,14 @@
+name: research-first
+display_name: Research First｜先调研再实现
+display_name_en: Research First
+description: >-
+  在新功能、交互设计、技术选型或系统集成前，先理解目的与约束，调查已有方案和一手资料，
+  比较复用、改造与自研的取舍，再实施和验收；用户质疑方案时重新核查。
+  不用于普通事实问答或不改变行为的精确机械修改。
+description_zh: >-
+  先理解目的，调查现有方案与一手资料，呈现选项和取舍，再按任务分量实施与验证。
+description_en: >-
+  Research existing solutions and primary guidance before feature, design, or
+  integration decisions; compare options, respect constraints, and verify outcomes.
+version: 1.0.0
+author: AnxForever
