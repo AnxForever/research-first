@@ -133,7 +133,7 @@ Understand → Inspect context → Investigate solutions and guidance → Show c
 Before substantial implementation, the agent should provide a concise update proportional to the task:
 
 - **Purpose and constraints:** whose problem it addresses, what the project already has, and which assumptions remain open.
-- **Evidence and findings:** products, source, documentation, or experiments examined; which findings changed or supported the approach.
+- **Evidence and findings:** products, source, documentation, or experiments examined, preferring the host's available documentation tools and checking the version; which findings changed or supported the approach.
 - **Candidates and tradeoffs:** what can be reused, what adoption involves, and what remains custom.
 - **Recommendation and verification:** why the approach fits this project and how important failure cases will be checked.
 
@@ -153,12 +153,31 @@ After implementation, report what was delivered, what verification showed, and w
 
 - **Research substantial work.** New features, pages, interactions, integrations, and important implementation choices qualify. Clear, low-risk changes that only alter copy and introduce no behavior can proceed directly; a small code change that introduces behavior is still a substantial feature.
 - **Match evidence to the claim.** Support important claims with primary evidence. Add independent corroboration for high-risk claims or evidence disputes that could materially affect the outcome.
+- **Use available documentation tools first.** When the host exposes a documentation MCP such as Context7, a vendor SDK's documentation server, or a package registry, query the contract for the version the project actually uses; a default-branch or unversioned result is only a lead. If the tool is missing, cannot find the package, or serves a different version, disclose that and fall back to versioned official documentation, pinned source, or a local probe.
 - **Implementation includes routine choices.** Explain and proceed with reversible choices within the existing stack and scope. Ask about an unauthorized change to the product outcome, explicit constraints, paid/external commitments, or substantial migration or maintenance obligations. Respect explicit requests to present options or wait first.
 - **Respect constraints and match the task's scale.** Honor required technologies and restrictions such as no new dependencies. Small edits do not need an industry survey, and frontend work does not automatically need an animation library.
 - **Reuse valid evidence and revisit affected conclusions.** Do not repeat current research. When the user questions the work, seek evidence that could overturn the approach instead of only defending it.
 - **Disclose research gaps.** If browsing is unavailable, sources are insufficient, or a candidate remains unverified, distinguish facts, inferences, and assumptions. A failed search does not prove that no existing solution exists.
 
 These are working instructions for an agent. Assess compliance through the sources it actually examines, the options it shows, and its delivery evidence. Repository examples do not replace validation in the current project.
+
+## Research tools (optional)
+
+The skill itself does not require these tools. Without them, the agent should fall back to versioned official documentation, pinned source, package registries and local probes, and say which route produced the evidence. With a suitable tool installed, the same question is answered against the version the project actually runs.
+
+| Tool | Answers | Cannot replace |
+|---|---|---|
+| **Context7** | Current documented API, options and examples for a named package, addressable by version | Whether this app is wired correctly; a default entry may describe another major version |
+| **DeepWiki** | Architecture, data flow and rationale of a public repository | The exact behavior of a release; it indexes a repository, not a version |
+| **Exa** and similar web search | Which projects, discussions or pages address the problem | That the page was read, or that its claim is current |
+| **Package registries** (npm / PyPI / NuGet) | Versions, publish dates, license, dependencies, repository URL | Runtime behavior or integration cost |
+
+Install commands are in the [research tools guide](references/research-tools.md); they track vendor pages and should be re-checked against official documentation. A few expectations:
+
+- **A suggestion, not a prerequisite.** The agent should first check what the host already exposes and whether local evidence answers the question; it should propose a tool only when the missing tool would leave a decision-changing claim unverified.
+- **The decision is yours.** Adding an MCP server edits your global or project configuration, may start a local process, and sends queries to a third party. The skill requires the agent to state the tool, its scope, the API-key requirement and what leaves the machine, and to act only after you agree; a research or review request is not that agreement.
+- **Prefer the narrower scope.** A project-level `.mcp.json` over a user-wide change, and a read-only documentation lookup over a server that can act on repositories or accounts.
+- **Verify after installing.** A configuration entry is not working software: start a new session and make one call whose answer you can check, such as resolving a package the project uses and confirming the version segment exists.
 
 ## Optional Jev checks
 
@@ -192,7 +211,8 @@ cases, and raw results. The core workflow remains usable without Jev.
 |---|---|
 | [SKILL.md](SKILL.md) | Skill entry point: intent, research, selection, execution, and verification |
 | [Reuse and alternatives](references/reuse-and-alternatives.md) | Existing solutions, frontend resources, and choices before implementation |
-| [Search quality](references/search-quality.md) · [Research depth](references/adapting-depth.md) | Select evidence, scale investigation, and decide when to stop searching |
+| [Search quality](references/search-quality.md) · [Research depth](references/adapting-depth.md) | Select evidence, use documentation tools, scale investigation, and decide when to stop searching |
+| [Research tools](references/research-tools.md) | Check what the host already exposes, what each tool can establish, and how to propose an installation with consent |
 | [Problem expansion](references/problem-expansion.md) · [Contradictions](references/contradictions.md) | Uncover material questions and resolve conflicting evidence |
 | [Feature evidence ledger](references/feature-evidence-ledger.md) | Track each feature's evidence, decisions, and historical gaps |
 | [Execution evidence and acceptance](references/execution-evidence.md) | Diagnose access failures, define support boundaries, and check completed outcomes with counterexamples |

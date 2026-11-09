@@ -17,13 +17,46 @@ Search by problem, competing solution, failure mode, and authoritative owner. Av
 | Priority | Source | Use for |
 |---|---|---|
 | 1 | Local system/source of truth | Current behavior, constraints, data, conventions |
-| 2 | Official docs/specs/policies | Supported contract, security, compliance, lifecycle |
+| 2 | Official docs/specs/policies, including version-matched documentation tools | Supported contract, security, compliance, lifecycle |
 | 3 | Primary implementation/tests/data | Edge behavior, integration details, reproducibility |
 | 4 | Maintainer issues/releases/advisories | Known defects, drift, migration notes |
 | 5 | Independent expert analysis | Alternative interpretation and operational experience |
 | 6 | Blogs/forums/search summaries | Leads only; verify material claims |
 
 The order changes by task. Production telemetry may outrank official performance claims; a legal policy may outrank an implementation example.
+
+## Retrieval Tools and Version Scope
+
+Check the host's callable tools before falling back on memory or a generic web
+search. Documentation servers and MCP tools (for example Context7, DeepWiki, or a
+vendor SDK's documentation server), package registries, and installed package
+sources answer different questions. Prefer the route that observes the intended
+contract; a tool appearing in a listing is availability, not a successful lookup.
+With a library-documentation server such as Context7, resolve the library first,
+then query it; request the version segment when the catalog exposes one.
+
+1. Resolve the exact package. A lookup may return a similarly named project or an
+   umbrella website. Confirm that the identifier belongs to the library the
+   project actually imports.
+2. Request the installed or target version when the tool supports it: a
+   version-qualified library identifier, a tagged revision, or a version selector.
+   A default or main-branch result may document a different major version than
+   the project runs.
+3. Check what came back: source URL, tag or branch, date, and API shape against
+   the local manifest, lockfile or installed package. Treat unversioned results
+   as leads rather than version-matched evidence.
+4. Record the tool, query, identifier and version scope in the evidence note, so
+   a later reader can tell what was actually inspected.
+
+Send only the public identifier, API name or error text to an external
+documentation service; keep private source, data and messages local.
+
+A documentation tool states an intended contract. It does not show how this
+application is wired or whether the assembled feature works; keep the local
+integration check from [execution evidence](execution-evidence.md). When the
+needed tool is missing or broken, see [research tools](research-tools.md) for
+what to check first and how to propose an installation without changing the
+user's environment unasked.
 
 ## Quality Signals
 
@@ -110,6 +143,8 @@ Continue when:
 
 - First-result bias
 - GitHub-only or web-only evidence
+- Answering a library or API question from memory when a documentation tool was available
+- Treating a default-branch or unversioned documentation result as the installed version
 - Reading README without tests for behavior-critical claims
 - Hard-coded recency filters that age poorly
 - Treating popularity as correctness

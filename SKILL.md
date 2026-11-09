@@ -2,10 +2,12 @@
 name: research-first
 description: >-
   Research existing solutions and primary guidance before substantial feature,
-  design, or integration decisions. Use to turn compressed requirements into
-  evidence-backed options, or reassess an implementation the user questions.
-  Preserve explicit constraints and show tradeoffs before implementing. Skip
-  routine factual lookups and exact mechanical edits that add no behavior.
+  design, or integration decisions. Use the host's documentation tools (such as
+  Context7) at the project's version before answering library or API questions from
+  memory. Use to turn compressed requirements into evidence-backed options, or
+  reassess an implementation the user questions. Preserve explicit constraints and
+  show tradeoffs before implementing. Skip routine factual lookups and exact
+  mechanical edits that add no behavior.
 ---
 
 # Research First
@@ -40,6 +42,23 @@ Identify the open choice that could materially change the result. Start with the
 local stack, installed capabilities and relevant evidence; then inspect suitable
 existing solutions and primary guidance. Standard libraries and local modules
 count as reuse. Knowing how to write something does not settle whether to write it.
+
+Before answering a library, framework, SDK or platform question from memory or a
+generic web search, check which retrieval tools the host actually exposes. When a
+documentation server, package registry or vendor SDK tool is available, use it and
+ask for the version the project actually uses. Prefer a version-pinned identifier
+over a default or main branch, verify that the returned source matches that
+version, and treat the result as a lead until it does. Record the tool, identifier
+and version scope. If the tool is absent, misses the package or serves another
+version, fall back to official versioned documentation, the pinned source or a
+local probe, and say which route produced the evidence.
+
+Do not install a documentation or search tool, edit the user's MCP configuration
+or run a third-party setup command on your own initiative: those change the user's
+environment and send queries outside the project. Propose the tool with its scope,
+API-key requirement and data-egress implications, continue with available evidence, and
+install only after the user agrees. [research tools](references/research-tools.md)
+holds the check-first procedure, tool roles and current install commands.
 
 When designing a user flow, inspect a comparable product or established exemplar's
 action, feedback and recovery, separately from its implementation. Adapt what fits
@@ -145,6 +164,7 @@ behavior, not user preference or the superiority of a design.
 - Ambiguous intent or reassessment: [intent interpretation](references/intent-interpretation-evaluation.md).
 - Unfamiliar domain questions: [problem expansion](references/problem-expansion.md).
 - Source selection or conflicting evidence: [search quality](references/search-quality.md), [contradictions](references/contradictions.md).
+- Missing or failing documentation/search tooling: [research tools](references/research-tools.md). Check what the host already exposes, and propose a change to the user's configuration instead of making it.
 - Requested written report or durable project context: [report template](assets/research-report-template.md), [project context](assets/project-identity-card.md).
 - Similar worked examples: [research examples](references/research-examples.md), [case studies](references/case-studies.md). Their fictional scenarios are not current-task evidence.
 - If the user enables Jev: [checkpoint guide](references/jev-checkpoints.md). It is optional advice on supplied evidence, cannot authenticate sources or authorize work, and never replaces executed checks. The core workflow needs no API key.

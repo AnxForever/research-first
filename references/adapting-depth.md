@@ -53,6 +53,12 @@ custom work. Do not assume that knowing how to implement it makes reuse irreleva
 Mechanical edits and bounded diagnoses may stay local when local evidence resolves
 the question. Resume valid, feature-specific comparisons instead of repeating them.
 
+Standard and Deep work should use a version-matched documentation tool when the host
+provides one, and should check the installed version in the manifest or lockfile
+before trusting the result. Quick work may use a single documentation lookup or a
+local probe when that settles the bounded unknown; a source that serves another
+major version is a lead, not the answer.
+
 ### Writing or document work
 
 Treat supplied facts and source material as primary evidence. For substantial new

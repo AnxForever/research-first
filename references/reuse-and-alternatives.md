@@ -39,7 +39,7 @@ Do not install a general component or animation library merely because the task 
 
 Inspect enough primary material to support the claims that would drive adoption. Apply these checks where relevant; do not turn them into a fixed quota:
 
-- **Behavior:** read the relevant API documentation, examples, core source, and tests for behavior-critical claims. Distinguish observed behavior from documented promises and untested inference.
+- **Behavior:** read the relevant API documentation, examples, core source, and tests for behavior-critical claims. Use the host's documentation tool with a version-qualified identifier when one is available, and check that the returned source matches the target version (see [search quality](search-quality.md)). Distinguish observed behavior from documented promises and untested inference.
 - **Compatibility:** check the target framework/runtime versions, rendering model, dependency and peer-dependency requirements, and integration with the existing stack.
 - **Reuse rights:** inspect the license for the exact code, asset, or material being reused, including attribution or redistribution conditions. Public availability does not establish permission to copy.
 - **Maintenance:** check relevant releases, issue handling, and support for the needed API. Age, stars, or a recent commit alone do not establish suitability.
